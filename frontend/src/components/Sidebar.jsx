@@ -1,46 +1,26 @@
-import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
-  const { user } = useAuth();
   const location = useLocation();
 
-  const isActive = (path) => {
-    return location.pathname === path ? 'bg-blue-100 text-blue-600' : 'text-gray-700 hover:bg-gray-100';
-  };
-
-  const studentLinks = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/my-courses', label: 'My Courses', icon: '📚' },
-    { path: '/certificates', label: 'Certificates', icon: '🎓' },
-    { path: '/profile', label: 'Profile', icon: '👤' },
-  ];
-
-  const adminLinks = [
-    { path: '/admin/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/admin/users', label: 'Users', icon: '👥' },
-    { path: '/admin/courses', label: 'Courses', icon: '📚' },
-    { path: '/admin/reports', label: 'Reports', icon: '📈' },
-  ];
-
-  const links = user?.role === 'admin' ? adminLinks : studentLinks;
+  const linkClass = (path) =>
+    `block px-3 py-2 rounded-md text-sm ${
+      location.pathname === path
+        ? "bg-primary text-white"
+        : "hover:bg-gray-100 dark:hover:bg-gray-700"
+    }`;
 
   return (
-    <aside className="w-64 bg-white shadow-lg h-screen sticky top-0">
-      <div className="p-4">
-        <nav className="space-y-2">
-          {links.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${isActive(link.path)}`}
-            >
-              <span className="text-xl">{link.icon}</span>
-              <span className="font-medium">{link.label}</span>
-            </Link>
-          ))}
-        </nav>
-      </div>
+    <aside className="w-64 bg-white dark:bg-gray-800 min-h-screen p-6 shadow-sm">
+      <nav className="space-y-2">
+        <Link to="/dashboard" className={linkClass("/dashboard")}>
+          My Courses
+        </Link>
+
+        <Link to="/admin" className={linkClass("/admin")}>
+          Admin Panel
+        </Link>
+      </nav>
     </aside>
   );
 };

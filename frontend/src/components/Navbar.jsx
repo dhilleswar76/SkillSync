@@ -1,52 +1,31 @@
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useContext } from "react";
+import { ThemeContext } from "../context/ThemeContext";
+import { AuthContext } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { darkMode, setDarkMode } = useContext(ThemeContext);
+  const { user, logout } = useContext(AuthContext);
 
   return (
-    <nav className="bg-white shadow-lg">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-bold text-blue-600">
-            Student Portal
-          </Link>
+    <nav className="bg-white dark:bg-gray-800 shadow p-4 flex justify-between items-center">
+      <Link to="/" className="text-xl font-semibold text-primary">
+        SkillSync
+      </Link>
 
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
-                <span className="text-gray-700">Welcome, {user?.name}</span>
-                <Link
-                  to={user?.role === 'admin' ? '/admin/dashboard' : '/dashboard'}
-                  className="text-gray-700 hover:text-blue-600"
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={logout}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-gray-700 hover:text-blue-600"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
+      <div className="flex gap-4 items-center">
+        <button
+          onClick={() => setDarkMode(!darkMode)}
+          className="px-3 py-1 bg-primary text-white rounded"
+        >
+          {darkMode ? "Light" : "Dark"}
+        </button>
+
+        {user && (
+          <button onClick={logout} className="text-red-500">
+            Logout
+          </button>
+        )}
       </div>
     </nav>
   );

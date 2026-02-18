@@ -8,7 +8,26 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or Postman)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = [
+      "http://localhost:3000",
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+    
+    // Check if origin matches allowed origins or is a Vercel deployment
+    const isAllowed = allowedOrigins.includes(origin) || 
+                      origin.includes('vercel.app') ||
+                      origin.includes('skill-sync');
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

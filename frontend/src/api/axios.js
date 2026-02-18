@@ -1,7 +1,11 @@
 import axios from "axios";
 
+const baseURL = import.meta.env.MODE === "production"
+  ? "https://skillsync-wi9y.onrender.com/api"
+  : "http://localhost:5000/api";
+
 const instance = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL,
 });
 
 instance.interceptors.request.use((config) => {

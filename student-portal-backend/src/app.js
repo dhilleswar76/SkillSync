@@ -33,8 +33,19 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Request logging middleware
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path}`, req.body);
+  next();
+});
+
 // API Documentation
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Root route
+app.get("/", (req, res) => {
+  res.json({ message: "SkillSync API is running", version: "1.0.0" });
+});
 
 // Health check route
 app.get("/api/health", (req, res) => {
@@ -50,6 +61,15 @@ app.use("/api/certificates", require("./routes/certificateRoutes"));
 app.use("/api/comments", require("./routes/commentRoutes"));
 app.use("/api/quiz", require("./routes/quizRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+
+// 404 handler for undefined routes
+app.use((req, res, next) => {
+  res.status(404).json({ 
+    message: "Route not found",
+    path: req.path,
+    method: req.method
+  });
+});
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

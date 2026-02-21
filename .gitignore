@@ -68,9 +68,6 @@ Thumbs.db
 *.temp
 .cache/
 
-# Docker
-.dockerignore
-
 # Uploads
 uploads/
 public/uploads/

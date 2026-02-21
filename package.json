@@ -1,0 +1,30 @@
+{
+  "name": "student-portal-mern",
+  "version": "1.0.0",
+  "description": "Full-stack MERN learning management system",
+  "scripts": {
+    "install-backend": "cd student-portal-backend && npm install",
+    "install-frontend": "cd frontend && npm install",
+    "install-all": "npm run install-backend && npm run install-frontend",
+    "backend": "cd student-portal-backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "seed": "cd student-portal-backend && npm run seed",
+    "test-backend": "cd student-portal-backend && npm test",
+    "build-frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "mern",
+    "mongodb",
+    "express",
+    "react",
+    "nodejs",
+    "learning-management-system",
+    "education"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

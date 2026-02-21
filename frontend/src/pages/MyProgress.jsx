@@ -1,8 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import ProgressBar from "../components/ProgressBar";
+import { AuthContext } from "../context/AuthContext";
 
 const MyProgress = () => {
+  const { user } = useContext(AuthContext);
   const [progressData, setProgressData] = useState([]);
   const [stats, setStats] = useState({
     totalCourses: 0,
@@ -12,18 +15,68 @@ const MyProgress = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  // Course data matching CourseView
+  const courseData = {
+    'dsa-fundamentals': {
+      title: 'Data Structures & Algorithms Fundamentals',
+      totalTopics: 9, // 3+3+3
+      totalModules: 3,
+      icon: '🎯',
+    },
+    'react-mastery': {
+      title: 'React.js Complete Guide',
+      totalTopics: 4, // 2+2
+      totalModules: 2,
+      icon: '⚛️',
+    },
+  };
+
   useEffect(() => {
-    const fetchProgress = async () => {
+    const calculateProgress = () => {
       try {
-        const res = await axios.get("/progress");
-        setProgressData(res.data);
+        // Get enrolled courses
+        const enrolledCourseIds = user?.enrolledCourses || [];
+        
+        // Calculate progress for each enrolled course
+        const progressArray = enrolledCourseIds.map(courseId => {
+          const course = courseData[courseId];
+          if (!course) return null;
+
+          // Get completed topics from localStorage (would be from backend in production)
+          const completedTopicsKey = `completedTopics_${courseId}`;
+          const completedTopics = JSON.parse(localStorage.getItem(completedTopicsKey) || '[]');
+          
+          // Get quiz scores from localStorage
+          const quizScoresKey = `quizScores_${courseId}`;
+          const quizScores = JSON.parse(localStorage.getItem(quizScoresKey) || '{}');
+          const completedQuizzes = Object.keys(quizScores).length;
+          
+          // Calculate progress percentage
+          const topicProgress = course.totalTopics > 0 
+            ? (completedTopics.length / course.totalTopics) * 100 
+            : 0;
+          
+          return {
+            _id: courseId,
+            courseId: courseId,
+            courseName: course.title,
+            icon: course.icon,
+            totalTopics: course.totalTopics,
+            completedTopics: completedTopics.length,
+            totalModules: course.totalModules,
+            completedQuizzes: completedQuizzes,
+            progress: Math.round(topicProgress),
+          };
+        }).filter(Boolean);
+        
+        setProgressData(progressArray);
         
         // Calculate stats
-        const total = res.data.length;
-        const completed = res.data.filter(p => p.progress >= 100).length;
-        const inProgress = res.data.filter(p => p.progress > 0 && p.progress < 100).length;
+        const total = progressArray.length;
+        const completed = progressArray.filter(p => p.progress >= 100).length;
+        const inProgress = progressArray.filter(p => p.progress > 0 && p.progress < 100).length;
         const avgProgress = total > 0 
-          ? res.data.reduce((sum, p) => sum + (p.progress || 0), 0) / total 
+          ? progressArray.reduce((sum, p) => sum + (p.progress || 0), 0) / total 
           : 0;
         
         setStats({
@@ -33,14 +86,14 @@ const MyProgress = () => {
           averageProgress: Math.round(avgProgress),
         });
       } catch (error) {
-        console.error("Error fetching progress:", error);
+        console.error("Error calculating progress:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProgress();
-  }, []);
+    calculateProgress();
+  }, [user]);
 
   if (loading) {
     return (
@@ -101,22 +154,35 @@ const MyProgress = () => {
             <p className="text-gray-600 dark:text-gray-400 text-lg mb-2">
               No courses enrolled yet
             </p>
-            <p className="text-gray-500 dark:text-gray-500 text-sm">
-              Start learning by enrolling in courses from the dashboard
+            <p className="text-gray-500 dark:text-gray-500 text-sm mb-6">
+              Start learning by enrolling in courses from our catalog
             </p>
+            <Link
+              to="/all-courses"
+              className="inline-block px-6 py-3 bg-gradient-to-r from-primary to-coral text-white rounded-lg font-bold shadow-lg hover:shadow-xl transition"
+            >
+              Browse All Courses →
+            </Link>
           </div>
         ) : (
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
             {progressData.map((item) => (
-              <div key={item._id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+              <Link
+                key={item._id}
+                to={`/course/${item.courseId}`}
+                className="block p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition"
+              >
                 <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
-                      {item.courseName || "Course"}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      {item.lessonsCompleted || 0} of {item.totalLessons || 0} lessons completed
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{item.icon}</span>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+                        {item.courseName}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {item.completedTopics} of {item.totalTopics} topics completed • {item.completedQuizzes}/{item.totalModules} quizzes done
+                      </p>
+                    </div>
                   </div>
                   {item.progress >= 100 ? (
                     <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold rounded-full">
@@ -133,7 +199,7 @@ const MyProgress = () => {
                   )}
                 </div>
                 <ProgressBar value={item.progress || 0} />
-              </div>
+              </Link>
             ))}
           </div>
         )}

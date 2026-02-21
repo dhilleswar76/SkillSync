@@ -8,7 +8,6 @@ import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import StudentDashboard from "./pages/StudentDashboard";
-import CourseDetails from "./pages/CourseDetails";
 import LessonView from "./pages/LessonView";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
@@ -34,7 +33,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<StudentDashboard />} />
-            <Route path="/course/:id" element={<CourseDetails />} />
+            <Route path="/course/:courseId" element={<CourseView />} />
             <Route path="/lesson/:id" element={<LessonView />} />
             <Route path="/progress" element={<MyProgress />} />
             <Route path="/certificates" element={<Certificates />} />
@@ -43,7 +42,6 @@ function App() {
             <Route path="/sheets" element={<CodingSheets />} />
             <Route path="/roadmaps" element={<Roadmaps />} />
             <Route path="/all-courses" element={<AllCourses />} />
-            <Route path="/course/:courseId" element={<CourseView />} />
             <Route 
               path="/admin" 
               element={

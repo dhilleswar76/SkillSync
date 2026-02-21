@@ -32,47 +32,55 @@ const Login = () => {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="max-w-md mx-auto mt-20 bg-white dark:bg-gray-800 p-8 rounded-xl shadow"
-    >
-      <h2 className="text-xl font-semibold mb-6">Login</h2>
+    <div className="max-w-md mx-auto mt-20 px-4">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+        <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">Welcome Back</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">Login to continue learning</p>
 
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 rounded">
-          {error}
-        </div>
-      )}
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-primary border border-red-200 dark:border-red-800 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
-      <input
-        type="email"
-        placeholder="Email"
-        className="w-full p-3 border rounded mb-4"
-        value={form.email}
-        onChange={(e) =>
-          setForm({ ...form, email: e.target.value })
-        }
-        required
-      />
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              value={form.email}
+              onChange={(e) =>
+                setForm({ ...form, email: e.target.value })
+              }
+              required
+            />
+          </div>
 
-      <input
-        type="password"
-        placeholder="Password"
-        className="w-full p-3 border rounded mb-4"
-        value={form.password}
-        onChange={(e) =>
-          setForm({ ...form, password: e.target.value })
-        }
-        required
-      />
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              value={form.password}
+              onChange={(e) =>
+                setForm({ ...form, password: e.target.value })
+              }
+              required
+            />
+          </div>
 
-      <button 
-        className="w-full bg-primary text-white p-3 rounded disabled:opacity-50"
-        disabled={loading}
-      >
-        {loading ? "Logging in..." : "Login"}
-      </button>
-    </form>
+          <button 
+            className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

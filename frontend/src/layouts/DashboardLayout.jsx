@@ -8,7 +8,7 @@ const DashboardLayout = () => {
       <Navbar />
       <div className="flex">
         <Sidebar />
-        <main className="flex-1 p-8 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <main className="flex-1 p-8 bg-background-light dark:bg-background-dark min-h-screen">
           <Outlet />
         </main>
       </div>

@@ -16,11 +16,16 @@ const StudentDashboard = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold mb-6">
-        My Courses
-      </h1>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+          My Courses
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Continue your learning journey
+        </p>
+      </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {courses.map((course) => (
           <CourseCard key={course._id} course={course} />
         ))}

@@ -10,6 +10,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import CourseDetails from "./pages/CourseDetails";
 import LessonView from "./pages/LessonView";
 import AdminDashboard from "./pages/AdminDashboard";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
             <Route path="/course/:id" element={<CourseDetails />} />
             <Route path="/lesson/:id" element={<LessonView />} />
             <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
 

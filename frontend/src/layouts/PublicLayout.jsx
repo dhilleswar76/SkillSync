@@ -5,7 +5,7 @@ const PublicLayout = () => {
   return (
     <>
       <Navbar />
-      <main className="max-w-6xl mx-auto p-6">
+      <main className="min-h-screen">
         <Outlet />
       </main>
     </>

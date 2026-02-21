@@ -1,6 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Landing = () => {
+  const { user } = useContext(AuthContext);
+
+  // If user is logged in, redirect to dashboard
+  if (user) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return (
     <section className="min-h-screen bg-gradient-to-br from-background-light via-white to-red-50 dark:from-background-dark dark:via-gray-900 dark:to-red-950">
       <div className="max-w-6xl mx-auto px-4 pt-20 pb-16 text-center">

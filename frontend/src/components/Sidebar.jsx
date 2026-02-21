@@ -1,7 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user } = useContext(AuthContext);
 
   const linkClass = (path) =>
     `block px-4 py-3 rounded-xl text-sm font-medium transition-all ${location.pathname === path
@@ -21,13 +24,46 @@ const Sidebar = () => {
           📚 My Courses
         </Link>
 
+        <Link to="/progress" className={linkClass("/progress")}>
+          📊 My Progress
+        </Link>
+
+        <Link to="/certificates" className={linkClass("/certificates")}>
+          🎓 Certificates
+        </Link>
+
         <Link to="/profile" className={linkClass("/profile")}>
           👤 Profile
         </Link>
 
-        <Link to="/admin" className={linkClass("/admin")}>
-          🛠️ Admin Panel
+        {/* Practice Section */}
+        <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+            Practice
+          </h2>
+        </div>
+
+        <Link to="/practice" className={linkClass("/practice")}>
+          💻 Code Practice
         </Link>
+
+        <Link to="/sheets" className={linkClass("/sheets")}>
+          📋 Coding Sheets
+        </Link>
+
+        {/* Admin Only Section */}
+        {user?.role === "admin" && (
+          <>
+            <div className="pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                Admin
+              </h2>
+            </div>
+            <Link to="/admin" className={linkClass("/admin")}>
+              🛠️ Admin Panel
+            </Link>
+          </>
+        )}
       </nav>
     </aside>
   );

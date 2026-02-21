@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import PublicLayout from "./layouts/PublicLayout";
 import DashboardLayout from "./layouts/DashboardLayout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
@@ -11,6 +12,10 @@ import CourseDetails from "./pages/CourseDetails";
 import LessonView from "./pages/LessonView";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
+import MyProgress from "./pages/MyProgress";
+import Certificates from "./pages/Certificates";
+import CodePractice from "./pages/CodePractice";
+import CodingSheets from "./pages/CodingSheets";
 
 function App() {
   return (
@@ -28,8 +33,19 @@ function App() {
             <Route path="/dashboard" element={<StudentDashboard />} />
             <Route path="/course/:id" element={<CourseDetails />} />
             <Route path="/lesson/:id" element={<LessonView />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/progress" element={<MyProgress />} />
+            <Route path="/certificates" element={<Certificates />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/practice" element={<CodePractice />} />
+            <Route path="/sheets" element={<CodingSheets />} />
+            <Route 
+              path="/admin" 
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
+              } 
+            />
           </Route>
         </Route>
 

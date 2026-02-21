@@ -16,6 +16,9 @@ import MyProgress from "./pages/MyProgress";
 import Certificates from "./pages/Certificates";
 import CodePractice from "./pages/CodePractice";
 import CodingSheets from "./pages/CodingSheets";
+import Roadmaps from "./pages/Roadmaps";
+import AllCourses from "./pages/AllCourses";
+import CourseView from "./pages/CourseView";
 
 function App() {
   return (
@@ -38,6 +41,9 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/practice" element={<CodePractice />} />
             <Route path="/sheets" element={<CodingSheets />} />
+            <Route path="/roadmaps" element={<Roadmaps />} />
+            <Route path="/all-courses" element={<AllCourses />} />
+            <Route path="/course/:courseId" element={<CourseView />} />
             <Route 
               path="/admin" 
               element={

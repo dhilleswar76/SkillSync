@@ -44,10 +44,18 @@ const Landing = () => {
         <div className="mt-20 grid md:grid-cols-3 gap-8 text-left">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <span className="text-2xl">�️</span>
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Career Roadmaps</h3>
+            <p className="text-gray-600 dark:text-gray-300">Follow structured learning paths for DSA, Web Dev, ML, Mobile, DevOps & more.</p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
               <span className="text-2xl">📚</span>
             </div>
-            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Structured Learning</h3>
-            <p className="text-gray-600 dark:text-gray-300">Follow curated learning paths designed for maximum retention and skill development.</p>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Comprehensive Courses</h3>
+            <p className="text-gray-600 dark:text-gray-300">Learn with theory blogs, video tutorials, and hands-on quizzes for every module.</p>
           </div>
 
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
@@ -60,10 +68,26 @@ const Landing = () => {
 
           <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <span className="text-2xl">💻</span>
+            </div>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Code Practice</h3>
+            <p className="text-gray-600 dark:text-gray-300">Solve problems on LeetCode & GFG with curated sheets and coding challenges.</p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
               <span className="text-2xl">🎯</span>
             </div>
+            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Quiz & Assessment</h3>
+            <p className="text-gray-600 dark:text-gray-300">Test your knowledge with module-wise quizzes and score-based evaluations.</p>
+          </div>
+
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-4">
+              <span className="text-2xl">🎓</span>
+            </div>
             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-white">Earn Certificates</h3>
-            <p className="text-gray-600 dark:text-gray-300">Complete courses and earn certificates to showcase your achievements.</p>
+            <p className="text-gray-600 dark:text-gray-300">Complete courses with passing scores and earn certificates to showcase achievements.</p>
           </div>
         </div>
       </div>

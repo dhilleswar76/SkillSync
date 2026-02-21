@@ -24,12 +24,20 @@ const Sidebar = () => {
           📚 My Courses
         </Link>
 
+        <Link to="/all-courses" className={linkClass("/all-courses")}>
+          🎓 All Courses
+        </Link>
+
+        <Link to="/roadmaps" className={linkClass("/roadmaps")}>
+          🗺️ Career Roadmaps
+        </Link>
+
         <Link to="/progress" className={linkClass("/progress")}>
           📊 My Progress
         </Link>
 
         <Link to="/certificates" className={linkClass("/certificates")}>
-          🎓 Certificates
+          🏆 Certificates
         </Link>
 
         <Link to="/profile" className={linkClass("/profile")}>

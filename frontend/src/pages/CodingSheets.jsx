@@ -1,11 +1,24 @@
 import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import CodeEditor from '../components/CodeEditor';
 
 const CodingSheets = () => {
   const { user } = useContext(AuthContext);
   const [selectedSheet, setSelectedSheet] = useState('dsa');
   const [activeCategory, setActiveCategory] = useState(null);
+  const [selectedProblem, setSelectedProblem] = useState(null);
+  const [showCodeEditor, setShowCodeEditor] = useState(false);
+
+  const openCodeEditor = (problem) => {
+    setSelectedProblem(problem);
+    setShowCodeEditor(true);
+  };
+
+  const closeCodeEditor = () => {
+    setShowCodeEditor(false);
+    setSelectedProblem(null);
+  };
 
   const sheetCategories = {
     dsa: {
@@ -14,72 +27,110 @@ const CodingSheets = () => {
         {
           id: 'striver-sde',
           name: 'Striver\'s SDE Sheet',
-          description: '180 most important DSA problems for placements',
-          problems: 180,
+          description: '191 handpicked top coding interview problems for product-based companies',
+          problems: 191,
           completed: 45,
           difficulty: 'mixed',
           icon: '🎯',
           color: 'from-primary to-coral',
+          source: 'https://takeuforward.org/dsa/strivers-sde-sheet-top-coding-interview-problems',
+          categories: ['Arrays', 'Linked List', 'Greedy', 'Recursion', 'Binary Search', 'Heaps', 'Binary Trees', 'BST', 'Graphs', 'Dynamic Programming', 'Stacks & Queues', 'Strings', 'Tries', 'Bit Manipulation'],
         },
         {
           id: 'striver-a2z',
           name: 'Striver\'s A2Z DSA Course',
-          description: 'Complete DSA roadmap from basics to advanced',
-          problems: 456,
+          description: 'Learn DSA from A to Z with 455 problems - Complete free course',
+          problems: 455,
           completed: 89,
           difficulty: 'mixed',
           icon: '📚',
           color: 'from-blue-500 to-indigo-500',
+          source: 'https://takeuforward.org/dsa/strivers-a2z-sheet-learn-dsa-a-to-z',
+          categories: ['Learn the Basics', 'Sorting', 'Arrays', 'Binary Search', 'Strings', 'Linked List', 'Recursion', 'Bit Manipulation', 'Stack & Queues', 'Heaps', 'Greedy', 'Binary Trees', 'BST', 'Graphs', 'Dynamic Programming', 'Tries'],
         },
         {
           id: 'neetcode-150',
           name: 'Neetcode 150',
-          description: 'Curated list of 150 LeetCode problems',
+          description: 'Curated 150 LeetCode problems for interview preparation',
           problems: 150,
           completed: 62,
           difficulty: 'mixed',
           icon: '🎓',
           color: 'from-green-500 to-emerald-500',
+          source: 'https://codolio.com/question-tracker/sheet/neetcode-150',
+          categories: ['Arrays & Hashing (9)', 'Two Pointers (5)', 'Sliding Window (6)', 'Stack (7)', 'Binary Search (7)', 'Linked List (11)', 'Trees (15)', 'Heap/Priority Queue (7)', 'Backtracking (9)', 'Tries (3)', 'Graphs (13)', 'Advanced Graphs (6)', '1-D DP (12)', '2-D DP (11)', 'Greedy (8)', 'Intervals (6)', 'Math & Geometry (8)', 'Bit Manipulation (7)'],
         },
         {
           id: 'blind-75',
           name: 'Blind 75',
-          description: 'Must-do problems for coding interviews',
+          description: '75 frequently asked LeetCode problems - Must solve for interviews',
           problems: 75,
           completed: 52,
           difficulty: 'mixed',
           icon: '🚀',
           color: 'from-purple-500 to-pink-500',
+          source: 'https://takeuforward.org/dsa/blind-75-leetcode-problems-detailed-video-solutions',
+          categories: ['Array', 'Binary', 'Dynamic Programming', 'Graph', 'Interval', 'Linked List', 'Matrix', 'String', 'Tree', 'Heap'],
         },
         {
           id: 'love-babbar',
           name: 'Love Babbar DSA Sheet',
-          description: '450 coding questions for complete preparation',
-          problems: 450,
+          description: '430 coding questions covering almost every DSA concept',
+          problems: 430,
           completed: 87,
           difficulty: 'mixed',
           icon: '💪',
           color: 'from-orange-500 to-red-500',
+          source: 'https://codolio.com/question-tracker/sheet/love-babbar-sheet',
+          categories: ['Array (35)', 'Matrix (10)', 'String (41)', 'Searching & Sorting (31)', 'LinkedList (34)', 'Binary Search Trees (22)', 'BackTracking (19)', 'Heap (18)', 'Graph (42)', 'Dynamic Programming (59)', 'Binary Trees (32)', 'Greedy (35)', 'Stacks & Queues (36)', 'Trie (6)', 'Bit Manipulation (10)'],
         },
         {
           id: 'raising-minds',
-          name: 'Raising Minds DSA Sheet',
-          description: 'Curated DSA problems for competitive programming',
+          name: 'Rising Brain DSA Sheet',
+          description: 'Pattern-wise DSA problems for mastering coding interviews',
           problems: 300,
           completed: 42,
           difficulty: 'mixed',
-          icon: '🎓',
+          icon: '🧠',
           color: 'from-teal-500 to-cyan-500',
+          source: 'https://www.risingbrain.org/sheet',
+          categories: ['Array (Two-Pointer, Sliding Window, Prefix Sum)', 'Binary Search', 'Stack (Monotonic, Expression)', 'Linked List', 'HashMap', 'Heap', 'Recursion', 'Tree & BST', 'Graph (BFS, DFS, Topological Sort)', 'Backtracking', 'Greedy', 'Dynamic Programming', 'Trie', 'Bit Manipulation'],
         },
         {
           id: 'tuf-cp-sheet',
           name: 'TUF CP Sheet',
-          description: 'TakeUForward\'s competitive programming sheet',
+          description: 'Competitive programming roadmap with 250+ problems',
           problems: 250,
           completed: 58,
           difficulty: 'mixed',
-          icon: '🚀',
+          icon: '⚡',
           color: 'from-violet-500 to-purple-500',
+          source: 'https://takeuforward.org/competitive-programming/strivers-cp-sheet',
+          categories: ['Mathematics', 'Sorting', 'Advanced Arrays', 'Stacks & Queues', 'Heaps', 'Tries', 'Graphs', 'Advanced DP', 'Segment Trees', 'Fenwick Trees'],
+        },
+        {
+          id: 'striver-79',
+          name: 'Striver 79 Sheet',
+          description: '79 last moment revision problems to ace DSA interviews',
+          problems: 79,
+          completed: 25,
+          difficulty: 'mixed',
+          icon: '⏰',
+          color: 'from-red-500 to-orange-500',
+          source: 'https://takeuforward.org/dsa/strivers-79-last-moment-dsa-sheet-ace-interviews',
+          categories: ['Quick Revision Arrays', 'Important Trees Problems', 'Graph Essentials', 'DP Must-Dos', 'String Patterns', 'Binary Search Critical'],
+        },
+        {
+          id: 'top-interview-150',
+          name: 'Top Interview 150',
+          description: 'LeetCode\'s most frequently asked interview questions',
+          problems: 150,
+          completed: 48,
+          difficulty: 'mixed',
+          icon: '💼',
+          color: 'from-indigo-500 to-blue-500',
+          source: 'https://codolio.com/question-tracker/sheet/top-interview-150-leetcode',
+          categories: ['Array / String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hashmap', 'Intervals', 'Stack', 'Linked List', 'Binary Tree', 'Graph', 'Backtracking', 'DP', 'Binary Search'],
         },
       ]
     },
@@ -89,32 +140,38 @@ const CodingSheets = () => {
         {
           id: 'frontend-mastery',
           name: 'Frontend Mastery',
-          description: 'HTML, CSS, JavaScript, React challenges',
+          description: 'Complete HTML, CSS, JavaScript, and React challenges',
           problems: 100,
           completed: 35,
           difficulty: 'mixed',
           icon: '🎨',
           color: 'from-blue-400 to-cyan-400',
+          source: 'https://www.w3schools.com/html/',
+          categories: ['HTML5 Semantics', 'CSS3 & Flexbox', 'Grid Layout', 'JavaScript ES6+', 'React Components', 'Responsive Design', 'Web APIs', 'Performance Optimization'],
         },
         {
           id: 'backend-excellence',
           name: 'Backend Excellence',
-          description: 'Node.js, Express, MongoDB, APIs',
+          description: 'Master Node.js, Express, MongoDB, and REST APIs',
           problems: 80,
           completed: 22,
           difficulty: 'mixed',
           icon: '⚙️',
           color: 'from-green-600 to-teal-600',
+          source: 'https://www.w3schools.com/nodejs/',
+          categories: ['Node.js Basics', 'Express.js', 'MongoDB & Mongoose', 'REST API Design', 'Authentication & JWT', 'Middleware', 'Error Handling', 'Testing'],
         },
         {
           id: 'fullstack-projects',
           name: 'Full Stack Projects',
-          description: 'End-to-end project implementations',
+          description: 'Build production-ready MERN & MEAN applications',
           problems: 50,
           completed: 12,
           difficulty: 'hard',
           icon: '🔥',
           color: 'from-red-500 to-orange-500',
+          source: 'https://www.geeksforgeeks.org/mern-stack/',
+          categories: ['MERN Stack', 'Authentication Systems', 'Real-time Features', 'Payment Integration', 'Cloud Deployment', 'CI/CD Pipeline'],
         },
       ]
     },
@@ -124,42 +181,50 @@ const CodingSheets = () => {
         {
           id: 'ml-basics',
           name: 'ML Fundamentals',
-          description: 'Core ML algorithms and concepts',
+          description: 'Core machine learning algorithms and implementations',
           problems: 60,
           completed: 18,
           difficulty: 'medium',
           icon: '🧠',
           color: 'from-purple-500 to-indigo-500',
+          source: 'https://www.geeksforgeeks.org/machine-learning/',
+          categories: ['Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forest', 'SVM', 'K-Means Clustering', 'PCA', 'Model Evaluation'],
         },
         {
           id: 'deep-learning',
           name: 'Deep Learning',
-          description: 'Neural Networks, CNN, RNN, Transformers',
+          description: 'Neural networks, CNN, RNN, and Transformers',
           problems: 75,
           completed: 15,
           difficulty: 'hard',
           icon: '🔬',
           color: 'from-indigo-600 to-purple-600',
+          source: 'https://www.geeksforgeeks.org/deep-learning-tutorial/',
+          categories: ['Neural Networks', 'CNN Architectures', 'RNN & LSTM', 'GANs', 'Transfer Learning', 'Attention Mechanisms', 'Transformers', 'Model Optimization'],
         },
         {
           id: 'nlp-sheet',
           name: 'NLP & LLMs',
-          description: 'Natural Language Processing projects',
+          description: 'Natural language processing and large language models',
           problems: 50,
           completed: 10,
           difficulty: 'hard',
           icon: '💬',
           color: 'from-pink-500 to-rose-500',
+          source: 'https://www.geeksforgeeks.org/natural-language-processing-nlp-tutorial/',
+          categories: ['Text Preprocessing', 'Word Embeddings', 'Sequence Models', 'BERT & GPT', 'Sentiment Analysis', 'NER', 'Machine Translation', 'Question Answering'],
         },
         {
           id: 'cv-sheet',
           name: 'Computer Vision',
-          description: 'Image processing and vision tasks',
+          description: 'Image processing and computer vision tasks',
           problems: 55,
           completed: 8,
           difficulty: 'hard',
           icon: '👁️',
           color: 'from-cyan-500 to-blue-500',
+          source: 'https://www.geeksforgeeks.org/computer-vision/',
+          categories: ['Image Processing', 'Object Detection', 'Image Segmentation', 'Face Recognition', 'OCR', 'Image Classification', 'Video Analysis', 'OpenCV'],
         },
       ]
     },
@@ -169,52 +234,62 @@ const CodingSheets = () => {
         {
           id: 'os-sheet',
           name: 'Operating Systems',
-          description: 'Process, threads, memory, scheduling',
+          description: 'Most asked OS interview questions with detailed explanations',
           problems: 90,
           completed: 42,
           difficulty: 'medium',
           icon: '💻',
           color: 'from-gray-600 to-gray-800',
+          source: 'https://takeuforward.org/operating-system/most-asked-operating-system-interview-questions',
+          categories: ['Process Management', 'Threads & Concurrency', 'CPU Scheduling', 'Deadlocks', 'Memory Management', 'Virtual Memory', 'File Systems', 'I/O Systems', 'System Calls'],
         },
         {
           id: 'cn-sheet',
           name: 'Computer Networks',
-          description: 'OSI, TCP/IP, protocols, security',
+          description: 'Essential networking concepts and interview questions',
           problems: 85,
           completed: 38,
           difficulty: 'medium',
           icon: '🌐',
           color: 'from-blue-600 to-indigo-600',
+          source: 'https://takeuforward.org/computer-network/most-asked-computer-networks-interview-questions',
+          categories: ['OSI & TCP/IP Model', 'HTTP/HTTPS', 'TCP vs UDP', 'Routing Protocols', 'DNS', 'Network Security', 'Subnetting', 'Socket Programming', 'VPN & Firewall'],
         },
         {
           id: 'dbms-sheet',
           name: 'Database Management',
-          description: 'SQL, normalization, transactions',
+          description: 'Complete DBMS interview preparation with SQL queries',
           problems: 100,
           completed: 55,
           difficulty: 'medium',
           icon: '🗄️',
           color: 'from-green-600 to-emerald-600',
+          source: 'https://takeuforward.org/dbms/most-asked-dbms-interview-questions',
+          categories: ['SQL Queries', 'Normalization', 'Transactions & ACID', 'Indexing', 'Keys & Constraints', 'Joins', 'Query Optimization', 'NoSQL vs SQL', 'Database Design'],
         },
         {
           id: 'oops-sheet',
           name: 'OOP Concepts',
-          description: 'Object-oriented programming principles',
+          description: 'Object-oriented programming principles and design patterns',
           problems: 70,
           completed: 48,
           difficulty: 'easy',
           icon: '🎯',
           color: 'from-yellow-600 to-orange-600',
+          source: 'https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/',
+          categories: ['Classes & Objects', 'Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction', 'Interfaces', 'Design Patterns', 'SOLID Principles'],
         },
         {
           id: 'system-design',
           name: 'System Design',
-          description: 'Scalability, design patterns, architecture',
+          description: 'Complete system design roadmap for SDEs with videos',
           problems: 60,
           completed: 15,
           difficulty: 'hard',
           icon: '🏗️',
           color: 'from-red-600 to-pink-600',
+          source: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes',
+          categories: ['Low Level Design', 'Object Oriented Design', 'High Level Design', 'Scalability', 'Load Balancing', 'Caching', 'Database Sharding', 'Microservices', 'Message Queues', 'CDN', 'API Design'],
         },
       ]
     }
@@ -583,6 +658,38 @@ const CodingSheets = () => {
                       <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">
                         {sheet.description}
                       </p>
+                      {/* Categories */}
+                      {sheet.categories && (
+                        <div className="mb-3">
+                          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">📂 Topics Covered:</p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {sheet.categories.slice(0, 4).map((category, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs"
+                              >
+                                {category}
+                              </span>
+                            ))}
+                            {sheet.categories.length > 4 && (
+                              <span className="px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">
+                                +{sheet.categories.length - 4} more
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                      {/* External Source Link */}
+                      {sheet.source && (
+                        <a
+                          href={sheet.source}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark transition mb-2"
+                        >
+                          🔗 View Original Sheet →
+                        </a>
+                      )}
                       <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm mb-2 sm:mb-3 flex-wrap">
                         <span className="text-gray-600 dark:text-gray-400">
                           📝 {sheet.problems} Problems
@@ -687,26 +794,35 @@ const CodingSheets = () => {
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                            <div className="flex items-center gap-2 flex-shrink-0">
                               <span className={`text-xs sm:text-sm font-medium hidden sm:inline ${getDifficultyColor(problem.difficulty)}`}>
                                 {problem.difficulty}
                               </span>
                               {user ? (
-                                problem.link ? (
-                                  <a
-                                    href={problem.link}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-2 sm:px-4 py-1 sm:py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs sm:text-sm font-medium transition"
+                                <>
+                                  <button
+                                    onClick={() => openCodeEditor(problem)}
+                                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-medium transition"
+                                    title="Open Code Editor"
                                   >
-                                    <span className="hidden sm:inline">Solve</span> →
-                                  </a>
-                                ) : (
-                                  <button className="px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-400 text-white rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
-                                    <span className="hidden sm:inline">Practice</span>
-                                    <span className="sm:hidden">–</span>
+                                    💻 <span className="hidden sm:inline">Code</span>
                                   </button>
-                                )
+                                  {problem.link ? (
+                                    <a
+                                      href={problem.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="px-2 sm:px-3 py-1 sm:py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs sm:text-sm font-medium transition"
+                                    >
+                                      <span className="hidden sm:inline">Solve</span> →
+                                    </a>
+                                  ) : (
+                                    <button className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-400 text-white rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
+                                      <span className="hidden sm:inline">Practice</span>
+                                      <span className="sm:hidden">–</span>
+                                    </button>
+                                  )}
+                                </>
                               ) : (
                                 <Link
                                   to="/login"
@@ -736,6 +852,11 @@ const CodingSheets = () => {
           </div>
         )}
       </div>
+
+      {/* Code Editor Modal */}
+      {showCodeEditor && selectedProblem && (
+        <CodeEditor problem={selectedProblem} onClose={closeCodeEditor} />
+      )}
     </div>
   );
 };

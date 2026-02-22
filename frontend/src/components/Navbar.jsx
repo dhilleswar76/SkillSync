@@ -39,6 +39,24 @@ const Navbar = () => {
       </Link>
 
       <div className="flex gap-4 items-center">
+        {/* Public navigation links for non-authenticated users */}
+        {!user && (
+          <>
+            <Link
+              to="/all-courses"
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+            >
+              Courses
+            </Link>
+            <Link
+              to="/sheets"
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+            >
+              Coding Sheets
+            </Link>
+          </>
+        )}
+
         {/* Theme Toggle - Icon Only */}
         <button
           onClick={() => setDarkMode(!darkMode)}

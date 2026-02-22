@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const CodingSheets = () => {
+  const { user } = useContext(AuthContext);
   const [selectedSheet, setSelectedSheet] = useState('dsa');
   const [activeCategory, setActiveCategory] = useState(null);
 
@@ -57,6 +60,26 @@ const CodingSheets = () => {
           difficulty: 'mixed',
           icon: '💪',
           color: 'from-orange-500 to-red-500',
+        },
+        {
+          id: 'raising-minds',
+          name: 'Raising Minds DSA Sheet',
+          description: 'Curated DSA problems for competitive programming',
+          problems: 300,
+          completed: 42,
+          difficulty: 'mixed',
+          icon: '🎓',
+          color: 'from-teal-500 to-cyan-500',
+        },
+        {
+          id: 'tuf-cp-sheet',
+          name: 'TUF CP Sheet',
+          description: 'TakeUForward\'s competitive programming sheet',
+          problems: 250,
+          completed: 58,
+          difficulty: 'mixed',
+          icon: '🚀',
+          color: 'from-violet-500 to-purple-500',
         },
       ]
     },
@@ -342,6 +365,124 @@ const CodingSheets = () => {
         { id: 511, title: 'E-commerce Cart System', difficulty: 'hard', completed: false, platform: 'codesandbox' },
       ]},
     ],
+    'raising-minds': [
+      { name: 'Arrays & Strings', problems: [
+        { id: 601, title: 'Two Sum', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/two-sum/' },
+        { id: 602, title: 'Longest Substring Without Repeating', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/' },
+        { id: 603, title: 'Trapping Rain Water', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/trapping-rain-water/' },
+        { id: 604, title: 'Product of Array Except Self', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/product-of-array-except-self/' },
+        { id: 605, title: 'Container With Most Water', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/container-with-most-water/' },
+        { id: 606, title: 'Minimum Window Substring', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/minimum-window-substring/' },
+        { id: 607, title: 'String to Integer (atoi)', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/string-to-integer-atoi/' },
+        { id: 608, title: 'Valid Parentheses', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-parentheses/' },
+      ]},
+      { name: 'Linked Lists & Stacks', problems: [
+        { id: 609, title: 'Reverse Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/reverse-linked-list/' },
+        { id: 610, title: 'Detect Cycle in Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/linked-list-cycle/' },
+        { id: 611, title: 'Merge K Sorted Lists', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-k-sorted-lists/' },
+        { id: 612, title: 'LRU Cache', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/lru-cache/' },
+        { id: 613, title: 'Copy List with Random Pointer', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/copy-list-with-random-pointer/' },
+        { id: 614, title: 'Min Stack', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/min-stack/' },
+        { id: 615, title: 'Implement Queue using Stacks', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-queue-using-stacks/' },
+      ]},
+      { name: 'Trees & Graphs', problems: [
+        { id: 616, title: 'Binary Tree Inorder Traversal', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-inorder-traversal/' },
+        { id: 617, title: 'Validate Binary Search Tree', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/validate-binary-search-tree/' },
+        { id: 618, title: 'Lowest Common Ancestor', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/' },
+        { id: 619, title: 'Binary Tree Maximum Path Sum', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-maximum-path-sum/' },
+        { id: 620, title: 'Clone Graph', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/clone-graph/' },
+        { id: 621, title: 'Course Schedule', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/course-schedule/' },
+        { id: 622, title: 'Word Ladder', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-ladder/' },
+        { id: 623, title: 'Network Delay Time', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/network-delay-time/' },
+      ]},
+      { name: 'Dynamic Programming', problems: [
+        { id: 624, title: 'Climbing Stairs', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/climbing-stairs/' },
+        { id: 625, title: 'House Robber', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/house-robber/' },
+        { id: 626, title: 'Coin Change', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/coin-change/' },
+        { id: 627, title: 'Longest Palindromic Substring', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-palindromic-substring/' },
+        { id: 628, title: 'Word Break', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-break/' },
+        { id: 629, title: 'Unique Paths', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/unique-paths/' },
+        { id: 630, title: 'Jump Game', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/jump-game/' },
+        { id: 631, title: 'Decode Ways', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/decode-ways/' },
+      ]},
+      { name: 'Backtracking & Bit Manipulation', problems: [
+        { id: 632, title: 'Subsets', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/subsets/' },
+        { id: 633, title: 'Permutations', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/permutations/' },
+        { id: 634, title: 'N-Queens', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/n-queens/' },
+        { id: 635, title: 'Sudoku Solver', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/sudoku-solver/' },
+        { id: 636, title: 'Single Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/single-number/' },
+        { id: 637, title: 'Number of 1 Bits', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-1-bits/' },
+        { id: 638, title: 'Counting Bits', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/counting-bits/' },
+      ]},
+    ],
+    'tuf-cp-sheet': [
+      { name: 'Mathematics & Number Theory', problems: [
+        { id: 701, title: 'Count Primes', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/count-primes/' },
+        { id: 702, title: 'Power of Two', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/power-of-two/' },
+        { id: 703, title: 'Happy Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/happy-number/' },
+        { id: 704, title: 'Factorial Trailing Zeroes', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/factorial-trailing-zeroes/' },
+        { id: 705, title: 'Excel Sheet Column Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/excel-sheet-column-number/' },
+        { id: 706, title: 'Pow(x, n)', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/powx-n/' },
+        { id: 707, title: 'Sqrt(x)', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/sqrtx/' },
+        { id: 708, title: 'Divide Two Integers', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/divide-two-integers/' },
+      ]},
+      { name: 'Sorting & Searching', problems: [
+        { id: 709, title: 'Binary Search', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-search/' },
+        { id: 710, title: 'Search Insert Position', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/search-insert-position/' },
+        { id: 711, title: 'First Bad Version', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/first-bad-version/' },
+        { id: 712, title: 'Find Minimum in Rotated Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/' },
+        { id: 713, title: 'Search in Rotated Sorted Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/search-in-rotated-sorted-array/' },
+        { id: 714, title: 'Find Peak Element', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/find-peak-element/' },
+        { id: 715, title: 'Kth Largest Element', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/kth-largest-element-in-an-array/' },
+        { id: 716, title: 'Merge Intervals', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-intervals/' },
+      ]},
+      { name: 'Advanced Arrays', problems: [
+        { id: 717, title: 'Majority Element', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/majority-element/' },
+        { id: 718, title: 'Move Zeroes', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/move-zeroes/' },
+        { id: 719, title: 'Remove Duplicates from Sorted Array', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/remove-duplicates-from-sorted-array/' },
+        { id: 720, title: 'Rotate Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/rotate-array/' },
+        { id: 721, title: 'Maximum Subarray', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/maximum-subarray/' },
+        { id: 722, title: 'Plus One', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/plus-one/' },
+        { id: 723, title: 'Pascal\'s Triangle', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/pascals-triangle/' },
+      ]},
+      { name: 'Stacks & Queues', problems: [
+        { id: 724, title: 'Valid Parentheses', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-parentheses/' },
+        { id: 725, title: 'Min Stack', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/min-stack/' },
+        { id: 726, title: 'Evaluate Reverse Polish Notation', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/evaluate-reverse-polish-notation/' },
+        { id: 727, title: 'Daily Temperatures', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/daily-temperatures/' },
+        { id: 728, title: 'Largest Rectangle in Histogram', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/largest-rectangle-in-histogram/' },
+        { id: 729, title: 'Sliding Window Maximum', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/sliding-window-maximum/' },
+      ]},
+      { name: 'Heaps & Priority Queues', problems: [
+        { id: 730, title: 'Kth Largest Element in Stream', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/kth-largest-element-in-a-stream/' },
+        { id: 731, title: 'Last Stone Weight', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/last-stone-weight/' },
+        { id: 732, title: 'K Closest Points to Origin', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/k-closest-points-to-origin/' },
+        { id: 733, title: 'Top K Frequent Elements', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/top-k-frequent-elements/' },
+        { id: 734, title: 'Find Median from Data Stream', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-median-from-data-stream/' },
+      ]},
+      { name: 'Tries & Advanced Strings', problems: [
+        { id: 735, title: 'Implement Trie', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-trie-prefix-tree/' },
+        { id: 736, title: 'Add and Search Word', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/design-add-and-search-words-data-structure/' },
+        { id: 737, title: 'Word Search II', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-search-ii/' },
+        { id: 738, title: 'Longest Common Prefix', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-common-prefix/' },
+        { id: 739, title: 'Implement strStr()', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-strstr/' },
+      ]},
+      { name: 'Graph Algorithms', problems: [
+        { id: 740, title: 'Number of Islands', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-islands/' },
+        { id: 741, title: 'Max Area of Island', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/max-area-of-island/' },
+        { id: 742, title: 'Pacific Atlantic Water Flow', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/pacific-atlantic-water-flow/' },
+        { id: 743, title: 'Number of Connected Components', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/' },
+        { id: 744, title: 'Graph Valid Tree', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/graph-valid-tree/' },
+        { id: 745, title: 'Cheapest Flights Within K Stops', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/cheapest-flights-within-k-stops/' },
+      ]},
+      { name: 'Advanced DP', problems: [
+        { id: 746, title: 'House Robber II', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/house-robber-ii/' },
+        { id: 747, title: 'Longest Increasing Subsequence', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-increasing-subsequence/' },
+        { id: 748, title: 'Partition Equal Subset Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/partition-equal-subset-sum/' },
+        { id: 749, title: 'Target Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/target-sum/' },
+        { id: 750, title: 'Regular Expression Matching', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/regular-expression-matching/' },
+      ]},
+    ],
   };
 
   const getDifficultyColor = (difficulty) => {
@@ -462,12 +603,21 @@ const CodingSheets = () => {
                       </div>
                     </div>
                   </div>
-                  <button
-                    className="mt-4 w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
-                    onClick={() => setViewingSheet(sheet.id)}
-                  >
-                    View Problems
-                  </button>
+                  {user ? (
+                    <button
+                      className="mt-4 w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
+                      onClick={() => setViewingSheet(sheet.id)}
+                    >
+                      View Problems
+                    </button>
+                  ) : (
+                    <Link
+                      to="/login"
+                      className="mt-4 w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition shadow-md text-center block"
+                    >
+                      🔒 Login to View
+                    </Link>
+                  )}
                 </div>
               );
             })}
@@ -541,19 +691,28 @@ const CodingSheets = () => {
                               <span className={`text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}>
                                 {problem.difficulty}
                               </span>
-                              {problem.link ? (
-                                <a
-                                  href={problem.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="px-4 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-medium transition"
-                                >
-                                  Solve →
-                                </a>
+                              {user ? (
+                                problem.link ? (
+                                  <a
+                                    href={problem.link}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-4 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-medium transition"
+                                  >
+                                    Solve →
+                                  </a>
+                                ) : (
+                                  <button className="px-4 py-1.5 bg-gray-400 text-white rounded-lg text-sm font-medium cursor-not-allowed">
+                                    Practice
+                                  </button>
+                                )
                               ) : (
-                                <button className="px-4 py-1.5 bg-gray-400 text-white rounded-lg text-sm font-medium cursor-not-allowed">
-                                  Practice
-                                </button>
+                                <Link
+                                  to="/login"
+                                  className="px-4 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition"
+                                >
+                                  🔒 Login
+                                </Link>
                               )}
                             </div>
                           </div>

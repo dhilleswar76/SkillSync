@@ -28,10 +28,10 @@ const Landing = () => {
 
         <div className="flex gap-4 justify-center flex-wrap">
           <Link
-            to="/register"
+            to="/all-courses"
             className="bg-primary hover:bg-primary-dark text-white px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all font-medium text-lg"
           >
-            Get Started Free
+            Get Started
           </Link>
           <Link
             to="/login"

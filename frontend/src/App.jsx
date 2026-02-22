@@ -28,6 +28,8 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/all-courses" element={<AllCourses />} />
+          <Route path="/sheets" element={<CodingSheets />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
@@ -39,9 +41,7 @@ function App() {
             <Route path="/certificates" element={<Certificates />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/practice" element={<CodePractice />} />
-            <Route path="/sheets" element={<CodingSheets />} />
             <Route path="/roadmaps" element={<Roadmaps />} />
-            <Route path="/all-courses" element={<AllCourses />} />
             <Route 
               path="/admin" 
               element={

@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
 
 const AllCourses = () => {
+  const { user } = useContext(AuthContext);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
 
@@ -342,12 +344,21 @@ const AllCourses = () => {
               </div>
 
               {/* CTA Button */}
-              <Link
-                to={`/course/${course.id}`}
-                className="block w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition text-center shadow-md"
-              >
-                View Course →
-              </Link>
+              {user ? (
+                <Link
+                  to={`/course/${course.id}`}
+                  className="block w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition text-center shadow-md"
+                >
+                  View Course →
+                </Link>
+              ) : (
+                <Link
+                  to="/login"
+                  className="block w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition text-center shadow-md"
+                >
+                  🔒 Login to View
+                </Link>
+              )}
             </div>
           ))}
         </div>

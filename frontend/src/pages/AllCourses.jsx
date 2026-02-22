@@ -51,6 +51,12 @@ const AllCourses = () => {
         { week: 6, title: 'Problem-Solving Patterns', lessons: 15, duration: '5h 0m' }
       ],
       features: ['Lifetime access', '100+ coding problems', 'Interview preparation guide', 'Certificate of completion', 'Mobile & TV access', 'Peer discussion forum'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/data-structures/', description: 'Complete DSA tutorials and examples' },
+        { platform: 'TakeUforward', url: 'https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2', description: "Striver's A2Z DSA Sheet" },
+        { platform: 'CodeChef', url: 'https://www.codechef.com/roadmap/beginner', description: 'Practice problems for beginners' }
+      ],
+      practiceProblems: '150+ problems curated from CodeChef, LeetCode, and Striver\'s DSA Sheet',
       targetAudience: ['Students preparing for coding interviews', 'Software engineers looking to strengthen DSA fundamentals', 'Computer science students', 'Self-taught developers transitioning to tech roles'],
     },
     {
@@ -98,6 +104,12 @@ const AllCourses = () => {
         { week: 8, title: 'Tries, Segment Trees & Advanced Topics', lessons: 14, duration: '5h 0m' }
       ],
       features: ['200+ advanced problems', 'FAANG interview patterns', 'Live coding sessions', 'System design integration', 'Resume review session', 'Mock interview practice'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/top-algorithms-and-data-structures-for-competitive-programming/', description: 'Advanced algorithms for competitive programming' },
+        { platform: 'TakeUforward', url: 'https://takeuforward.org/interviews/strivers-sde-sheet-top-coding-interview-problems/', description: "Striver's SDE Sheet - Top interview problems" },
+        { platform: 'CodeChef', url: 'https://www.codechef.com/roadmap/advanced', description: 'Advanced competitive programming problems' }
+      ],
+      practiceProblems: '250+ hard problems from LeetCode, CodeChef Division 1, and Striver\'s SDE Sheet',
       targetAudience: ['Experienced developers aiming for FAANG companies', 'Software engineers preparing for senior roles', 'Competitive programmers', 'Computer science graduates'],
     },
     // Web Development Courses
@@ -143,6 +155,13 @@ const AllCourses = () => {
         { week: 6, title: 'Final Projects & Deployment', lessons: 8, duration: '2h 30m' }
       ],
       features: ['5 real-world projects', 'Code along videos', 'Downloadable resources', 'Responsive design templates', 'Career guidance', 'Portfolio building tips'],
+      externalResources: [
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/html/', description: 'HTML5 complete reference and interactive examples' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/css/', description: 'CSS3 tutorials and properties guide' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/js/', description: 'JavaScript ES6+ comprehensive tutorials' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/web-development/', description: 'Web development concepts and best practices' }
+      ],
+      practiceProblems: '50+ UI challenges and web projects from W3Schools exercises',
       targetAudience: ['Complete beginners to web development', 'Designers wanting to code their designs', 'Students learning web development', 'Career changers entering tech'],
     },
     {
@@ -189,6 +208,12 @@ const AllCourses = () => {
         { week: 7, title: 'Testing & Production Deployment', lessons: 12, duration: '4h 0m' }
       ],
       features: ['3 full-stack projects', 'Real API integration', 'Authentication patterns', 'Deployment guides', 'Code review sessions', 'React best practices guide'],
+      externalResources: [
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/react/', description: 'React.js tutorial with interactive examples' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/reactjs-tutorials/', description: 'React hooks and advanced patterns' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/react/react_router.asp', description: 'React Router complete guide' }
+      ],
+      practiceProblems: '40+ React component challenges and mini-projects',
       targetAudience: ['JavaScript developers learning React', 'Frontend developers upgrading skills', 'Web developers building SPAs', 'Full-stack developers'],
     },
     {
@@ -238,6 +263,13 @@ const AllCourses = () => {
         { week: 10, title: 'Testing, Security & Deployment', lessons: 15, duration: '5h 30m' }
       ],
       features: ['3 production-ready projects', 'GitHub repository access', 'Interview preparation', 'Resume building workshop', 'Job search strategies', 'Alumni network access'],
+      externalResources: [
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/nodejs/', description: 'Node.js and Express.js complete guide' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/mongodb/', description: 'MongoDB tutorial and queries' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/mern-stack/', description: 'MERN stack development best practices' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/react/', description: 'React.js frontend integration' }
+      ],
+      practiceProblems: '25+ full-stack project ideas and API challenges',
       targetAudience: ['Developers wanting full-stack skills', 'React developers learning backend', 'Career changers entering web development', 'Freelancers expanding capabilities'],
     },
     // Machine Learning Courses
@@ -286,6 +318,12 @@ const AllCourses = () => {
         { week: 8, title: 'ML Pipeline & Deployment', lessons: 13, duration: '4h 45m' }
       ],
       features: ['10+ real datasets', 'Kaggle competition walkthrough', 'ML interview prep', 'Model deployment guide', 'Python notebooks included', 'Career roadmap'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/machine-learning/', description: 'ML algorithms explained with code examples' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/python-numpy/', description: 'NumPy and Pandas for data manipulation' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/python/python_ml_getting_started.asp', description: 'Python machine learning tutorials' }
+      ],
+      practiceProblems: '30+ real-world ML projects and Kaggle dataset challenges',
       targetAudience: ['Software developers entering ML', 'Data analysts transitioning to ML', 'Students pursuing data science', 'Professionals upskilling in AI'],
     },
     {
@@ -335,6 +373,12 @@ const AllCourses = () => {
         { week: 10, title: 'GANs & Advanced Topics', lessons: 13, duration: '5h 15m' }
       ],
       features: ['GPU training access', 'Research paper reviews', 'Kaggle competition project', 'Model zoo access', 'Community forums', 'Research mentorship'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/deep-learning-tutorial/', description: 'Deep learning fundamentals and neural networks' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/convolutional-neural-network-cnn-in-machine-learning/', description: 'CNN architectures and applications' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/ai/', description: 'AI and deep learning with Python' }
+      ],
+      practiceProblems: '20+ deep learning projects including image classification and object detection',
       targetAudience: ['ML engineers going deep into AI', 'Researchers in computer vision/NLP', 'Data scientists advancing skills', 'PhD students in AI'],
     },
     {
@@ -382,6 +426,12 @@ const AllCourses = () => {
         { week: 8, title: 'Production NLP Systems', lessons: 11, duration: '4h 30m' }
       ],
       features: ['Hugging Face integration', 'LLM fine-tuning projects', 'Production deployment guides', 'Research paper discussions', 'API development workshop', 'Industry case studies'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/natural-language-processing-nlp-tutorial/', description: 'NLP concepts and text processing techniques' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/transformer-neural-network/', description: 'Transformer architecture explained' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/python/python_ml_nlp.asp', description: 'Python NLP libraries and tools' }
+      ],
+      practiceProblems: '15+ NLP projects: chatbots, sentiment analysis, and text generation',
       targetAudience: ['ML engineers specializing in NLP', 'Data scientists working with text', 'Researchers in computational linguistics', 'AI product developers'],
     },
     // CS Fundamentals
@@ -429,6 +479,12 @@ const AllCourses = () => {
         { week: 7, title: 'File Systems & I/O', lessons: 13, duration: '4h 30m' }
       ],
       features: ['C programming exercises', 'Linux kernel exploration', 'System calls lab', 'Performance analysis', 'Interview prep questions', 'Virtual machine access'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/operating-systems/', description: 'Complete OS concepts and tutorials' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/process-synchronization-in-os/', description: 'Process synchronization and deadlock handling' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/c/', description: 'C programming for system implementation' }
+      ],
+      practiceProblems: '35+ OS implementation exercises and system programming challenges',
       targetAudience: ['CS students', 'Systems programmers', 'Backend engineers', 'Software engineers preparing for interviews'],
     },
     {
@@ -475,6 +531,12 @@ const AllCourses = () => {
         { week: 7, title: 'Advanced Topics & Projects', lessons: 11, duration: '4h 0m' }
       ],
       features: ['Wireshark labs', 'Network simulation', 'Socket programming projects', 'Security exercises', 'Cloud networking intro', 'Interview questions'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/computer-network-tutorials/', description: 'Computer networks complete guide' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/tcp-ip-model/', description: 'TCP/IP protocol suite explained' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/python/python_network.asp', description: 'Socket programming with Python' }
+      ],
+      practiceProblems: '25+ network programming projects and protocol implementation',
       targetAudience: ['Software engineers', 'Backend developers', 'DevOps engineers', 'Security professionals'],
     },
     {
@@ -522,6 +584,13 @@ const AllCourses = () => {
         { week: 8, title: 'Database Administration & Security', lessons: 11, duration: '4h 15m' }
       ],
       features: ['PostgreSQL & MongoDB labs', 'Real database projects', 'Query optimization workshop', 'Database interview prep', 'Cloud database intro', 'Best practices guide'],
+      externalResources: [
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/sql/', description: 'SQL complete reference and interactive tutorials' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/mongodb/', description: 'MongoDB queries and operations' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/dbms/', description: 'DBMS concepts, normalization, and transactions' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/postgresql/', description: 'PostgreSQL advanced features' }
+      ],
+      practiceProblems: '40+ SQL challenges and database design projects',
       targetAudience: ['Backend developers', 'Data engineers', 'Full-stack developers', 'Database administrators'],
     },
     {
@@ -569,6 +638,12 @@ const AllCourses = () => {
         { week: 8, title: 'Interview Preparation & Mock Interviews', lessons: 11, duration: '4h 25m' }
       ],
       features: ['15+ system design case studies', 'Mock interview sessions', 'Architecture diagrams', 'Trade-off discussions', 'FAANG interview patterns', 'Mentorship sessions'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/system-design-tutorial/', description: 'System design concepts and patterns' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/design-patterns/', description: 'Software design patterns and microservices' },
+        { platform: 'TakeUforward', url: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes/', description: 'Complete system design roadmap' }
+      ],
+      practiceProblems: '20+ real-world system design problems from FAANG interviews',
       targetAudience: ['Senior software engineers', 'Engineering managers', 'Technical architects', 'FAANG interview aspirants'],
     },
     // Mobile Development
@@ -616,6 +691,12 @@ const AllCourses = () => {
         { week: 7, title: 'Publishing & Deployment', lessons: 12, duration: '4h 15m' }
       ],
       features: ['3 complete app projects', 'iOS & Android testing', 'App Store submission guide', 'Push notifications setup', 'Performance optimization tips', 'Debugging workshop'],
+      externalResources: [
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/react/', description: 'React fundamentals for React Native' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/react-native/', description: 'React Native components and APIs' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/react/react_native.asp', description: 'React Native complete tutorial' }
+      ],
+      practiceProblems: '15+ mobile app UI challenges and feature implementations',
       targetAudience: ['React developers entering mobile', 'Web developers learning mobile', 'Freelancers expanding services', 'Startups building MVPs'],
     },
     {
@@ -664,6 +745,12 @@ const AllCourses = () => {
         { week: 9, title: 'Testing & Play Store Deployment', lessons: 12, duration: '4h 25m' }
       ],
       features: ['4 complete app projects', 'Kotlin coroutines guide', 'Material Design templates', 'Testing best practices', 'Play Store optimization', 'Firebase integration'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/android-tutorial/', description: 'Android development complete guide' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/kotlin-programming-language/', description: 'Kotlin programming tutorials' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/kotlin/', description: 'Kotlin syntax and examples' }
+      ],
+      practiceProblems: '20+ Android app features and UI component exercises',
       targetAudience: ['Aspiring Android developers', 'iOS developers learning Android', 'Java developers transitioning to Kotlin', 'Students building portfolios'],
     },
     // DevOps
@@ -711,6 +798,12 @@ const AllCourses = () => {
         { week: 7, title: 'Monitoring & Production Best Practices', lessons: 11, duration: '4h 10m' }
       ],
       features: ['Hands-on labs', 'Cloud environment access', 'Real deployment projects', 'Troubleshooting guides', 'Interview prep', 'Certification exam prep'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/devops-tutorial/', description: 'DevOps practices and tools' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/git/', description: 'Git version control complete guide' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/docker-tutorial/', description: 'Docker containerization tutorial' }
+      ],
+      practiceProblems: '30+ DevOps scenarios and CI/CD pipeline implementations',
       targetAudience: ['Developers transitioning to DevOps', 'System administrators', 'Operations engineers', 'Full-stack developers'],
     },
     {
@@ -759,6 +852,12 @@ const AllCourses = () => {
         { week: 9, title: 'Exam Preparation & Practice', lessons: 16, duration: '5h 45m' }
       ],
       features: ['AWS free tier access', 'Practice exam questions', 'Architecture diagrams', 'Cost calculator workshop', 'Certification voucher included', 'Real-world case studies'],
+      externalResources: [
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/aws-tutorial/', description: 'AWS services and cloud concepts' },
+        { platform: 'W3Schools', url: 'https://www.w3schools.com/aws/', description: 'AWS cloud computing tutorials' },
+        { platform: 'GeeksforGeeks', url: 'https://www.geeksforgeeks.org/amazon-web-services-aws/', description: 'AWS architecture and best practices' }
+      ],
+      practiceProblems: '25+ AWS hands-on labs and real-world scenarios',
       targetAudience: ['Cloud engineers', 'DevOps professionals', 'Solutions architects', 'Certification seekers'],
     },
   ];
@@ -946,6 +1045,32 @@ const AllCourses = () => {
                       </span>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* External Resources */}
+              {course.externalResources && course.externalResources.length > 0 && (
+                <div className="mb-3 sm:mb-4 border-t border-gray-200 dark:border-gray-700 pt-3">
+                  <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">📚 Learning Resources:</p>
+                  <div className="flex flex-wrap gap-1">
+                    {course.externalResources.map((resource, idx) => (
+                      <a
+                        key={idx}
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs hover:bg-blue-100 dark:hover:bg-blue-900/50 transition flex items-center gap-1"
+                        title={resource.description}
+                      >
+                        🔗 {resource.platform}
+                      </a>
+                    ))}
+                  </div>
+                  {course.practiceProblems && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-2">
+                      💡 {course.practiceProblems}
+                    </p>
+                  )}
                 </div>
               )}
 

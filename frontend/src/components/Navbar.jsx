@@ -8,6 +8,7 @@ const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -33,100 +34,192 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800 p-4 flex justify-between items-center">
-      <Link to="/" className="text-2xl font-bold text-primary hover:text-primary-dark transition">
-        SkillSync
-      </Link>
+    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800">
+      <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
+        <Link to="/" className="text-xl sm:text-2xl font-bold text-primary hover:text-primary-dark transition">
+          SkillSync
+        </Link>
 
-      <div className="flex gap-4 items-center">
-        {/* Public navigation links for non-authenticated users */}
-        {!user && (
-          <>
-            <Link
-              to="/all-courses"
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
-            >
-              Courses
-            </Link>
-            <Link
-              to="/sheets"
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
-            >
-              Coding Sheets
-            </Link>
-          </>
-        )}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex gap-4 items-center">
+          {/* Public navigation links for non-authenticated users */}
+          {!user && (
+            <>
+              <Link
+                to="/all-courses"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+              >
+                Courses
+              </Link>
+              <Link
+                to="/sheets"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+              >
+                Coding Sheets
+              </Link>
+            </>
+          )}
 
-        {/* Theme Toggle - Icon Only */}
-        <button
-          onClick={() => setDarkMode(!darkMode)}
-          className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl"
-          aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {darkMode ? "☀️" : "🌙"}
-        </button>
+          {/* Theme Toggle - Icon Only */}
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl"
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? "☀️" : "🌙"}
+          </button>
 
-        {/* Show Login/Register when NOT logged in */}
-        {!user && (
-          <>
-            <Link
-              to="/login"
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
-            >
-              Sign Up
-            </Link>
-          </>
-        )}
+          {/* Show Login/Register when NOT logged in */}
+          {!user && (
+            <>
+              <Link
+                to="/login"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
 
-        {/* Profile Dropdown - Only when logged in */}
-        {user && (
-          <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-full hover:bg-primary-dark transition font-semibold text-sm shadow-md"
-              aria-label="Profile menu"
-              title={user.name}
-            >
-              {user.name ? user.name.charAt(0).toUpperCase() : '👤'}
-            </button>
+          {/* Profile Dropdown - Only when logged in */}
+          {user && (
+            <div className="relative" ref={dropdownRef}>
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-full hover:bg-primary-dark transition font-semibold text-sm shadow-md"
+                aria-label="Profile menu"
+                title={user.name}
+              >
+                {user.name ? user.name.charAt(0).toUpperCase() : '👤'}
+              </button>
 
-            {/* Dropdown Menu */}
-            {showProfileMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
-                <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+              {/* Dropdown Menu */}
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleProfileClick}
+                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                  >
+                    <span className="text-lg">👤</span>
+                    <span>Profile</span>
+                  </button>
+                  <hr className="my-1 border-gray-200 dark:border-gray-700" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full text-left px-4 py-2 text-primary hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3"
+                  >
+                    <span className="text-lg">🚪</span>
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Mobile Menu Button & Theme Toggle */}
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="w-9 h-9 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition text-lg"
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? "☀️" : "🌙"}
+          </button>
+          
+          <button
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+            className="w-9 h-9 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            aria-label="Toggle menu"
+          >
+            {showMobileMenu ? '✕' : '☰'}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {showMobileMenu && (
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 pb-4">
+          <div className="px-4 pt-2 space-y-1">
+            {!user && (
+              <>
+                <Link
+                  to="/all-courses"
+                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  📚 Courses
+                </Link>
+                <Link
+                  to="/sheets"
+                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  📋 Coding Sheets
+                </Link>
+                <hr className="my-2 border-gray-200 dark:border-gray-700" />
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="block px-4 py-3 bg-primary text-white rounded-lg font-medium text-center"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
+            
+            {user && (
+              <>
+                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
                     {user.name}
                   </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {user.email}
                   </p>
                 </div>
-                <button
-                  onClick={handleProfileClick}
-                  className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
+                <Link
+                  to="/profile"
+                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
+                  onClick={() => setShowMobileMenu(false)}
                 >
-                  <span className="text-lg">👤</span>
-                  <span>Profile</span>
-                </button>
-                <hr className="my-1 border-gray-200 dark:border-gray-700" />
+                  👤 Profile
+                </Link>
                 <button
-                  onClick={handleLogout}
-                  className="w-full text-left px-4 py-2 text-primary hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3"
+                  onClick={() => {
+                    setShowMobileMenu(false);
+                    handleLogout();
+                  }}
+                  className="w-full text-left px-4 py-3 text-primary hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
                 >
-                  <span className="text-lg">🚪</span>
-                  <span>Logout</span>
+                  🚪 Logout
                 </button>
-              </div>
+              </>
             )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   );
 };

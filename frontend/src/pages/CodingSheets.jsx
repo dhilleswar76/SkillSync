@@ -524,16 +524,16 @@ const CodingSheets = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary via-coral to-secondary py-12">
-        <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold text-white mb-3">📋 Coding Sheets</h1>
-          <p className="text-white/90 text-lg">Curated problem sets to ace your interviews and master concepts</p>
+      <div className="bg-gradient-to-r from-primary via-coral to-secondary py-8 sm:py-10 md:py-12">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">📋 Coding Sheets</h1>
+          <p className="text-white/90 text-sm sm:text-base md:text-lg">Curated problem sets to ace your interviews and master concepts</p>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Category Tabs */}
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+        <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
           {Object.keys(sheetCategories).map((key) => (
             <button
               key={key}
@@ -541,7 +541,7 @@ const CodingSheets = () => {
                 setSelectedSheet(key);
                 setViewingSheet(null);
               }}
-              className={`px-6 py-3 rounded-lg font-medium transition whitespace-nowrap ${
+              className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg font-medium transition whitespace-nowrap text-sm sm:text-base ${
                 selectedSheet === key
                   ? 'bg-primary text-white shadow-md'
                   : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
@@ -556,7 +556,7 @@ const CodingSheets = () => {
         {viewingSheet && (
           <button
             onClick={() => setViewingSheet(null)}
-            className="mb-6 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2"
+            className="mb-4 sm:mb-6 px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2 text-sm sm:text-base"
           >
             ← Back to Sheets
           </button>
@@ -564,26 +564,26 @@ const CodingSheets = () => {
 
         {/* Sheets Grid */}
         {!viewingSheet && (
-          <div className="grid md:grid-cols-2 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
             {currentSheets.map((sheet) => {
               const progress = Math.round((sheet.completed / sheet.problems) * 100);
               return (
                 <div
                   key={sheet.id}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition"
+                  className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${sheet.color} flex items-center justify-center text-3xl shadow-md flex-shrink-0`}>
+                  <div className="flex items-start gap-3 sm:gap-4">
+                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br ${sheet.color} flex items-center justify-center text-2xl sm:text-3xl shadow-md flex-shrink-0`}>
                       {sheet.icon}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
                         {sheet.name}
                       </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+                      <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">
                         {sheet.description}
                       </p>
-                      <div className="flex items-center gap-4 text-sm mb-3 flex-wrap">
+                      <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm mb-2 sm:mb-3 flex-wrap">
                         <span className="text-gray-600 dark:text-gray-400">
                           📝 {sheet.problems} Problems
                         </span>
@@ -605,7 +605,7 @@ const CodingSheets = () => {
                   </div>
                   {user ? (
                     <button
-                      className="mt-4 w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
+                      className="mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md text-sm sm:text-base"
                       onClick={() => setViewingSheet(sheet.id)}
                     >
                       View Problems
@@ -613,7 +613,7 @@ const CodingSheets = () => {
                   ) : (
                     <Link
                       to="/login"
-                      className="mt-4 w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition shadow-md text-center block"
+                      className="mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition shadow-md text-center block text-sm sm:text-base"
                     >
                       🔒 Login to View
                     </Link>
@@ -627,7 +627,7 @@ const CodingSheets = () => {
         {/* Problem Details View */}
         {viewingSheet && currentProblems.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
               {currentSheets.find(s => s.id === viewingSheet)?.name}
             </h2>
             <div className="space-y-4">
@@ -642,12 +642,12 @@ const CodingSheets = () => {
                     className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
                   >
                     {/* Category Header */}
-                    <div className="p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    <div className="p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2">
+                        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
                           {category.name}
                         </h3>
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
                           {solvedProblems}/{totalProblems} Solved
                         </span>
                       </div>
@@ -661,15 +661,15 @@ const CodingSheets = () => {
                     </div>
 
                     {/* Problems List */}
-                    <div className="p-4">
+                    <div className="p-3 sm:p-4">
                       <div className="space-y-2">
                         {category.problems.map((problem) => (
                           <div
                             key={problem.id}
-                            className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition"
+                            className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition gap-2"
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div className={`w-6 h-6 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                                 problem.completed
                                   ? 'bg-green-500 border-green-500'
                                   : 'border-gray-300 dark:border-gray-600'
@@ -678,17 +678,17 @@ const CodingSheets = () => {
                                   <span className="text-white text-xs font-bold">✓</span>
                                 )}
                               </div>
-                              <span className="text-gray-900 dark:text-white font-medium truncate">
+                              <span className="text-gray-900 dark:text-white font-medium truncate text-sm sm:text-base">
                                 {problem.title}
                               </span>
                               {problem.platform && (
-                                <span className="text-sm" title={problem.platform}>
+                                <span className="text-xs sm:text-sm flex-shrink-0" title={problem.platform}>
                                   {getPlatformIcon(problem.platform)}
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-4 flex-shrink-0">
-                              <span className={`text-sm font-medium ${getDifficultyColor(problem.difficulty)}`}>
+                            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+                              <span className={`text-xs sm:text-sm font-medium hidden sm:inline ${getDifficultyColor(problem.difficulty)}`}>
                                 {problem.difficulty}
                               </span>
                               {user ? (
@@ -697,21 +697,22 @@ const CodingSheets = () => {
                                     href={problem.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="px-4 py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-medium transition"
+                                    className="px-2 sm:px-4 py-1 sm:py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs sm:text-sm font-medium transition"
                                   >
-                                    Solve →
+                                    <span className="hidden sm:inline">Solve</span> →
                                   </a>
                                 ) : (
-                                  <button className="px-4 py-1.5 bg-gray-400 text-white rounded-lg text-sm font-medium cursor-not-allowed">
-                                    Practice
+                                  <button className="px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-400 text-white rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
+                                    <span className="hidden sm:inline">Practice</span>
+                                    <span className="sm:hidden">–</span>
                                   </button>
                                 )
                               ) : (
                                 <Link
                                   to="/login"
-                                  className="px-4 py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition"
+                                  className="px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs sm:text-sm font-medium transition"
                                 >
-                                  🔒 Login
+                                  🔒<span className="hidden sm:inline ml-1">Login</span>
                                 </Link>
                               )}
                             </div>

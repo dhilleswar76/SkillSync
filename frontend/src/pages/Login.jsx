@@ -1,11 +1,13 @@
 import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
+  const location = useLocation();
   const navigate = useNavigate();
+  const redirectTo = location.state?.redirectTo || location.state?.from?.pathname || "/dashboard";
 
   const [form, setForm] = useState({
     email: "",
@@ -23,7 +25,7 @@ const Login = () => {
     try {
       const res = await axios.post("/auth/login", form);
       login(res.data);
-      navigate("/dashboard");
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {

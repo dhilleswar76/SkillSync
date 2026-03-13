@@ -100,6 +100,46 @@ const CourseView = () => {
                 ],
                 correct: 2,
               },
+              {
+                question: 'What is the time complexity of inserting an element at the end of an array (assuming space is available)?',
+                options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'],
+                correct: 0,
+              },
+              {
+                question: 'Which operation on arrays requires shifting elements?',
+                options: ['Accessing an element', 'Inserting at beginning', 'Reading last element', 'Finding array length'],
+                correct: 1,
+              },
+              {
+                question: 'In a 2D array arr[3][4], how many elements can it store?',
+                options: ['7', '12', '3', '4'],
+                correct: 1,
+              },
+              {
+                question: 'What is array traversal?',
+                options: ['Deleting all elements', 'Visiting each element once', 'Sorting elements', 'Finding maximum'],
+                correct: 1,
+              },
+              {
+                question: 'Arrays are best suited for which type of access pattern?',
+                options: ['Sequential only', 'Random access', 'Stack operations', 'Queue operations'],
+                correct: 1,
+              },
+              {
+                question: 'What happens when you access an array element out of bounds in most languages?',
+                options: ['Returns null', 'Runtime error', 'Returns 0', 'Automatically extends array'],
+                correct: 1,
+              },
+              {
+                question: 'Which is NOT an advantage of arrays?',
+                options: ['Random access', 'Cache friendly', 'Dynamic size', 'Simple to use'],
+                correct: 2,
+              },
+              {
+                question: 'In memory, array elements are stored:',
+                options: ['Randomly', 'In a linked manner', 'Contiguously', 'In a tree structure'],
+                correct: 2,
+              },
             ],
           },
         },
@@ -158,6 +198,46 @@ const CourseView = () => {
               {
                 question: 'Which pointer is NULL in a singly linked list?',
                 options: ['First node\'s previous', 'Last node\'s next', 'Middle node\'s next', 'All nodes\' previous'],
+                correct: 1,
+              },
+              {
+                question: 'What is the main advantage of linked lists over arrays?',
+                options: ['Faster access', 'Dynamic size', 'Less memory', 'Better cache performance'],
+                correct: 1,
+              },
+              {
+                question: 'In a doubly linked list, each node has:',
+                options: ['One pointer', 'Two pointers', 'Three pointers', 'No pointers'],
+                correct: 1,
+              },
+              {
+                question: 'What is the time complexity of searching in a linked list?',
+                options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'],
+                correct: 1,
+              },
+              {
+                question: 'In a circular linked list, the last node points to:',
+                options: ['NULL', 'First node', 'Previous node', 'Itself'],
+                correct: 1,
+              },
+              {
+                question: 'Which operation is more efficient in a linked list compared to an array?',
+                options: ['Random access', 'Insertion at beginning', 'Finding size', 'Memory efficiency'],
+                correct: 1,
+              },
+              {
+                question: 'What does the head pointer in a linked list point to?',
+                options: ['Last node', 'Middle node', 'First node', 'NULL'],
+                correct: 2,
+              },
+              {
+                question: 'Which is NOT a type of linked list?',
+                options: ['Singly', 'Doubly', 'Circular', 'Binary'],
+                correct: 3,
+              },
+              {
+                question: 'Reversing a linked list takes:',
+                options: ['O(1) time', 'O(n) time', 'O(n²) time', 'O(log n) time'],
                 correct: 1,
               },
             ],
@@ -219,6 +299,46 @@ const CourseView = () => {
                 question: 'Which data structure is used in BFS?',
                 options: ['Stack', 'Queue', 'Heap', 'Tree'],
                 correct: 1,
+              },
+              {
+                question: 'What is the time complexity of push operation in a stack?',
+                options: ['O(1)', 'O(n)', 'O(log n)', 'O(n²)'],
+                correct: 0,
+              },
+              {
+                question: 'Which principle does a queue follow?',
+                options: ['LIFO', 'FIFO', 'Random', 'Priority'],
+                correct: 1,
+              },
+              {
+                question: 'Which data structure is used for function call management?',
+                options: ['Queue', 'Stack', 'Tree', 'Graph'],
+                correct: 1,
+              },
+              {
+                question: 'In a circular queue, when is it considered full?',
+                options: ['rear == front', '(rear + 1) % size == front', 'rear == size', 'front == 0'],
+                correct: 1,
+              },
+              {
+                question: 'Which operation retrieves but does not remove an element from a queue?',
+                options: ['dequeue', 'enqueue', 'peek', 'pop'],
+                correct: 2,
+              },
+              {
+                question: 'Stack overflow occurs when:',
+                options: ['Stack is empty', 'Stack is full and we try to push', 'We pop from empty stack', 'Stack size is zero'],
+                correct: 1,
+              },
+              {
+                question: 'Which application uses a queue?',
+                options: ['Undo operation', 'Expression evaluation', 'Print spooling', 'Recursion'],
+                correct: 2,
+              },
+              {
+                question: 'A deque (double-ended queue) allows:',
+                options: ['Insertion at both ends', 'Deletion only at front', 'Insertion only at rear', 'Random access'],
+                correct: 0,
               },
             ],
           },
@@ -289,6 +409,51 @@ const CourseView = () => {
                 ],
                 correct: 0,
               },
+              {
+                question: 'Which method is used to create a React component?',
+                options: ['React.createComponent()', 'function or class', 'React.component()', 'createElement()'],
+                correct: 1,
+              },
+              {
+                question: 'Props in React are:',
+                options: ['Mutable', 'Immutable', 'Sometimes mutable', 'Always undefined'],
+                correct: 1,
+              },
+              {
+                question: 'What is the virtual DOM?',
+                options: ['Real DOM copy', 'JavaScript object representation', 'Browser API', 'CSS framework'],
+                correct: 1,
+              },
+              {
+                question: 'Which hook is used for side effects?',
+                options: ['useState', 'useEffect', 'useContext', 'useMemo'],
+                correct: 1,
+              },
+              {
+                question: 'React components must return:',
+                options: ['Multiple elements', 'Single root element', 'Array only', 'String only'],
+                correct: 1,
+              },
+              {
+                question: 'What does the key prop help React with?',
+                options: ['Styling', 'Identify elements', 'Add events', 'State management'],
+                correct: 1,
+              },
+              {
+                question: 'Functional components can use state via:',
+                options: ['this.state', 'useState hook', 'getState()', 'state()'],
+                correct: 1,
+              },
+              {
+                question: 'What is the purpose of React.Fragment?',
+                options: ['Add styling', 'Group elements without extra DOM node', 'Create animations', 'Manage state'],
+                correct: 1,
+              },
+              {
+                question: 'Which is NOT a lifecycle method?',
+                options: ['componentDidMount', 'componentWillUpdate', 'useEffect', 'componentDidLoad'],
+                correct: 3,
+              },
             ],
           },
         },
@@ -329,6 +494,1768 @@ const CourseView = () => {
               {
                 question: 'Which hook is used for side effects?',
                 options: ['useState', 'useEffect', 'useContext', 'useReducer'],
+                correct: 1,
+              },
+              {
+                question: 'useState returns:',
+                options: ['State only', 'Updater only', 'Array with state and updater', 'Object with state'],
+                correct: 2,
+              },
+              {
+                question: 'When does useEffect run by default?',
+                options: ['Before render', 'After every render', 'Only once', 'On unmount'],
+                correct: 1,
+              },
+              {
+                question: 'How do you prevent useEffect from running on every render?',
+                options: ['Use useState', 'Provide dependency array', 'Use useCallback', 'Cannot prevent'],
+                correct: 1,
+              },
+              {
+                question: 'What does useContext do?',
+                options: ['Creates context', 'Consumes context', 'Updates context', 'Deletes context'],
+                correct: 1,
+              },
+              {
+                question: 'useReducer is useful for:',
+                options: ['Simple state', 'Complex state logic', 'API calls', 'Routing'],
+                correct: 1,
+              },
+              {
+                question: 'useMemo is used to:',
+                options: ['Memoize values', 'Memoize functions', 'Create state', 'Handle events'],
+                correct: 0,
+              },
+              {
+                question: 'useCallback returns:',
+                options: ['Memoized value', 'Memoized callback', 'State', 'Props'],
+                correct: 1,
+              },
+              {
+                question: 'Custom hooks must:',
+                options: ['Return JSX', 'Start with "use"', 'Be class components', 'Have state'],
+                correct: 1,
+              },
+              {
+                question: 'useRef can be used to:',
+                options: ['Create state', 'Access DOM elements', 'Make API calls', 'Style components'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'ml-basics': {
+      title: 'Machine Learning A-Z: From Fundamentals to Production',
+      description: 'Master machine learning algorithms from scratch. Learn supervised and unsupervised learning, model evaluation, and deploy ML models to production.',
+      level: 'Intermediate',
+      duration: '10 weeks',
+      totalScore: 800,
+      passingScore: 550,
+      instructor: 'Dr. Rajesh Kumar',
+      rating: 4.7,
+      enrolled: 1900,
+      image: '🤖',
+      syllabus: [
+        { week: 1, title: 'ML Fundamentals', topics: ['Introduction to ML', 'Python Setup', 'NumPy & Pandas'] },
+        { week: 2, title: 'Regression Algorithms', topics: ['Linear Regression', 'Polynomial Regression', 'Regularization'] },
+        { week: 3, title: 'Classification', topics: ['Logistic Regression', 'Decision Trees', 'Model Evaluation'] },
+        { week: 4, title: 'Tree-Based Methods', topics: ['Random Forest', 'Gradient Boosting', 'XGBoost'] },
+        { week: 5, title: 'SVM', topics: ['Support Vector Machines', 'Kernel Tricks', 'Hyperparameter Tuning'] },
+        { week: 6, title: 'Unsupervised Learning', topics: ['K-Means', 'DBSCAN', 'PCA'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'ML Fundamentals & Python Setup',
+          duration: '1 week',
+          topics: [
+            {
+              id: 'ml-1',
+              name: 'Introduction to Machine Learning',
+              theory: {
+                title: 'Machine Learning Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/machine-learning/',
+              },
+              video: {
+                title: 'Machine Learning Complete Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=NWONeJKn6kc',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'ml-2',
+              name: 'Python for ML - NumPy & Pandas',
+              theory: {
+                title: 'NumPy Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/python-numpy/',
+              },
+              video: {
+                title: 'Pandas & NumPy for ML - Corey Schafer',
+                url: 'https://www.youtube.com/watch?v=ZyhVh-qRZPA',
+                channel: 'Corey Schafer',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is supervised learning?',
+                options: ['Learning with labeled data', 'Learning without labels', 'Learning with rewards', 'Learning from errors'],
+                correct: 0,
+              },
+              {
+                question: 'Which library is primarily used for ML in Python?',
+                options: ['NumPy', 'Pandas', 'scikit-learn', 'Matplotlib'],
+                correct: 2,
+              },
+              {
+                question: 'What is overfitting?',
+                options: ['Model too simple', 'Model too complex', 'Perfect model', 'No training'],
+                correct: 1,
+              },
+              {
+                question: 'Which is a classification algorithm?',
+                options: ['Linear Regression', 'Logistic Regression', 'Mean Squared Error', 'R-squared'],
+                correct: 1,
+              },
+              {
+                question: 'What does train-test split do?',
+                options: ['Splits data for evaluation', 'Splits model', 'Splits features', 'Splits labels'],
+                correct: 0,
+              },
+              {
+                question: 'What is a feature in machine learning?',
+                options: ['Output variable', 'Input variable', 'Model parameter', 'Loss function'],
+                correct: 1,
+              },
+              {
+                question: 'Cross-validation is used for:',
+                options: ['Training faster', 'Model evaluation', 'Data cleaning', 'Feature selection'],
+                correct: 1,
+              },
+              {
+                question: 'What is underfitting?',
+                options: ['Model too complex', 'Model too simple', 'Perfect fit', 'Overfitted model'],
+                correct: 1,
+              },
+              {
+                question: 'Which metric is used for regression?',
+                options: ['Accuracy', 'Precision', 'MSE', 'F1-score'],
+                correct: 2,
+              },
+              {
+                question: 'What does NumPy provide?',
+                options: ['Data visualization', 'Array operations', 'Web framework', 'Database'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Regression Algorithms',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'ml-3',
+              name: 'Linear & Polynomial Regression',
+              theory: {
+                title: 'ML Linear Regression - W3Schools',
+                url: 'https://www.w3schools.com/python/python_ml_linear_regression.asp',
+              },
+              video: {
+                title: 'Linear Regression - StatQuest',
+                url: 'https://www.youtube.com/watch?v=nk2CQITm_eo',
+                channel: 'StatQuest',
+              },
+            },
+            {
+              id: 'ml-4',
+              name: 'Model Evaluation & Feature Engineering',
+              theory: {
+                title: 'ML Getting Started - W3Schools',
+                url: 'https://www.w3schools.com/python/python_ml_getting_started.asp',
+              },
+              video: {
+                title: 'Feature Engineering - Krish Naik',
+                url: 'https://www.youtube.com/watch?v=6WDFfaYtN6s',
+                channel: 'Krish Naik',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What does R-squared measure?',
+                options: ['Model complexity', 'Goodness of fit', 'Training speed', 'Number of features'],
+                correct: 1,
+              },
+              {
+                question: 'Linear regression predicts:',
+                options: ['Classes', 'Continuous values', 'Categories', 'Clusters'],
+                correct: 1,
+              },
+              {
+                question: 'What is the cost function in linear regression?',
+                options: ['Accuracy', 'MSE', 'Precision', 'Recall'],
+                correct: 1,
+              },
+              {
+                question: 'Polynomial regression is used for:',
+                options: ['Linear relationships', 'Non-linear relationships', 'Classification', 'Clustering'],
+                correct: 1,
+              },
+              {
+                question: 'What does regularization prevent?',
+                options: ['Underfitting', 'Overfitting', 'Fast training', 'Data loss'],
+                correct: 1,
+              },
+              {
+                question: 'L1 regularization is also called:',
+                options: ['Ridge', 'Lasso', 'Elastic Net', 'Dropout'],
+                correct: 1,
+              },
+              {
+                question: 'Feature scaling is important for:',
+                options: ['All algorithms', 'Distance-based algorithms', 'Tree algorithms', 'No algorithms'],
+                correct: 1,
+              },
+              {
+                question: 'What is gradient descent?',
+                options: ['Classification method', 'Optimization algorithm', 'Evaluation metric', 'Preprocessing technique'],
+                correct: 1,
+              },
+              {
+                question: 'Learning rate controls:',
+                options: ['Step size in optimization', 'Model complexity', 'Number of features', 'Data size'],
+                correct: 0,
+              },
+              {
+                question: 'Which assumption does linear regression make?',
+                options: ['Non-linear relationship', 'Linear relationship', 'No relationship', 'Random relationship'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 3,
+          title: 'Classification Algorithms',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'ml-5',
+              name: 'Logistic Regression & Decision Trees',
+              theory: {
+                title: 'Classification Algorithms - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/machine-learning/',
+              },
+              video: {
+                title: 'Classification ML - Simplilearn',
+                url: 'https://www.youtube.com/watch?v=7O4dpR9QMIM',
+                channel: 'Simplilearn',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'Which metric is best for imbalanced datasets?',
+                options: ['Accuracy', 'F1-score', 'R-squared', 'MSE'],
+                correct: 1,
+              },
+              {
+                question: 'Logistic regression is used for:',
+                options: ['Regression', 'Classification', 'Clustering', 'Dimensionality reduction'],
+                correct: 1,
+              },
+              {
+                question: 'What does a confusion matrix show?',
+                options: ['Training loss', 'Prediction accuracy breakdown', 'Feature importance', 'Learning rate'],
+                correct: 1,
+              },
+              {
+                question: 'Precision measures:',
+                options: ['True positives / All positives predicted', 'True positives / All actual positives', 'Accuracy', 'Loss'],
+                correct: 0,
+              },
+              {
+                question: 'Recall measures:',
+                options: ['True positives / All positives predicted', 'True positives / All actual positives', 'False positives', 'Specificity'],
+                correct: 1,
+              },
+              {
+                question: 'ROC curve plots:',
+                options: ['Precision vs Recall', 'TPR vs FPR', 'Accuracy vs Loss', 'Train vs Test'],
+                correct: 1,
+              },
+              {
+                question: 'AUC stands for:',
+                options: ['Area Under Curve', 'Accuracy Under Classification', 'Average Unit Cost', 'Algorithm Under Control'],
+                correct: 0,
+              },
+              {
+                question: 'Decision trees can handle:',
+                options: ['Only numerical data', 'Only categorical data', 'Both numerical and categorical', 'Neither type'],
+                correct: 2,
+              },
+              {
+                question: 'What is entropy in decision trees?',
+                options: ['Measure of impurity', 'Accuracy metric', 'Loss function', 'Optimization method'],
+                correct: 0,
+              },
+              {
+                question: 'Random Forest is:',
+                options: ['Single tree', 'Ensemble of trees', 'Linear model', 'Neural network'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'deep-learning': {
+      title: 'Deep Learning Specialization - Neural Networks & TensorFlow',
+      description: 'Master deep learning with neural networks, CNNs, RNNs, and Transformers. Build advanced AI models using TensorFlow and Keras.',
+      level: 'Advanced',
+      duration: '12 weeks',
+      totalScore: 1000,
+      passingScore: 700,
+      instructor: 'Dr. Maria Chen',
+      rating: 4.9,
+      enrolled: 1500,
+      image: '🧠',
+      syllabus: [
+        { week: 1, title: 'Neural Networks', topics: ['Perceptron', 'Backpropagation', 'Activation Functions'] },
+        { week: 2, title: 'Deep Networks', topics: ['Deep NNs', 'Optimization', 'Regularization'] },
+        { week: 3, title: 'CNNs', topics: ['Convolution', 'Pooling', 'CNN Architectures'] },
+        { week: 4, title: 'Object Detection', topics: ['YOLO', 'R-CNN', 'Image Segmentation'] },
+        { week: 5, title: 'RNNs & LSTMs', topics: ['Sequence Models', 'LSTM', 'GRU'] },
+        { week: 6, title: 'Transformers', topics: ['Attention', 'BERT', 'GPT'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Neural Network Fundamentals',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'dl-1',
+              name: 'Introduction to Neural Networks',
+              theory: {
+                title: 'Deep Learning Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/deep-learning-tutorial/',
+              },
+              video: {
+                title: 'Neural Networks Explained - 3Blue1Brown',
+                url: 'https://www.youtube.com/watch?v=aircAruvnKk',
+                channel: '3Blue1Brown',
+              },
+            },
+            {
+              id: 'dl-2',
+              name: 'Backpropagation & Training',
+              theory: {
+                title: 'AI Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/ai/',
+              },
+              video: {
+                title: 'Backpropagation Calculus - 3Blue1Brown',
+                url: 'https://www.youtube.com/watch?v=tIeHLnjs5U8',
+                channel: '3Blue1Brown',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the purpose of activation functions?',
+                options: ['Add linearity', 'Add non-linearity', 'Reduce computation', 'Normalize data'],
+                correct: 1,
+              },
+              {
+                question: 'What does backpropagation compute?',
+                options: ['Forward pass', 'Gradients', 'Predictions', 'Accuracy'],
+                correct: 1,
+              },
+              {
+                question: 'Which activation function can cause vanishing gradient?',
+                options: ['ReLU', 'Sigmoid', 'LeakyReLU', 'ELU'],
+                correct: 1,
+              },
+              {
+                question: 'What is a perceptron?',
+                options: ['Neural network layer', 'Single neuron', 'Activation function', 'Loss function'],
+                correct: 1,
+              },
+              {
+                question: 'Deep learning requires:',
+                options: ['Small data', 'Large data', 'No data', 'Only labeled data'],
+                correct: 1,
+              },
+              {
+                question: 'What is the vanishing gradient problem?',
+                options: ['Gradients become too large', 'Gradients become too small', 'No gradients', 'Constant gradients'],
+                correct: 1,
+              },
+              {
+                question: 'Dropout is used for:',
+                options: ['Faster training', 'Preventing overfitting', 'Data augmentation', 'Feature extraction'],
+                correct: 1,
+              },
+              {
+                question: 'Batch normalization helps with:',
+                options: ['Faster convergence', 'Slower training', 'Less accuracy', 'More parameters'],
+                correct: 0,
+              },
+              {
+                question: 'Which optimizer is commonly used?',
+                options: ['SGD', 'Adam', 'RMSprop', 'All of these'],
+                correct: 3,
+              },
+              {
+                question: 'What is an epoch?',
+                options: ['One batch', 'One iteration', 'One full pass through data', 'One layer'],
+                correct: 2,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Convolutional Neural Networks',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'dl-3',
+              name: 'CNN Architecture & Applications',
+              theory: {
+                title: 'CNN in Machine Learning - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/convolutional-neural-network-cnn-in-machine-learning/',
+              },
+              video: {
+                title: 'CNNs Explained - Computerphile',
+                url: 'https://www.youtube.com/watch?v=K4ZZmqRCCPo',
+                channel: 'Computerphile',
+              },
+            },
+            {
+              id: 'dl-4',
+              name: 'Image Classification with TensorFlow',
+              theory: {
+                title: 'Deep Learning - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/deep-learning-tutorial/',
+              },
+              video: {
+                title: 'TensorFlow CNN Tutorial - Sentdex',
+                url: 'https://www.youtube.com/watch?v=WvoLTXIjBYU',
+                channel: 'Sentdex',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What does a convolutional layer do?',
+                options: ['Flatten data', 'Extract features', 'Classify', 'Normalize'],
+                correct: 1,
+              },
+              {
+                question: 'What is pooling used for?',
+                options: ['Increase size', 'Reduce spatial dimensions', 'Add layers', 'Training speed'],
+                correct: 1,
+              },
+              {
+                question: 'Max pooling selects:',
+                options: ['Average value', 'Maximum value', 'Minimum value', 'Sum of values'],
+                correct: 1,
+              },
+              {
+                question: 'What is a filter in CNN?',
+                options: ['Activation function', 'Kernel for convolution', 'Pooling layer', 'Dense layer'],
+                correct: 1,
+              },
+              {
+                question: 'Stride in convolution refers to:',
+                options: ['Filter size', 'Step size of filter movement', 'Number of filters', 'Padding size'],
+                correct: 1,
+              },
+              {
+                question: 'Padding is used to:',
+                options: ['Reduce size', 'Maintain size', 'Remove boundaries', 'Add layers'],
+                correct: 1,
+              },
+              {
+                question: 'CNNs are primarily used for:',
+                options: ['Text data', 'Image data', 'Audio data', 'Tabular data'],
+                correct: 1,
+              },
+              {
+                question: 'Transfer learning involves:',
+                options: ['Training from scratch', 'Using pre-trained models', 'No training', 'Data transfer'],
+                correct: 1,
+              },
+              {
+                question: 'ImageNet is:',
+                options: ['Neural network', 'Large image dataset', 'Architecture', 'Framework'],
+                correct: 1,
+              },
+              {
+                question: 'ResNet introduced:',
+                options: ['Pooling', 'Skip connections', 'Dropout', 'Batch norm'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 3,
+          title: 'Recurrent Neural Networks & Transformers',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'dl-5',
+              name: 'RNNs and Sequence Modeling',
+              theory: {
+                title: 'Deep Learning Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/deep-learning-tutorial/',
+              },
+              video: {
+                title: 'RNN & LSTM - The AI Hacker',
+                url: 'https://www.youtube.com/watch?v=WCUNPb-5EYI',
+                channel: 'The AI Hacker',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What problem do LSTMs solve?',
+                options: ['Overfitting', 'Vanishing gradients', 'Underfitting', 'Bias'],
+                correct: 1,
+              },
+              {
+                question: 'RNNs are used for:',
+                options: ['Images', 'Sequential data', 'Tabular data', 'Static data'],
+                correct: 1,
+              },
+              {
+                question: 'LSTM stands for:',
+                options: ['Long Short-Term Memory', 'Linear State Transfer Model', 'Large Scale Training Method', 'Layer Stacking Temporal Model'],
+                correct: 0,
+              },
+              {
+                question: 'GRU has how many gates?',
+                options: ['1', '2', '3', '4'],
+                correct: 1,
+              },
+              {
+                question: 'Attention mechanism helps with:',
+                options: ['Focusing on relevant parts', 'Faster training', 'Less memory', 'More layers'],
+                correct: 0,
+              },
+              {
+                question: 'Transformers use:',
+                options: ['Convolution', 'Recurrence', 'Attention', 'Pooling'],
+                correct: 2,
+              },
+              {
+                question: 'BERT is:',
+                options: ['CNN model', 'RNN model', 'Transformer model', 'Linear model'],
+                correct: 2,
+              },
+              {
+                question: 'Seq2Seq models are used for:',
+                options: ['Classification', 'Translation', 'Regression', 'Clustering'],
+                correct: 1,
+              },
+              {
+                question: 'Teacher forcing is used in:',
+                options: ['Training RNNs', 'Testing CNNs', 'Deploying models', 'Data preprocessing'],
+                correct: 0,
+              },
+              {
+                question: 'Encoder-decoder architecture is used in:',
+                options: ['Image classification', 'Sequence-to-sequence tasks', 'Object detection', 'Segmentation'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'advanced-dsa': {
+      title: 'Advanced Data Structures & Algorithms',
+      description: 'Master advanced data structures including trees, graphs, and complex algorithms. Perfect for experienced programmers targeting senior roles.',
+      level: 'Advanced',
+      duration: '10 weeks',
+      totalScore: 900,
+      passingScore: 650,
+      instructor: 'Prof. Michael Zhang',
+      rating: 4.9,
+      enrolled: 1800,
+      image: '🚀',
+      syllabus: [
+        { week: 1, title: 'Binary Trees & BST', topics: ['Tree Traversals', 'BST Operations', 'Tree Problems'] },
+        { week: 2, title: 'Advanced Trees', topics: ['AVL Trees', 'Red-Black Trees', 'B-Trees'] },
+        { week: 3, title: 'Graph Algorithms', topics: ['BFS', 'DFS', 'Shortest Paths'] },
+        { week: 4, title: 'Dynamic Programming', topics: ['DP Patterns', 'Optimization', 'DP Problems'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Binary Trees & BST',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'adsa-1',
+              name: 'Binary Trees Fundamentals',
+              theory: {
+                title: 'Binary Tree - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/binary-tree-data-structure/',
+              },
+              video: {
+                title: 'Binary Trees - mycodeschool',
+                url: 'https://www.youtube.com/watch?v=H5JubkIy_p8',
+                channel: 'mycodeschool',
+              },
+            },
+            {
+              id: 'adsa-2',
+              name: 'Binary Search Trees',
+              theory: {
+                title: 'BST Operations - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/binary-search-tree-data-structure/',
+              },
+              video: {
+                title: 'BST Complete Tutorial - Abdul Bari',
+                url: 'https://www.youtube.com/watch?v=pYT9F8_LFTM',
+                channel: 'Abdul Bari',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the time complexity of BST search in average case?',
+                options: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'],
+                correct: 1,
+              },
+              {
+                question: 'Binary tree traversal types include:',
+                options: ['Inorder only', 'Preorder only', 'Postorder only', 'All of these'],
+                correct: 3,
+              },
+              {
+                question: 'In BST, left child is:',
+                options: ['Greater than parent', 'Less than parent', 'Equal to parent', 'No relation'],
+                correct: 1,
+              },
+              {
+                question: 'Height of a balanced binary tree with n nodes:',
+                options: ['O(n)', 'O(log n)', 'O(n²)', 'O(1)'],
+                correct: 1,
+              },
+              {
+                question: 'AVL tree is:',
+                options: ['Unbalanced tree', 'Self-balancing BST', 'Binary heap', 'Graph'],
+                correct: 1,
+              },
+              {
+                question: 'Red-Black tree ensures:',
+                options: ['Always balanced', 'Approximately balanced', 'Never balanced', 'Random balance'],
+                correct: 1,
+              },
+              {
+                question: 'Complete binary tree has:',
+                options: ['All levels full except possibly last', 'No structure', 'Only one node', 'Unbalanced'],
+                correct: 0,
+              },
+              {
+                question: 'Inorder traversal of BST gives:',
+                options: ['Random order', 'Sorted order', 'Reverse order', 'Level order'],
+                correct: 1,
+              },
+              {
+                question: 'What is a leaf node?',
+                options: ['Root node', 'Node with no children', 'Node with one child', 'Internal node'],
+                correct: 1,
+              },
+              {
+                question: 'Binary heap is used to implement:',
+                options: ['Queue', 'Priority Queue', 'Stack', 'Deque'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Graph Algorithms',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'adsa-3',
+              name: 'Graph Representations & BFS/DFS',
+              theory: {
+                title: 'Graph Data Structure - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/',
+              },
+              video: {
+                title: 'Graph Algorithms - William Fiset',
+                url: 'https://www.youtube.com/watch?v=tWVWeAqZ0WU',
+                channel: 'William Fiset',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'Which data structure is used for BFS?',
+                options: ['Stack', 'Queue', 'Heap', 'Tree'],
+                correct: 1,
+              },
+              {
+                question: 'DFS uses which data structure?',
+                options: ['Queue', 'Stack', 'Heap', 'Array'],
+                correct: 1,
+              },
+              {
+                question: 'Dijkstra algorithm finds:',
+                options: ['Minimum spanning tree', 'Shortest path', 'Maximum flow', 'Cycles'],
+                correct: 1,
+              },
+              {
+                question: 'Graph with no cycles is called:',
+                options: ['Cyclic', 'Acyclic', 'Complete', 'Bipartite'],
+                correct: 1,
+              },
+              {
+                question: 'Topological sort works on:',
+                options: ['Undirected graphs', 'Directed acyclic graphs', 'Cyclic graphs', 'Complete graphs'],
+                correct: 1,
+              },
+              {
+                question: 'Bellman-Ford algorithm can handle:',
+                options: ['Only positive weights', 'Negative weights', 'No weights', 'Zero weights only'],
+                correct: 1,
+              },
+              {
+                question: 'Kruskal\'s algorithm is for:',
+                options: ['Shortest path', 'Minimum spanning tree', 'Maximum flow', 'Cycle detection'],
+                correct: 1,
+              },
+              {
+                question: 'BFS finds shortest path in:',
+                options: ['Weighted graphs', 'Unweighted graphs', 'Directed graphs only', 'Trees only'],
+                correct: 1,
+              },
+              {
+                question: 'Graph coloring is used in:',
+                options: ['Sorting', 'Register allocation', 'Searching', 'Hashing'],
+                correct: 1,
+              },
+              {
+                question: 'Floyd-Warshall finds:',
+                options: ['Single source shortest path', 'All pairs shortest path', 'MST', 'Maximum flow'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'mern-fullstack': {
+      title: 'Complete MERN Stack Development Bootcamp',
+      description: 'Build production-ready full-stack applications with MongoDB, Express.js, React, and Node.js.',
+      level: 'Advanced',
+      duration: '12 weeks',
+      totalScore: 1000,
+      passingScore: 700,
+      instructor: 'Aisha Patel',
+      rating: 4.8,
+      enrolled: 2100,
+      image: '🔥',
+      syllabus: [
+        { week: 1, title: 'Node.js & Express', topics: ['Node Basics', 'Express Setup', 'REST APIs'] },
+        { week: 2, title: 'MongoDB', topics: ['Database Design', 'Mongoose', 'CRUD Operations'] },
+        { week: 3, title: 'Authentication', topics: ['JWT', 'OAuth', 'Security'] },
+        { week: 4, title: 'React Integration', topics: ['Frontend-Backend', 'State Management', 'Deployment'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Node.js & Express Fundamentals',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'mern-1',
+              name: 'Node.js Basics & NPM',
+              theory: {
+                title: 'Node.js Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/nodejs/',
+              },
+              video: {
+                title: 'Node.js Complete Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=Oe421EPjeBE',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'mern-2',
+              name: 'Express.js & REST APIs',
+              theory: {
+                title: 'MERN Stack - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/mern-stack/',
+              },
+              video: {
+                title: 'Express.js Tutorial - Traversy Media',
+                url: 'https://www.youtube.com/watch?v=L72fhGm1tfE',
+                channel: 'Traversy Media',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is Express.js?',
+                options: ['A database', 'A web framework', 'A frontend library', 'A CSS framework'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'MongoDB & Database Design',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'mern-3',
+              name: 'MongoDB Basics & Mongoose',
+              theory: {
+                title: 'MongoDB Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/mongodb/',
+              },
+              video: {
+                title: 'MongoDB Complete Guide - Academind',
+                url: 'https://www.youtube.com/watch?v=-56x56UppqQ',
+                channel: 'Academind',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What type of database is MongoDB?',
+                options: ['SQL', 'NoSQL', 'Graph', 'Time-series'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 3,
+          title: 'React Frontend Integration',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'mern-4',
+              name: 'React with Backend APIs',
+              theory: {
+                title: 'React Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/react/',
+              },
+              video: {
+                title: 'MERN Stack Tutorial - Traversy Media',
+                url: 'https://www.youtube.com/watch?v=7CqJlxBYj-M',
+                channel: 'Traversy Media',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'Which HTTP method is used to create a resource?',
+                options: ['GET', 'POST', 'PUT', 'DELETE'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'operating-systems': {
+      title: 'Operating Systems: Concepts & Implementation',
+      description: 'Deep dive into operating system internals. Learn process management, memory management, file systems, and implement key OS concepts.',
+      level: 'Intermediate',
+      duration: '8 weeks',
+      totalScore: 700,
+      passingScore: 480,
+      instructor: 'Prof. Thomas Anderson',
+      rating: 4.6,
+      enrolled: 2200,
+      image: '💻',
+      syllabus: [
+        { week: 1, title: 'OS Introduction', topics: ['OS Architecture', 'Processes', 'System Calls'] },
+        { week: 2, title: 'Threads & Concurrency', topics: ['Threading', 'Synchronization', 'Deadlocks'] },
+        { week: 3, title: 'Memory Management', topics: ['Virtual Memory', 'Paging', 'Segmentation'] },
+        { week: 4, title: 'File Systems', topics: ['File Operations', 'Directory Structure', 'I/O Systems'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'OS Introduction & Processes',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'os-1',
+              name: 'Operating Systems Fundamentals',
+              theory: {
+                title: 'Operating Systems - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/operating-systems/',
+              },
+              video: {
+                title: 'OS Complete Course - Neso Academy',
+                url: 'https://www.youtube.com/watch?v=vBURTt97EkA',
+                channel: 'Neso Academy',
+              },
+            },
+            {
+              id: 'os-2',
+              name: 'Process Management',
+              theory: {
+                title: 'Process Synchronization - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/process-synchronization-in-os/',
+              },
+              video: {
+                title: 'Process Management - Jenny\'s Lectures',
+                url: 'https://www.youtube.com/watch?v=OrM7nZcxXZU',
+                channel: 'Jenny\'s Lectures',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is a process?',
+                options: ['A program in execution', 'A file on disk', 'A user interface', 'A network connection'],
+                correct: 0,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Memory Management & Virtual Memory',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'os-3',
+              name: 'Memory Management Techniques',
+              theory: {
+                title: 'Operating Systems Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/operating-systems/',
+              },
+              video: {
+                title: 'Memory Management - Gate Smashers',
+                url: 'https://www.youtube.com/watch?v=qdkxXygc3rE',
+                channel: 'Gate Smashers',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is paging?',
+                options: ['Memory allocation technique', 'CPU scheduling', 'File system', 'Network protocol'],
+                correct: 0,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'computer-networks': {
+      title: 'Computer Networks: Protocol Design & Implementation',
+      description: 'Master computer networking from protocols to security. Learn TCP/IP, HTTP/HTTPS, DNS, and build network applications.',
+      level: 'Intermediate',
+      duration: '8 weeks',
+      totalScore: 700,
+      passingScore: 490,
+      instructor: 'Dr. Lisa Wang',
+      rating: 4.7,
+      enrolled: 2400,
+      image: '🌐',
+      syllabus: [
+        { week: 1, title: 'Network Fundamentals', topics: ['OSI Model', 'TCP/IP', 'Network Layers'] },
+        { week: 2, title: 'Transport Layer', topics: ['TCP', 'UDP', 'Sockets'] },
+        { week: 3, title: 'Application Layer', topics: ['HTTP', 'DNS', 'FTP'] },
+        { week: 4, title: 'Network Security', topics: ['Encryption', 'Firewalls', 'VPN'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Network Fundamentals & OSI Model',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'net-1',
+              name: 'Introduction to Computer Networks',
+              theory: {
+                title: 'Computer Networks - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/computer-network-tutorials/',
+              },
+              video: {
+                title: 'Computer Networks Course - Neso Academy',
+                url: 'https://www.youtube.com/watch?v=VwN91x5i25g',
+                channel: 'Neso Academy',
+              },
+            },
+            {
+              id: 'net-2',
+              name: 'TCP/IP Protocol Suite',
+              theory: {
+                title: 'TCP/IP Model - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/tcp-ip-model/',
+              },
+              video: {
+                title: 'TCP/IP Explained - PowerCert',
+                url: 'https://www.youtube.com/watch?v=PpsEaqJV_A0',
+                channel: 'PowerCert',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'How many layers are in the OSI model?',
+                options: ['5', '6', '7', '8'],
+                correct: 2,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Socket Programming',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'net-3',
+              name: 'Socket Programming with Python',
+              theory: {
+                title: 'Python Network Programming - W3Schools',
+                url: 'https://www.w3schools.com/python/python_network.asp',
+              },
+              video: {
+                title: 'Socket Programming - Tech With Tim',
+                url: 'https://www.youtube.com/watch?v=3QiPPX-KeSc',
+                channel: 'Tech With Tim',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'Which protocol is connection-oriented?',
+                options: ['UDP', 'TCP', 'ICMP', 'ARP'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'dbms-course': {
+      title: 'Database Management Systems - SQL & NoSQL Mastery',
+      description: 'Master database design, SQL queries, normalization, transactions, and NoSQL databases. Learn PostgreSQL, MongoDB, and optimization.',
+      level: 'Intermediate',
+      duration: '9 weeks',
+      totalScore: 750,
+      passingScore: 520,
+      instructor: 'Mark Stevens',
+      rating: 4.8,
+      enrolled: 2600,
+      image: '🗄️',
+      syllabus: [
+        { week: 1, title: 'SQL Basics', topics: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'] },
+        { week: 2, title: 'Advanced SQL', topics: ['Joins', 'Subqueries', 'Aggregations'] },
+        { week: 3, title: 'Database Design', topics: ['Normalization', 'ER Diagrams', 'Schema Design'] },
+        { week: 4, title: 'MongoDB', topics: ['Document DB', 'CRUD', 'Aggregation Pipeline'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'SQL Basics & Queries',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'db-1',
+              name: 'SQL Fundamentals',
+              theory: {
+                title: 'SQL Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/sql/',
+              },
+              video: {
+                title: 'SQL Complete Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=HXV3zeQKqGY',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'db-2',
+              name: 'Advanced SQL Queries',
+              theory: {
+                title: 'PostgreSQL Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/postgresql/',
+              },
+              video: {
+                title: 'SQL Joins Explained - Programming with Mosh',
+                url: 'https://www.youtube.com/watch?v=9yeOJ0ZMUYw',
+                channel: 'Programming with Mosh',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What does SQL stand for?',
+                options: ['Structured Query Language', 'Simple Question Language', 'Standard Query List', 'System Query Logic'],
+                correct: 0,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Database Design & Normalization',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'db-3',
+              name: 'Database Normalization',
+              theory: {
+                title: 'DBMS Concepts - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/dbms/',
+              },
+              video: {
+                title: 'Database Design - Caleb Curry',
+                url: 'https://www.youtube.com/watch?v=ztHopE5Wnpc',
+                channel: 'Caleb Curry',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the goal of normalization?',
+                options: ['Increase redundancy', 'Reduce redundancy', 'Add more tables', 'Remove all tables'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 3,
+          title: 'MongoDB & NoSQL',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'db-4',
+              name: 'MongoDB Basics',
+              theory: {
+                title: 'MongoDB Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/mongodb/',
+              },
+              video: {
+                title: 'MongoDB Complete Course - Academind',
+                url: 'https://www.youtube.com/watch?v=-56x56UppqQ',
+                channel: 'Academind',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What type of database is MongoDB?',
+                options: ['Relational', 'Document', 'Graph', 'Key-Value'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'system-design': {
+      title: 'System Design & Scalable Architecture',
+      description: 'Learn to design large-scale distributed systems. Master scalability patterns, microservices, caching, load balancing.',
+      level: 'Advanced',
+      duration: '10 weeks',
+      totalScore: 900,
+      passingScore: 630,
+      instructor: 'Alex Morrison',
+      rating: 4.9,
+      enrolled: 1700,
+      image: '🏗️',
+      syllabus: [
+        { week: 1, title: 'System Design Basics', topics: ['Scalability', 'Reliability', 'Availability'] },
+        { week: 2, title: 'Load Balancing', topics: ['Load Balancers', 'Caching', 'CDN'] },
+        { week: 3, title: 'Databases', topics: ['SQL vs NoSQL', 'Sharding', 'Replication'] },
+        { week: 4, title: 'Microservices', topics: ['Service Architecture', 'API Gateway', 'Message Queues'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'System Design Fundamentals',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'sd-1',
+              name: 'Introduction to System Design',
+              theory: {
+                title: 'System Design Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/system-design-tutorial/',
+              },
+              video: {
+                title: 'System Design Primer - Gaurav Sen',
+                url: 'https://www.youtube.com/watch?v=FSR1s2b-l_I',
+                channel: 'Gaurav Sen',
+              },
+            },
+            {
+              id: 'sd-2',
+              name: 'Scalability & Load Balancing',
+              theory: {
+                title: 'System Design Roadmap - TakeUforward',
+                url: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes/',
+              },
+              video: {
+                title: 'Scalability - Tech Dummies',
+                url: 'https://www.youtube.com/watch?v=xpDnVSmNFX0',
+                channel: 'Tech Dummies',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is horizontal scaling?',
+                options: ['Adding more power to servers', 'Adding more servers', 'Adding more storage', 'Adding more networks'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Microservices Architecture',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'sd-3',
+              name: 'Microservices Design Patterns',
+              theory: {
+                title: 'Design Patterns - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/design-patterns/',
+              },
+              video: {
+                title: 'Microservices Tutorial - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=CdBtNQZH8a4',
+                channel: 'freeCodeCamp',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the main benefit of microservices?',
+                options: ['Simplicity', 'Monolithic structure', 'Independent deployment', 'Single database'],
+                correct: 2,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'react-native': {
+      title: 'React Native - Build iOS & Android Apps',
+      description: 'Build cross-platform mobile apps with React Native. Learn navigation, state management, native modules, and app publishing.',
+      level: 'Intermediate',
+      duration: '8 weeks',
+      totalScore: 700,
+      passingScore: 490,
+      instructor: 'Sophie Martinez',
+      rating: 4.7,
+      enrolled: 1600,
+      image: '📱',
+      syllabus: [
+        { week: 1, title: 'React Native Basics', topics: ['Setup', 'Components', 'Styling'] },
+        { week: 2, title: 'Navigation', topics: ['React Navigation', 'Stack', 'Tabs'] },
+        { week: 3, title: 'State Management', topics: ['Context API', 'Redux', 'Async Storage'] },
+        { week: 4, title: 'Native Features', topics: ['Camera', 'GPS', 'Notifications'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'React Native Fundamentals',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'rn-1',
+              name: 'Getting Started with React Native',
+              theory: {
+                title: 'React Native Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/react/react_native.asp',
+              },
+              video: {
+                title: 'React Native Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=0-S5a0eXPoc',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'rn-2',
+              name: 'React Native Components',
+              theory: {
+                title: 'React Native - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/react-native/',
+              },
+              video: {
+                title: 'React Native Components - Programming with Mosh',
+                url: 'https://www.youtube.com/watch?v=0-S5a0eXPoc',
+                channel: 'Programming with Mosh',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What library is used for navigation in React Native?',
+                options: ['React Router', 'React Navigation', 'Native Navigation', 'RN Router'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'State Management & APIs',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'rn-3',
+              name: 'React Context & Redux',
+              theory: {
+                title: 'React Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/react/',
+              },
+              video: {
+                title: 'React Native State Management - Academind',
+                url: 'https://www.youtube.com/watch?v=MJzmZ9qmdaE',
+                channel: 'Academind',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is used for persistent storage in React Native?',
+                options: ['localStorage', 'AsyncStorage', 'SessionStorage', 'Cookies'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'android-kotlin': {
+      title: 'Android Development Masterclass with Kotlin',
+      description: 'Master native Android development with Kotlin and Jetpack Compose. Build modern Android apps with Material Design.',
+      level: 'Intermediate',
+      duration: '10 weeks',
+      totalScore: 800,
+      passingScore: 560,
+      instructor: 'Kevin Park',
+      rating: 4.8,
+      enrolled: 1400,
+      image: '🤖',
+      syllabus: [
+        { week: 1, title: 'Kotlin Basics', topics: ['Syntax', 'OOP', 'Functions'] },
+        { week: 2, title: 'Android Fundamentals', topics: ['Activities', 'Intents', 'Layouts'] },
+        { week: 3, title: 'Jetpack Compose', topics: ['Composables', 'State', 'UI'] },
+        { week: 4, title: 'Data Persistence', topics: ['Room DB', 'SharedPreferences', 'DataStore'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Kotlin Programming Fundamentals',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'android-1',
+              name: 'Kotlin Basics',
+              theory: {
+                title: 'Kotlin Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/kotlin/',
+              },
+              video: {
+                title: 'Kotlin Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=F9UC9DY-vIU',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'android-2',
+              name: 'Kotlin for Android',
+              theory: {
+                title: 'Kotlin Programming - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/kotlin-programming-language/',
+              },
+              video: {
+                title: 'Kotlin Android Tutorial - Philipp Lackner',
+                url: 'https://www.youtube.com/watch?v=BBWyXo-3JGQ',
+                channel: 'Philipp Lackner',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the null-safe operator in Kotlin?',
+                options: ['?', '!', '!!', '?.'],
+                correct: 3,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Android Basics & Layouts',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'android-3',
+              name: 'Android Activities & Intents',
+              theory: {
+                title: 'Android Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/android-tutorial/',
+              },
+              video: {
+                title: 'Android Development - Traversy Media',
+                url: 'https://www.youtube.com/watch?v=fis26HvvDII',
+                channel: 'Traversy Media',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is an Activity in Android?',
+                options: ['A database', 'A screen', 'A service', 'A file'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'devops-basics': {
+      title: 'DevOps Engineering Bootcamp - CI/CD to Kubernetes',
+      description: 'Master DevOps practices with Git, CI/CD pipelines, Docker, Kubernetes, Jenkins, and cloud deployment.',
+      level: 'Intermediate',
+      duration: '8 weeks',
+      totalScore: 700,
+      passingScore: 490,
+      instructor: 'Robert Chen',
+      rating: 4.7,
+      enrolled: 1900,
+      image: '⚙️',
+      syllabus: [
+        { week: 1, title: 'Git & Version Control', topics: ['Git Basics', 'Branching', 'Merging'] },
+        { week: 2, title: 'CI/CD Pipelines', topics: ['Jenkins', 'GitHub Actions', 'Automation'] },
+        { week: 3, title: 'Docker', topics: ['Containers', 'Images', 'Docker Compose'] },
+        { week: 4, title: 'Kubernetes', topics: ['Pods', 'Deployments', 'Services'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'Git & Version Control Mastery',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'devops-1',
+              name: 'Git Fundamentals',
+              theory: {
+                title: 'Git Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/git/',
+              },
+              video: {
+                title: 'Git & GitHub Complete Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=RGOj5yH7evk',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'devops-2',
+              name: 'Git Branching Strategies',
+              theory: {
+                title: 'DevOps Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/devops-tutorial/',
+              },
+              video: {
+                title: 'Git Branching - The Net Ninja',
+                url: 'https://www.youtube.com/watch?v=QV0kVNvkMxc',
+                channel: 'The Net Ninja',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What command is used to create a new branch?',
+                options: ['git new branch', 'git branch', 'git checkout -b', 'git create branch'],
+                correct: 2,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Docker & Containerization',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'devops-3',
+              name: 'Docker Basics & Images',
+              theory: {
+                title: 'Docker Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/docker-tutorial/',
+              },
+              video: {
+                title: 'Docker Complete Course - TechWorld with Nana',
+                url: 'https://www.youtube.com/watch?v=3c-iBn73dDE',
+                channel: 'TechWorld with Nana',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is a Docker container?',
+                options: ['A virtual machine', 'A lightweight executable package', 'A database', 'A web server'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'aws-cloud': {
+      title: 'AWS Solutions Architect - Complete Certification Course',
+      description: 'Master AWS cloud services and architecture. Learn EC2, S3, Lambda, VPC, RDS, and prepare for AWS certification.',
+      level: 'Advanced',
+      duration: '10 weeks',
+      totalScore: 900,
+      passingScore: 630,
+      instructor: 'Rachel Brown',
+      rating: 4.8,
+      enrolled: 1500,
+      image: '☁️',
+      syllabus: [
+        { week: 1, title: 'AWS Fundamentals', topics: ['IAM', 'Regions', 'AWS Console'] },
+        { week: 2, title: 'EC2 & Compute', topics: ['EC2 Instances', 'Auto Scaling', 'Load Balancers'] },
+        { week: 3, title: 'Storage Services', topics: ['S3', 'EBS', 'EFS'] },
+        { week: 4, title: 'Databases', topics: ['RDS', 'DynamoDB', 'Aurora'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'AWS Fundamentals & IAM',
+          duration: '1.5 weeks',
+          topics: [
+            {
+              id: 'aws-1',
+              name: 'Introduction to AWS',
+              theory: {
+                title: 'AWS Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/aws-tutorial/',
+              },
+              video: {
+                title: 'AWS Certified Solutions Architect - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=Ia-UEYYR44s',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'aws-2',
+              name: 'IAM & Security',
+              theory: {
+                title: 'AWS Cloud Computing - W3Schools',
+                url: 'https://www.w3schools.com/aws/',
+              },
+              video: {
+                title: 'AWS IAM Tutorial - Simplilearn',
+                url: 'https://www.youtube.com/watch?v=ExjW3HCFVLA',
+                channel: 'Simplilearn',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What does IAM stand for?',
+                options: ['Internet Access Management', 'Identity and Access Management', 'Infrastructure Application Manager', 'Instance Authentication Method'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'EC2 & Compute Services',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'aws-3',
+              name: 'EC2 Instances & Auto Scaling',
+              theory: {
+                title: 'Amazon Web Services - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/amazon-web-services-aws/',
+              },
+              video: {
+                title: 'AWS EC2 Complete Course - Edureka',
+                url: 'https://www.youtube.com/watch?v=_xPBNjvnHTo',
+                channel: 'Edureka',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is EC2?',
+                options: ['A database service', 'A virtual server in the cloud', 'A storage service', 'A networking tool'],
+                correct: 1,
+              },
+            ],
+          },
+        },
+        {
+          id: 3,
+          title: 'Storage Services (S3, EBS, EFS)',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'aws-4',
+              name: 'Amazon S3 & Storage Options',
+              theory: {
+                title: 'AWS Tutorial - W3Schools',
+                url: 'https://www.w3schools.com/aws/',
+              },
+              video: {
+                title: 'AWS S3 Tutorial - Simplilearn',
+                url: 'https://www.youtube.com/watch?v=77lMCiiMilo',
+                channel: 'Simplilearn',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What does S3 stand for?',
+                options: ['Simple Storage Service', 'Secure Server Storage', 'System Storage Solution', 'Standard Storage Service'],
+                correct: 0,
+              },
+            ],
+          },
+        },
+      ],
+    },
+    'nlp-course': {
+      title: 'Natural Language Processing - From BERT to GPT',
+      description: 'Master modern NLP techniques with Transformers, BERT, GPT. Build chatbots, sentiment analysis systems, and language models.',
+      level: 'Advanced',
+      duration: '10 weeks',
+      totalScore: 850,
+      passingScore: 595,
+      instructor: 'Prof. David Lee',
+      rating: 4.8,
+      enrolled: 1200,
+      image: '💬',
+      syllabus: [
+        { week: 1, title: 'NLP Foundations', topics: ['Text Processing', 'Tokenization', 'Word Embeddings'] },
+        { week: 2, title: 'Transformers', topics: ['Attention', 'BERT', 'GPT'] },
+        { week: 3, title: 'Applications', topics: ['Sentiment Analysis', 'NER', 'Question Answering'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'NLP Foundations & Text Processing',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'nlp-1',
+              name: 'Introduction to NLP',
+              theory: {
+                title: 'NLP Tutorial - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/natural-language-processing-nlp-tutorial/',
+              },
+              video: {
+                title: 'NLP Complete Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=fLvJ8VdHLA0',
+                channel: 'freeCodeCamp',
+              },
+            },
+            {
+              id: 'nlp-2',
+              name: 'Word Embeddings & Representations',
+              theory: {
+                title: 'Python NLP - W3Schools',
+                url: 'https://www.w3schools.com/python/python_ml_nlp.asp',
+              },
+              video: {
+                title: 'Word2Vec Explained - Computerphile',
+                url: 'https://www.youtube.com/watch?v=nk2CQITm_eo',
+                channel: 'Computerphile',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is tokenization?',
+                options: ['Splitting text into tokens', 'Encrypting text', 'Translating text', 'Compressing text'],
+                correct: 0,
+              },
+            ],
+          },
+        },
+        {
+          id: 2,
+          title: 'Transformer Architecture',
+          duration: '2 weeks',
+          topics: [
+            {
+              id: 'nlp-3',
+              name: 'Transformers & Attention Mechanisms',
+              theory: {
+                title: 'Transformer Neural Network - GeeksforGeeks',
+                url: 'https://www.geeksforgeeks.org/transformer-neural-network/',
+              },
+              video: {
+                title: 'Transformers Explained - Yannic Kilcher',
+                url: 'https://www.youtube.com/watch?v=4Bdc55j80l8',
+                channel: 'Yannic Kilcher',
+              },
+            },
+          ],
+          quiz: {
+            questions: [
+              {
+                question: 'What is the key innovation in Transformers?',
+                options: ['Convolution', 'Attention mechanism', 'Pooling', 'Dropout'],
                 correct: 1,
               },
             ],
@@ -784,6 +2711,16 @@ const CourseView = () => {
   );
 };
 
+// Utility function to shuffle array
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
 // Quiz Modal Component
 const QuizModal = ({ module, onClose, onComplete }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -791,15 +2728,38 @@ const QuizModal = ({ module, onClose, onComplete }) => {
   const [score, setScore] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [answers, setAnswers] = useState([]);
+  const [shuffledQuestions, setShuffledQuestions] = useState([]);
+
+  // Shuffle questions and options when component mounts
+  useEffect(() => {
+    const shuffled = shuffleArray(module.quiz.questions).map(question => {
+      // Shuffle options and track correct answer position
+      const optionsWithIndex = question.options.map((option, idx) => ({
+        text: option,
+        isCorrect: idx === question.correct
+      }));
+      const shuffledOptions = shuffleArray(optionsWithIndex);
+      const newCorrectIndex = shuffledOptions.findIndex(opt => opt.isCorrect);
+      
+      return {
+        ...question,
+        options: shuffledOptions.map(opt => opt.text),
+        correct: newCorrectIndex
+      };
+    });
+    setShuffledQuestions(shuffled);
+  }, [module]);
 
   const handleAnswer = () => {
-    const isCorrect = selectedAnswer === module.quiz.questions[currentQuestion].correct;
+    if (shuffledQuestions.length === 0) return;
+    
+    const isCorrect = selectedAnswer === shuffledQuestions[currentQuestion].correct;
     setAnswers([...answers, { question: currentQuestion, correct: isCorrect }]);
     if (isCorrect) {
       setScore(score + 1);
     }
 
-    if (currentQuestion + 1 < module.quiz.questions.length) {
+    if (currentQuestion + 1 < shuffledQuestions.length) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
     } else {
@@ -814,7 +2774,18 @@ const QuizModal = ({ module, onClose, onComplete }) => {
     onClose();
   };
 
-  const percentage = Math.round((score / module.quiz.questions.length) * 100);
+  // Don't render until questions are shuffled
+  if (shuffledQuestions.length === 0) {
+    return (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-8">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+        </div>
+      </div>
+    );
+  }
+
+  const percentage = Math.round((score / shuffledQuestions.length) * 100);
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -835,14 +2806,14 @@ const QuizModal = ({ module, onClose, onComplete }) => {
 
             <div className="mb-6">
               <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Question {currentQuestion + 1} of {module.quiz.questions.length}
+                Question {currentQuestion + 1} of {shuffledQuestions.length}
               </p>
               <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-                {module.quiz.questions[currentQuestion].question}
+                {shuffledQuestions[currentQuestion].question}
               </h4>
 
               <div className="space-y-3">
-                {module.quiz.questions[currentQuestion].options.map((option, index) => (
+                {shuffledQuestions[currentQuestion].options.map((option, index) => (
                   <button
                     key={index}
                     onClick={() => setSelectedAnswer(index)}
@@ -863,7 +2834,7 @@ const QuizModal = ({ module, onClose, onComplete }) => {
               disabled={selectedAnswer === null}
               className="w-full px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {currentQuestion + 1 === module.quiz.questions.length ? 'Finish Quiz' : 'Next Question'}
+              {currentQuestion + 1 === shuffledQuestions.length ? 'Finish Quiz' : 'Next Question'}
             </button>
           </>
         ) : (
@@ -875,7 +2846,7 @@ const QuizModal = ({ module, onClose, onComplete }) => {
               Quiz Completed!
             </h3>
             <p className="text-4xl font-bold text-primary mb-4">
-              {score}/{module.quiz.questions.length}
+              {score}/{shuffledQuestions.length}
             </p>
             <p className="text-xl text-gray-600 dark:text-gray-400 mb-6">
               {percentage}% Score

@@ -1,24 +1,13 @@
-import { useState, useContext } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useContext, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import CodeEditor from '../components/CodeEditor';
 
 const CodingSheets = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useContext(AuthContext);
   const [selectedSheet, setSelectedSheet] = useState('dsa');
-  const [activeCategory, setActiveCategory] = useState(null);
-  const [selectedProblem, setSelectedProblem] = useState(null);
-  const [showCodeEditor, setShowCodeEditor] = useState(false);
-
-  const openCodeEditor = (problem) => {
-    setSelectedProblem(problem);
-    setShowCodeEditor(true);
-  };
-
-  const closeCodeEditor = () => {
-    setShowCodeEditor(false);
-    setSelectedProblem(null);
-  };
+  const [redirectingSheetId, setRedirectingSheetId] = useState(null);
 
   const sheetCategories = {
     dsa: {
@@ -29,7 +18,6 @@ const CodingSheets = () => {
           name: 'Striver\'s SDE Sheet',
           description: '191 handpicked top coding interview problems for product-based companies',
           problems: 191,
-          completed: 45,
           difficulty: 'mixed',
           icon: '🎯',
           color: 'from-primary to-coral',
@@ -38,103 +26,128 @@ const CodingSheets = () => {
         },
         {
           id: 'striver-a2z',
-          name: 'Striver\'s A2Z DSA Course',
-          description: 'Learn DSA from A to Z with 455 problems - Complete free course',
-          problems: 455,
-          completed: 89,
+          name: 'Striver A2Z DSA Course',
+          description: 'Complete A to Z DSA course from basics to advanced',
+          problems: 456,
           difficulty: 'mixed',
           icon: '📚',
-          color: 'from-blue-500 to-indigo-500',
-          source: 'https://takeuforward.org/dsa/strivers-a2z-sheet-learn-dsa-a-to-z',
-          categories: ['Learn the Basics', 'Sorting', 'Arrays', 'Binary Search', 'Strings', 'Linked List', 'Recursion', 'Bit Manipulation', 'Stack & Queues', 'Heaps', 'Greedy', 'Binary Trees', 'BST', 'Graphs', 'Dynamic Programming', 'Tries'],
+          color: 'from-orange-500 to-red-500',
+          source: 'https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2',
+          categories: ['Learn the Basics', 'Sorting', 'Arrays', 'Binary Search', 'Strings', 'Linked List', 'Recursion', 'Bit Manipulation', 'Stack & Queues', 'Graphs', 'Dynamic Programming', 'Tries', 'Greedy'],
         },
         {
           id: 'neetcode-150',
           name: 'Neetcode 150',
           description: 'Curated 150 LeetCode problems for interview preparation',
           problems: 150,
-          completed: 62,
           difficulty: 'mixed',
           icon: '🎓',
           color: 'from-green-500 to-emerald-500',
           source: 'https://codolio.com/question-tracker/sheet/neetcode-150',
-          categories: ['Arrays & Hashing (9)', 'Two Pointers (5)', 'Sliding Window (6)', 'Stack (7)', 'Binary Search (7)', 'Linked List (11)', 'Trees (15)', 'Heap/Priority Queue (7)', 'Backtracking (9)', 'Tries (3)', 'Graphs (13)', 'Advanced Graphs (6)', '1-D DP (12)', '2-D DP (11)', 'Greedy (8)', 'Intervals (6)', 'Math & Geometry (8)', 'Bit Manipulation (7)'],
+          categories: ['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Heap', 'Backtracking', 'Tries', 'Graphs', 'DP', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'],
         },
         {
           id: 'blind-75',
           name: 'Blind 75',
-          description: '75 frequently asked LeetCode problems - Must solve for interviews',
+          description: 'Top 75 must-do problems for tech interviews',
           problems: 75,
-          completed: 52,
           difficulty: 'mixed',
-          icon: '🚀',
-          color: 'from-purple-500 to-pink-500',
-          source: 'https://takeuforward.org/dsa/blind-75-leetcode-problems-detailed-video-solutions',
+          icon: '👁️',
+          color: 'from-pink-500 to-rose-500',
+          source: 'https://leetcode.com/discuss/general-discussion/460599/blind-75-leetcode-questions',
           categories: ['Array', 'Binary', 'Dynamic Programming', 'Graph', 'Interval', 'Linked List', 'Matrix', 'String', 'Tree', 'Heap'],
+        },
+        {
+          id: 'grind-75',
+          name: 'Grind 75',
+          description: 'Structured 75 problems to grind for weeks',
+          problems: 75,
+          difficulty: 'mixed',
+          icon: '⚙️',
+          color: 'from-blue-500 to-purple-500',
+          source: 'https://www.techinterviewhandbook.org/grind75',
+          categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+        },
+        {
+          id: 'leetcode-top-100',
+          name: 'LeetCode Top 100',
+          description: 'Most liked 100 problems on LeetCode',
+          problems: 100,
+          difficulty: 'mixed',
+          icon: '🔝',
+          color: 'from-yellow-500 to-orange-500',
+          source: 'https://leetcode.com/studyplan/top-100-liked/',
+          categories: ['Hash Table', 'String', 'Tree', 'Graph', 'Dynamic Programming', 'Array', 'Math', 'Sorting'],
         },
         {
           id: 'love-babbar',
           name: 'Love Babbar DSA Sheet',
-          description: '430 coding questions covering almost every DSA concept',
-          problems: 430,
-          completed: 87,
+          description: '450 most important DSA questions curated by Love Babbar',
+          problems: 450,
           difficulty: 'mixed',
-          icon: '💪',
-          color: 'from-orange-500 to-red-500',
-          source: 'https://codolio.com/question-tracker/sheet/love-babbar-sheet',
-          categories: ['Array (35)', 'Matrix (10)', 'String (41)', 'Searching & Sorting (31)', 'LinkedList (34)', 'Binary Search Trees (22)', 'BackTracking (19)', 'Heap (18)', 'Graph (42)', 'Dynamic Programming (59)', 'Binary Trees (32)', 'Greedy (35)', 'Stacks & Queues (36)', 'Trie (6)', 'Bit Manipulation (10)'],
+          icon: '❤️',
+          color: 'from-red-500 to-pink-500',
+          source: 'https://www.geeksforgeeks.org/dsa-sheet-by-love-babbar/',
+          categories: ['Array', 'Matrix', 'String', 'Searching & Sorting', 'Linked List', 'Binary Trees', 'BST', 'Greedy', 'Backtracking', 'Stacks & Queues', 'Heap', 'Graph', 'Trie', 'Dynamic Programming', 'Bit Manipulation'],
         },
         {
           id: 'raising-minds',
           name: 'Rising Brain DSA Sheet',
           description: 'Pattern-wise DSA problems for mastering coding interviews',
           problems: 300,
-          completed: 42,
           difficulty: 'mixed',
           icon: '🧠',
           color: 'from-teal-500 to-cyan-500',
           source: 'https://www.risingbrain.org/sheet',
-          categories: ['Array (Two-Pointer, Sliding Window, Prefix Sum)', 'Binary Search', 'Stack (Monotonic, Expression)', 'Linked List', 'HashMap', 'Heap', 'Recursion', 'Tree & BST', 'Graph (BFS, DFS, Topological Sort)', 'Backtracking', 'Greedy', 'Dynamic Programming', 'Trie', 'Bit Manipulation'],
+          categories: ['Array (Two-Pointer, Sliding Window)', 'Binary Search', 'Stack', 'Linked List', 'HashMap', 'Heap', 'Recursion', 'Tree & BST', 'Graph', 'Backtracking', 'Greedy', 'Dynamic Programming'],
         },
         {
           id: 'tuf-cp-sheet',
           name: 'TUF CP Sheet',
           description: 'Competitive programming roadmap with 250+ problems',
           problems: 250,
-          completed: 58,
           difficulty: 'mixed',
           icon: '⚡',
           color: 'from-violet-500 to-purple-500',
           source: 'https://takeuforward.org/competitive-programming/strivers-cp-sheet',
-          categories: ['Mathematics', 'Sorting', 'Advanced Arrays', 'Stacks & Queues', 'Heaps', 'Tries', 'Graphs', 'Advanced DP', 'Segment Trees', 'Fenwick Trees'],
+          categories: ['Mathematics', 'Sorting', 'Advanced Arrays', 'Stacks & Queues', 'Heaps', 'Tries', 'Graphs', 'Advanced DP', 'Segment Trees'],
         },
         {
           id: 'striver-79',
           name: 'Striver 79 Sheet',
-          description: '79 last moment revision problems to ace DSA interviews',
+          description: 'Last-minute quick revision sheet with 79 important topics',
           problems: 79,
-          completed: 25,
           difficulty: 'mixed',
-          icon: '⏰',
-          color: 'from-red-500 to-orange-500',
-          source: 'https://takeuforward.org/dsa/strivers-79-last-moment-dsa-sheet-ace-interviews',
-          categories: ['Quick Revision Arrays', 'Important Trees Problems', 'Graph Essentials', 'DP Must-Dos', 'String Patterns', 'Binary Search Critical'],
+          icon: '🚀',
+          color: 'from-indigo-500 to-blue-500',
+          source: 'https://takeuforward.org/interview-experience/strivers-79-last-moment-dsa-sheet-ace-interviews/',
+          categories: ['Quick Revision Arrays', 'Important Trees Problems', 'Graph Essentials', 'DP Must-Dos', 'Binary Search', 'Greedy Patterns'],
         },
         {
           id: 'top-interview-150',
           name: 'Top Interview 150',
-          description: 'LeetCode\'s most frequently asked interview questions',
+          description: 'LeetCode\'s curated 150 questions for top companies',
           problems: 150,
-          completed: 48,
           difficulty: 'mixed',
-          icon: '💼',
-          color: 'from-indigo-500 to-blue-500',
-          source: 'https://codolio.com/question-tracker/sheet/top-interview-150-leetcode',
-          categories: ['Array / String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hashmap', 'Intervals', 'Stack', 'Linked List', 'Binary Tree', 'Graph', 'Backtracking', 'DP', 'Binary Search'],
+          icon: '🏆',
+          color: 'from-amber-500 to-yellow-500',
+          source: 'https://leetcode.com/studyplan/top-interview-150/',
+          categories: ['Array/String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hash Map', 'Intervals', 'Stack', 'Binary Tree General', 'Binary Tree BFS', 'Binary Search Tree', 'Graph General', 'Graph BFS', 'Trie', 'Backtracking', 'Divide & Conquer', 'Kadane\'s Algorithm', 'Binary Search', 'Heap', 'Bit Manipulation', 'Math', 'Dynamic Programming'],
+        },
+        {
+          id: 'algoexpert',
+          name: 'AlgoExpert',
+          description: '160 hand-picked coding interview questions',
+          problems: 160,
+          difficulty: 'mixed',
+          icon: '🎖️',
+          color: 'from-emerald-500 to-green-500',
+          source: 'https://www.algoexpert.io/questions',
+          categories: ['Arrays', 'Binary Search Trees', 'Binary Trees', 'Dynamic Programming', 'Famous Algorithms', 'Graphs', 'Greedy Algorithms', 'Heaps', 'Linked Lists', 'Recursion', 'Searching', 'Sorting', 'Stacks', 'Strings', 'Tries'],
         },
       ]
     },
-    web: {
+    webdev: {
       name: '🌐 Web Development',
       sheets: [
         {
@@ -142,89 +155,214 @@ const CodingSheets = () => {
           name: 'Frontend Mastery',
           description: 'Complete HTML, CSS, JavaScript, and React challenges',
           problems: 100,
-          completed: 35,
           difficulty: 'mixed',
           icon: '🎨',
           color: 'from-blue-400 to-cyan-400',
-          source: 'https://www.w3schools.com/html/',
-          categories: ['HTML5 Semantics', 'CSS3 & Flexbox', 'Grid Layout', 'JavaScript ES6+', 'React Components', 'Responsive Design', 'Web APIs', 'Performance Optimization'],
+          source: 'https://www.frontendmentor.io/challenges',
+          categories: ['HTML5 Semantics', 'CSS3 & Flexbox', 'Grid Layout', 'JavaScript ES6+', 'React Components', 'Responsive Design'],
         },
         {
           id: 'backend-excellence',
           name: 'Backend Excellence',
-          description: 'Master Node.js, Express, MongoDB, and REST APIs',
+          description: 'Master Node.js, Express, MongoDB, and REST API design',
           problems: 80,
-          completed: 22,
           difficulty: 'mixed',
           icon: '⚙️',
-          color: 'from-green-600 to-teal-600',
-          source: 'https://www.w3schools.com/nodejs/',
-          categories: ['Node.js Basics', 'Express.js', 'MongoDB & Mongoose', 'REST API Design', 'Authentication & JWT', 'Middleware', 'Error Handling', 'Testing'],
+          color: 'from-green-600 to-emerald-600',
+          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
+          categories: ['Node.js Basics', 'Express.js', 'MongoDB & Mongoose', 'REST API Design', 'Authentication', 'WebSockets', 'Microservices'],
         },
         {
-          id: 'fullstack-projects',
+          id: 'full-stack-projects',
           name: 'Full Stack Projects',
-          description: 'Build production-ready MERN & MEAN applications',
+          description: 'Build complete MERN stack applications from scratch',
           problems: 50,
-          completed: 12,
           difficulty: 'hard',
-          icon: '🔥',
-          color: 'from-red-500 to-orange-500',
-          source: 'https://www.geeksforgeeks.org/mern-stack/',
-          categories: ['MERN Stack', 'Authentication Systems', 'Real-time Features', 'Payment Integration', 'Cloud Deployment', 'CI/CD Pipeline'],
+          icon: '🚀',
+          color: 'from-purple-600 to-indigo-600',
+          source: 'https://www.theodinproject.com/paths/full-stack-javascript',
+          categories: ['MERN Stack', 'Authentication Systems', 'Real-time Features', 'Payment Integration', 'Deployment', 'CI/CD'],
+        },
+        {
+          id: 'web-step-by-step',
+          name: 'Web Dev Step-by-Step Practice',
+          description: 'Guided bite-sized development practice with incremental coding tasks, not full project builds',
+          problems: 120,
+          difficulty: 'easy',
+          icon: '🪜',
+          color: 'from-sky-500 to-blue-600',
+          source: 'https://www.freecodecamp.org/learn/2022/responsive-web-design/',
+          categories: ['HTML Basics', 'CSS Fundamentals', 'Responsive Layouts', 'Accessibility', 'Forms', 'Semantics', 'Daily Coding Drills'],
+        },
+        {
+          id: 'html-practice-sheet',
+          name: 'HTML Practice Sheet',
+          description: 'Topic-wise HTML exercises for tags, forms, semantic structure, and accessibility',
+          problems: 75,
+          difficulty: 'easy',
+          icon: '🧱',
+          color: 'from-orange-500 to-amber-500',
+          source: 'https://www.w3schools.com/html/html_exercises.asp',
+          categories: ['HTML Elements', 'Forms', 'Tables', 'Media', 'Semantic HTML', 'Accessibility Basics'],
+        },
+        {
+          id: 'css-practice-sheet',
+          name: 'CSS Practice Sheet',
+          description: 'Hands-on CSS practice for layout, responsiveness, and styling fundamentals',
+          problems: 90,
+          difficulty: 'easy',
+          icon: '🎯',
+          color: 'from-blue-500 to-cyan-500',
+          source: 'https://www.w3schools.com/css/css_exercises.asp',
+          categories: ['Selectors', 'Box Model', 'Flexbox', 'Grid', 'Responsive Design', 'Animations'],
+        },
+        {
+          id: 'javascript-practice-sheet',
+          name: 'JavaScript Practice Sheet',
+          description: 'Progressive JavaScript problems and coding drills for web development',
+          problems: 100,
+          difficulty: 'medium',
+          icon: '🟨',
+          color: 'from-yellow-500 to-orange-500',
+          source: 'https://www.hackerrank.com/domains/tutorials/10-days-of-javascript',
+          categories: ['Variables & Scope', 'Arrays', 'Functions', 'Objects', 'DOM', 'Events', 'Async Basics'],
+        },
+        {
+          id: 'react-practice-sheet',
+          name: 'React Practice Sheet',
+          description: 'React-focused guided exercises for components, state, hooks, and UI patterns',
+          problems: 85,
+          difficulty: 'medium',
+          icon: '⚛️',
+          color: 'from-cyan-500 to-sky-500',
+          source: 'https://www.freecodecamp.org/learn/front-end-development-libraries/',
+          categories: ['Components', 'Props', 'State', 'Hooks', 'Forms', 'Routing', 'State Management Basics'],
+        },
+        {
+          id: 'node-practice-sheet',
+          name: 'Node.js Practice Sheet',
+          description: 'Node.js backend practice path with incremental coding tasks and server-side fundamentals',
+          problems: 80,
+          difficulty: 'medium',
+          icon: '🟢',
+          color: 'from-green-600 to-lime-600',
+          source: 'https://nodeschool.io/#workshoppers',
+          categories: ['Node Basics', 'Modules', 'File System', 'NPM', 'Streams', 'CLI Tools', 'Server Basics'],
+        },
+        {
+          id: 'express-practice-sheet',
+          name: 'Express Practice Sheet',
+          description: 'Practice routes, middleware, and APIs using guided Express exercises',
+          problems: 70,
+          difficulty: 'medium',
+          icon: '🚏',
+          color: 'from-emerald-600 to-green-700',
+          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
+          categories: ['Routing', 'Middleware', 'Request/Response', 'Error Handling', 'Validation', 'REST Basics'],
+        },
+        {
+          id: 'mongodb-practice-sheet',
+          name: 'MongoDB Practice Sheet',
+          description: 'MongoDB query and schema practice for web application development',
+          problems: 65,
+          difficulty: 'medium',
+          icon: '🍃',
+          color: 'from-green-700 to-emerald-700',
+          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
+          categories: ['CRUD Operations', 'Schemas', 'Indexes', 'Aggregation', 'Mongoose Models', 'Data Validation'],
+        },
+        {
+          id: 'rest-api-practice-sheet',
+          name: 'REST API Practice Sheet',
+          description: 'API-focused practice problems for request handling, status codes, auth, and integration',
+          problems: 75,
+          difficulty: 'medium',
+          icon: '🔌',
+          color: 'from-violet-600 to-indigo-600',
+          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
+          categories: ['HTTP Methods', 'Status Codes', 'JSON APIs', 'Authentication', 'Pagination', 'API Testing'],
         },
       ]
     },
-    ml: {
-      name: '🤖 Machine Learning',
+    mlai: {
+      name: '🤖 Artificial Intelligence',
       sheets: [
         {
           id: 'ml-basics',
-          name: 'ML Fundamentals',
-          description: 'Core machine learning algorithms and implementations',
-          problems: 60,
-          completed: 18,
+          name: 'Machine Learning Step-by-Step',
+          description: 'Guided machine learning practice from model basics to evaluation using hands-on notebooks',
+          problems: 80,
           difficulty: 'medium',
           icon: '🧠',
           color: 'from-purple-500 to-indigo-500',
-          source: 'https://www.geeksforgeeks.org/machine-learning/',
-          categories: ['Linear Regression', 'Logistic Regression', 'Decision Trees', 'Random Forest', 'SVM', 'K-Means Clustering', 'PCA', 'Model Evaluation'],
+          source: 'https://www.kaggle.com/learn/intro-to-machine-learning',
+          categories: ['Model Basics', 'Validation', 'Underfitting vs Overfitting', 'Random Forests', 'Pipelines', 'Hands-on Exercises'],
         },
         {
           id: 'deep-learning',
-          name: 'Deep Learning',
-          description: 'Neural networks, CNN, RNN, and Transformers',
-          problems: 75,
-          completed: 15,
+          name: 'Deep Learning Step-by-Step',
+          description: 'Incremental deep learning exercises covering neural nets and practical model training',
+          problems: 85,
           difficulty: 'hard',
-          icon: '🔬',
-          color: 'from-indigo-600 to-purple-600',
-          source: 'https://www.geeksforgeeks.org/deep-learning-tutorial/',
-          categories: ['Neural Networks', 'CNN Architectures', 'RNN & LSTM', 'GANs', 'Transfer Learning', 'Attention Mechanisms', 'Transformers', 'Model Optimization'],
+          icon: '🔥',
+          color: 'from-red-600 to-orange-600',
+          source: 'https://www.kaggle.com/learn/intro-to-deep-learning',
+          categories: ['Neural Networks', 'TensorFlow/Keras', 'Overfitting Control', 'Dropout', 'Training Workflow', 'Practice Labs'],
         },
         {
-          id: 'nlp-sheet',
-          name: 'NLP & LLMs',
-          description: 'Natural language processing and large language models',
-          problems: 50,
-          completed: 10,
+          id: 'nlp-llms',
+          name: 'NLP Step-by-Step Practice',
+          description: 'Practice text preprocessing, embeddings, and NLP modeling through guided exercises',
+          problems: 75,
           difficulty: 'hard',
           icon: '💬',
-          color: 'from-pink-500 to-rose-500',
-          source: 'https://www.geeksforgeeks.org/natural-language-processing-nlp-tutorial/',
-          categories: ['Text Preprocessing', 'Word Embeddings', 'Sequence Models', 'BERT & GPT', 'Sentiment Analysis', 'NER', 'Machine Translation', 'Question Answering'],
+          color: 'from-blue-600 to-purple-600',
+          source: 'https://www.kaggle.com/learn/natural-language-processing',
+          categories: ['Text Cleaning', 'Tokenization', 'Sentiment Models', 'Embeddings', 'Transformer Basics', 'Notebook Exercises'],
         },
         {
-          id: 'cv-sheet',
-          name: 'Computer Vision',
-          description: 'Image processing and computer vision tasks',
-          problems: 55,
-          completed: 8,
+          id: 'computer-vision',
+          name: 'Computer Vision Step-by-Step',
+          description: 'Guided image-based model practice from CNN basics to real-world vision tasks',
+          problems: 75,
           difficulty: 'hard',
           icon: '👁️',
-          color: 'from-cyan-500 to-blue-500',
-          source: 'https://www.geeksforgeeks.org/computer-vision/',
-          categories: ['Image Processing', 'Object Detection', 'Image Segmentation', 'Face Recognition', 'OCR', 'Image Classification', 'Video Analysis', 'OpenCV'],
+          color: 'from-cyan-600 to-blue-600',
+          source: 'https://www.kaggle.com/learn/computer-vision',
+          categories: ['Image Tensors', 'CNN Basics', 'Data Augmentation', 'Transfer Learning', 'Prediction Pipelines', 'Lab Practice'],
+        },
+        {
+          id: 'intermediate-ml',
+          name: 'Intermediate ML Practice',
+          description: 'Step-by-step machine learning practice for missing data, categorical values, and robust pipelines',
+          problems: 70,
+          difficulty: 'medium',
+          icon: '📈',
+          color: 'from-indigo-600 to-violet-600',
+          source: 'https://www.kaggle.com/learn/intermediate-machine-learning',
+          categories: ['Missing Values', 'Categorical Encoding', 'XGBoost', 'Data Leakage', 'Cross Validation', 'Applied Exercises'],
+        },
+        {
+          id: 'feature-engineering',
+          name: 'Feature Engineering Practice',
+          description: 'Guided feature engineering drills for better model performance in AI workflows',
+          problems: 65,
+          difficulty: 'medium',
+          icon: '🧩',
+          color: 'from-fuchsia-600 to-pink-600',
+          source: 'https://www.kaggle.com/learn/feature-engineering',
+          categories: ['Mutual Information', 'Feature Creation', 'Clustering Features', 'Target Encoding', 'Pipelines', 'Practical Tasks'],
+        },
+        {
+          id: 'time-series-ai',
+          name: 'Time Series AI Practice',
+          description: 'Step-by-step forecasting practice for AI and ML time series problems',
+          problems: 60,
+          difficulty: 'medium',
+          icon: '⏱️',
+          color: 'from-slate-600 to-gray-700',
+          source: 'https://www.kaggle.com/learn/time-series',
+          categories: ['Trend & Seasonality', 'Lag Features', 'Forecasting Models', 'Validation Strategy', 'Error Metrics', 'Notebook Drills'],
         },
       ]
     },
@@ -236,365 +374,270 @@ const CodingSheets = () => {
           name: 'Operating Systems',
           description: 'Most asked OS interview questions with detailed explanations',
           problems: 90,
-          completed: 42,
           difficulty: 'medium',
           icon: '💻',
           color: 'from-gray-600 to-gray-800',
           source: 'https://takeuforward.org/operating-system/most-asked-operating-system-interview-questions',
-          categories: ['Process Management', 'Threads & Concurrency', 'CPU Scheduling', 'Deadlocks', 'Memory Management', 'Virtual Memory', 'File Systems', 'I/O Systems', 'System Calls'],
+          categories: ['Process Management', 'Threads', 'CPU Scheduling', 'Deadlocks', 'Memory Management', 'Virtual Memory', 'File Systems'],
         },
         {
           id: 'cn-sheet',
           name: 'Computer Networks',
           description: 'Essential networking concepts and interview questions',
           problems: 85,
-          completed: 38,
           difficulty: 'medium',
           icon: '🌐',
           color: 'from-blue-600 to-indigo-600',
           source: 'https://takeuforward.org/computer-network/most-asked-computer-networks-interview-questions',
-          categories: ['OSI & TCP/IP Model', 'HTTP/HTTPS', 'TCP vs UDP', 'Routing Protocols', 'DNS', 'Network Security', 'Subnetting', 'Socket Programming', 'VPN & Firewall'],
+          categories: ['OSI & TCP/IP Model', 'HTTP/HTTPS', 'TCP vs UDP', 'Routing Protocols', 'DNS', 'Network Security'],
         },
         {
           id: 'dbms-sheet',
-          name: 'Database Management',
-          description: 'Complete DBMS interview preparation with SQL queries',
-          problems: 100,
-          completed: 55,
+          name: 'DBMS',
+          description: 'Database management system concepts and SQL queries',
+          problems: 75,
           difficulty: 'medium',
           icon: '🗄️',
-          color: 'from-green-600 to-emerald-600',
-          source: 'https://takeuforward.org/dbms/most-asked-dbms-interview-questions',
-          categories: ['SQL Queries', 'Normalization', 'Transactions & ACID', 'Indexing', 'Keys & Constraints', 'Joins', 'Query Optimization', 'NoSQL vs SQL', 'Database Design'],
+          color: 'from-teal-600 to-green-600',
+          source: 'https://takeuforward.org/dbms/most-asked-dbms-interview-questions/',
+          categories: ['SQL Queries', 'Normalization', 'Transactions & ACID', 'Indexing', 'Query Optimization', 'NoSQL'],
         },
         {
-          id: 'oops-sheet',
+          id: 'oop-concepts',
           name: 'OOP Concepts',
           description: 'Object-oriented programming principles and design patterns',
-          problems: 70,
-          completed: 48,
+          problems: 60,
           difficulty: 'easy',
           icon: '🎯',
-          color: 'from-yellow-600 to-orange-600',
+          color: 'from-violet-600 to-purple-600',
           source: 'https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/',
-          categories: ['Classes & Objects', 'Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction', 'Interfaces', 'Design Patterns', 'SOLID Principles'],
+          categories: ['Classes & Objects', 'Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction', 'Design Patterns'],
         },
         {
           id: 'system-design',
           name: 'System Design',
-          description: 'Complete system design roadmap for SDEs with videos',
-          problems: 60,
-          completed: 15,
+          description: 'Design scalable systems and learn architecture patterns',
+          problems: 50,
           difficulty: 'hard',
           icon: '🏗️',
-          color: 'from-red-600 to-pink-600',
-          source: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes',
-          categories: ['Low Level Design', 'Object Oriented Design', 'High Level Design', 'Scalability', 'Load Balancing', 'Caching', 'Database Sharding', 'Microservices', 'Message Queues', 'CDN', 'API Design'],
+          color: 'from-gray-700 to-slate-700',
+          source: 'https://github.com/donnemartin/system-design-primer',
+          categories: ['Low Level Design', 'Object Oriented Design', 'High Level Design', 'Scalability', 'Load Balancing', 'Caching', 'Database Design', 'Microservices'],
+        },
+        {
+          id: 'striver-system-design',
+          name: 'Striver System Design Sheet',
+          description: 'Interview-focused system design roadmap and curated topics from Striver',
+          problems: 40,
+          difficulty: 'hard',
+          icon: '🏛️',
+          color: 'from-slate-700 to-blue-700',
+          source: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes/',
+          categories: ['System Design Fundamentals', 'Scalability', 'Caching', 'Databases', 'Load Balancing', 'Message Queues', 'Distributed Systems'],
         },
       ]
     }
   };
 
-  // Comprehensive problem sets for each category
-  const problemSets = {
-    'striver-sde': [
-      { name: 'Arrays', problems: [
-        { id: 1, title: 'Set Matrix Zeroes', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/set-matrix-zeroes/' },
-        { id: 2, title: 'Pascal\'s Triangle', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/pascals-triangle/' },
-        { id: 3, title: 'Next Permutation', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/next-permutation/' },
-        { id: 4, title: 'Kadane\'s Algorithm', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/maximum-subarray/' },
-        { id: 5, title: 'Sort Colors', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/sort-colors/' },
-        { id: 6, title: 'Stock Buy and Sell', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock/' },
-        { id: 7, title: 'Rotate Image', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/rotate-image/' },
-        { id: 8, title: 'Merge Intervals', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-intervals/' },
-        { id: 9, title: 'Merge Sorted Arrays', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-sorted-array/' },
-        { id: 10, title: 'Find Duplicate Number', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-the-duplicate-number/' },
-      ]},
-      { name: 'Linked List', problems: [
-        { id: 11, title: 'Reverse Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/reverse-linked-list/' },
-        { id: 12, title: 'Middle of Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/middle-of-the-linked-list/' },
-        { id: 13, title: 'Merge Two Sorted Lists', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-two-sorted-lists/' },
-        { id: 14, title: 'Remove Nth Node From End', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/remove-nth-node-from-end-of-list/' },
-        { id: 15, title: 'Add Two Numbers', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/add-two-numbers/' },
-        { id: 16, title: 'Delete Node in Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/delete-node-in-a-linked-list/' },
-        { id: 17, title: 'Detect Cycle', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/linked-list-cycle/' },
-        { id: 18, title: 'Reverse Nodes in K-Group', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/reverse-nodes-in-k-group/' },
-      ]},
-      { name: 'Greedy', problems: [
-        { id: 19, title: 'N Meetings in One Room', difficulty: 'easy', completed: false, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/n-meetings-in-one-room/' },
-        { id: 20, title: 'Job Sequencing Problem', difficulty: 'medium', completed: false, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/job-sequencing-problem/' },
-        { id: 21, title: 'Fractional Knapsack', difficulty: 'medium', completed: false, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/fractional-knapsack/' },
-      ]},
-      { name: 'Recursion', problems: [
-        { id: 22, title: 'Subset Sums', difficulty: 'easy', completed: true, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/subset-sums/' },
-        { id: 23, title: 'Subsets II', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/subsets-ii/' },
-        { id: 24, title: 'Combination Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/combination-sum/' },
-        { id: 25, title: 'Palindrome Partitioning', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/palindrome-partitioning/' },
-      ]},
-      { name: 'Binary Search', problems: [
-        { id: 26, title: 'Binary Search', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-search/' },
-        { id: 27, title: 'Search in Rotated Sorted Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/search-in-rotated-sorted-array/' },
-        { id: 28, title: 'Find Peak Element', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-peak-element/' },
-        { id: 29, title: 'Median of Two Sorted Arrays', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/median-of-two-sorted-arrays/' },
-      ]},
-      { name: 'Binary Trees', problems: [
-        { id: 30, title: 'Inorder Traversal', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-inorder-traversal/' },
-        { id: 31, title: 'Level Order Traversal', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-level-order-traversal/' },
-        { id: 32, title: 'Maximum Depth', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/maximum-depth-of-binary-tree/' },
-        { id: 33, title: 'Diameter of Binary Tree', difficulty: 'easy', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/diameter-of-binary-tree/' },
-        { id: 34, title: 'Serialize and Deserialize', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/serialize-and-deserialize-binary-tree/' },
-      ]},
-      { name: 'Dynamic Programming', problems: [
-        { id: 35, title: 'Climbing Stairs', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/climbing-stairs/' },
-        { id: 36, title: 'Longest Increasing Subsequence', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-increasing-subsequence/' },
-        { id: 37, title: 'Edit Distance', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/edit-distance/' },
-        { id: 38, title: 'Maximum Product Subarray', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/maximum-product-subarray/' },
-        { id: 39, title: '0/1 Knapsack', difficulty: 'medium', completed: false, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/0-1-knapsack-problem/' },
-      ]},
-      { name: 'Graphs', problems: [
-        { id: 40, title: 'Number of Islands', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-islands/' },
-        { id: 41, title: 'BFS of Graph', difficulty: 'easy', completed: true, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/bfs-traversal-of-graph/' },
-        { id: 42, title: 'DFS of Graph', difficulty: 'easy', completed: true, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/depth-first-traversal-for-a-graph/' },
-        { id: 43, title: 'Detect Cycle in Graph', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/course-schedule/' },
-        { id: 44, title: 'Topological Sort', difficulty: 'medium', completed: false, platform: 'gfg', link: 'https://practice.geeksforgeeks.org/problems/topological-sort/' },
-      ]},
-    ],
-    'neetcode-150': [
-      { name: 'Arrays & Hashing', problems: [
-        { id: 101, title: 'Contains Duplicate', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/contains-duplicate/' },
-        { id: 102, title: 'Valid Anagram', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-anagram/' },
-        { id: 103, title: 'Two Sum', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/two-sum/' },
-        { id: 104, title: 'Group Anagrams', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/group-anagrams/' },
-        { id: 105, title: 'Top K Frequent Elements', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/top-k-frequent-elements/' },
-      ]},
-      { name: 'Two Pointers', problems: [
-        { id: 106, title: 'Valid Palindrome', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-palindrome/' },
-        { id: 107, title: '3Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/3sum/' },
-        { id: 108, title: 'Container With Most Water', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/container-with-most-water/' },
-      ]},
-      { name: 'Sliding Window', problems: [
-        { id: 109, title: 'Best Time to Buy and Sell Stock', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock/' },
-        { id: 110, title: 'Longest Substring Without Repeating', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/' },
-        { id: 111, title: 'Minimum Window Substring', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/minimum-window-substring/' },
-      ]},
-    ],
-    'os-sheet': [
-      { name: 'Process Management', problems: [
-        { id: 200, title: 'CPU Scheduling - FCFS', difficulty: 'easy', completed: true, platform: 'theory' },
-        { id: 201, title: 'CPU Scheduling - SJF', difficulty: 'medium', completed: true, platform: 'theory' },
-        { id: 202, title: 'CPU Scheduling - Round Robin', difficulty: 'medium', completed: false, platform: 'theory' },
-        { id: 203, title: 'Process Synchronization', difficulty: 'hard', completed: false, platform: 'theory' },
-        { id: 204, title: 'Deadlock Detection', difficulty: 'hard', completed: false, platform: 'theory' },
-      ]},
-      { name: 'Memory Management', problems: [
-        { id: 205, title: 'Paging Implementation', difficulty: 'medium', completed: false, platform: 'theory' },
-        { id: 206, title: 'Segmentation', difficulty: 'medium', completed: false, platform: 'theory' },
-        { id: 207, title: 'Virtual Memory', difficulty: 'hard', completed: false, platform: 'theory' },
-        { id: 208, title: 'Page Replacement - LRU', difficulty: 'medium', completed: true, platform: 'theory' },
-      ]},
-    ],
-    'cn-sheet': [
-      { name: 'Network Layers', problems: [
-        { id: 300, title: 'OSI Model Layers', difficulty: 'easy', completed: true, platform: 'theory' },
-        { id: 301, title: 'TCP vs UDP', difficulty: 'easy', completed: true, platform: 'theory' },
-        { id: 302, title: 'HTTP/HTTPS Protocol', difficulty: 'medium', completed: false, platform: 'theory' },
-        { id: 303, title: 'Subnetting Problems', difficulty: 'medium', completed: false, platform: 'theory' },
-      ]},
-      { name: 'Routing & Protocols', problems: [
-        { id: 304, title: 'Distance Vector Routing', difficulty: 'medium', completed: false, platform: 'theory' },
-        { id: 305, title: 'Link State Routing', difficulty: 'hard', completed: false, platform: 'theory' },
-        { id: 306, title: 'ARP & RARP', difficulty: 'easy', completed: true, platform: 'theory' },
-      ]},
-    ],
-    'ml-basics': [
-      { name: 'Supervised Learning', problems: [
-        { id: 400, title: 'Linear Regression Implementation', difficulty: 'easy', completed: true, platform: 'kaggle' },
-        { id: 401, title: 'Logistic Regression', difficulty: 'easy', completed: true, platform: 'kaggle' },
-        { id: 402, title: 'Decision Trees', difficulty: 'medium', completed: false, platform: 'kaggle' },
-        { id: 403, title: 'Random Forest Classifier', difficulty: 'medium', completed: false, platform: 'kaggle' },
-        { id: 404, title: 'SVM Classification', difficulty: 'medium', completed: false, platform: 'kaggle' },
-      ]},
-      { name: 'Unsupervised Learning', problems: [
-        { id: 405, title: 'K-Means Clustering', difficulty: 'medium', completed: false, platform: 'kaggle' },
-        { id: 406, title: 'PCA Implementation', difficulty: 'medium', completed: false, platform: 'kaggle' },
-        { id: 407, title: 'Hierarchical Clustering', difficulty: 'hard', completed: false, platform: 'kaggle' },
-      ]},
-    ],
-    'frontend-mastery': [
-      { name: 'HTML & CSS', problems: [
-        { id: 500, title: 'Responsive Navigation Bar', difficulty: 'easy', completed: true, platform: 'codepen' },
-        { id: 501, title: 'Flexbox Layout Challenge', difficulty: 'medium', completed: false, platform: 'codepen' },
-        { id: 502, title: 'CSS Grid Dashboard', difficulty: 'medium', completed: false, platform: 'codepen' },
-        { id: 503, title: 'Animated Landing Page', difficulty: 'hard', completed: false, platform: 'codepen' },
-      ]},
-      { name: 'JavaScript', problems: [
-        { id: 504, title: 'Todo App with LocalStorage', difficulty: 'easy', completed: true, platform: 'codepen' },
-        { id: 505, title: 'API Fetch and Display', difficulty: 'medium', completed: false, platform: 'codepen' },
-        { id: 506, title: 'Infinite Scroll Implementation', difficulty: 'medium', completed: false, platform: 'codepen' },
-        { id: 507, title: 'Custom Promise Implementation', difficulty: 'hard', completed: false, platform: 'codepen' },
-      ]},
-      { name: 'React', problems: [
-        { id: 508, title: 'Counter App with Hooks', difficulty: 'easy', completed: true, platform: 'codesandbox' },
-        { id: 509, title: 'Context API State Management', difficulty: 'medium', completed: false, platform: 'codesandbox' },
-        { id: 510, title: 'Custom Hooks Creation', difficulty: 'medium', completed: false, platform: 'codesandbox' },
-        { id: 511, title: 'E-commerce Cart System', difficulty: 'hard', completed: false, platform: 'codesandbox' },
-      ]},
-    ],
-    'raising-minds': [
-      { name: 'Arrays & Strings', problems: [
-        { id: 601, title: 'Two Sum', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/two-sum/' },
-        { id: 602, title: 'Longest Substring Without Repeating', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/' },
-        { id: 603, title: 'Trapping Rain Water', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/trapping-rain-water/' },
-        { id: 604, title: 'Product of Array Except Self', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/product-of-array-except-self/' },
-        { id: 605, title: 'Container With Most Water', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/container-with-most-water/' },
-        { id: 606, title: 'Minimum Window Substring', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/minimum-window-substring/' },
-        { id: 607, title: 'String to Integer (atoi)', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/string-to-integer-atoi/' },
-        { id: 608, title: 'Valid Parentheses', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-parentheses/' },
-      ]},
-      { name: 'Linked Lists & Stacks', problems: [
-        { id: 609, title: 'Reverse Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/reverse-linked-list/' },
-        { id: 610, title: 'Detect Cycle in Linked List', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/linked-list-cycle/' },
-        { id: 611, title: 'Merge K Sorted Lists', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-k-sorted-lists/' },
-        { id: 612, title: 'LRU Cache', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/lru-cache/' },
-        { id: 613, title: 'Copy List with Random Pointer', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/copy-list-with-random-pointer/' },
-        { id: 614, title: 'Min Stack', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/min-stack/' },
-        { id: 615, title: 'Implement Queue using Stacks', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-queue-using-stacks/' },
-      ]},
-      { name: 'Trees & Graphs', problems: [
-        { id: 616, title: 'Binary Tree Inorder Traversal', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-inorder-traversal/' },
-        { id: 617, title: 'Validate Binary Search Tree', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/validate-binary-search-tree/' },
-        { id: 618, title: 'Lowest Common Ancestor', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/' },
-        { id: 619, title: 'Binary Tree Maximum Path Sum', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-tree-maximum-path-sum/' },
-        { id: 620, title: 'Clone Graph', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/clone-graph/' },
-        { id: 621, title: 'Course Schedule', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/course-schedule/' },
-        { id: 622, title: 'Word Ladder', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-ladder/' },
-        { id: 623, title: 'Network Delay Time', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/network-delay-time/' },
-      ]},
-      { name: 'Dynamic Programming', problems: [
-        { id: 624, title: 'Climbing Stairs', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/climbing-stairs/' },
-        { id: 625, title: 'House Robber', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/house-robber/' },
-        { id: 626, title: 'Coin Change', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/coin-change/' },
-        { id: 627, title: 'Longest Palindromic Substring', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-palindromic-substring/' },
-        { id: 628, title: 'Word Break', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-break/' },
-        { id: 629, title: 'Unique Paths', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/unique-paths/' },
-        { id: 630, title: 'Jump Game', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/jump-game/' },
-        { id: 631, title: 'Decode Ways', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/decode-ways/' },
-      ]},
-      { name: 'Backtracking & Bit Manipulation', problems: [
-        { id: 632, title: 'Subsets', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/subsets/' },
-        { id: 633, title: 'Permutations', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/permutations/' },
-        { id: 634, title: 'N-Queens', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/n-queens/' },
-        { id: 635, title: 'Sudoku Solver', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/sudoku-solver/' },
-        { id: 636, title: 'Single Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/single-number/' },
-        { id: 637, title: 'Number of 1 Bits', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-1-bits/' },
-        { id: 638, title: 'Counting Bits', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/counting-bits/' },
-      ]},
-    ],
-    'tuf-cp-sheet': [
-      { name: 'Mathematics & Number Theory', problems: [
-        { id: 701, title: 'Count Primes', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/count-primes/' },
-        { id: 702, title: 'Power of Two', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/power-of-two/' },
-        { id: 703, title: 'Happy Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/happy-number/' },
-        { id: 704, title: 'Factorial Trailing Zeroes', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/factorial-trailing-zeroes/' },
-        { id: 705, title: 'Excel Sheet Column Number', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/excel-sheet-column-number/' },
-        { id: 706, title: 'Pow(x, n)', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/powx-n/' },
-        { id: 707, title: 'Sqrt(x)', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/sqrtx/' },
-        { id: 708, title: 'Divide Two Integers', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/divide-two-integers/' },
-      ]},
-      { name: 'Sorting & Searching', problems: [
-        { id: 709, title: 'Binary Search', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/binary-search/' },
-        { id: 710, title: 'Search Insert Position', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/search-insert-position/' },
-        { id: 711, title: 'First Bad Version', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/first-bad-version/' },
-        { id: 712, title: 'Find Minimum in Rotated Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/' },
-        { id: 713, title: 'Search in Rotated Sorted Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/search-in-rotated-sorted-array/' },
-        { id: 714, title: 'Find Peak Element', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/find-peak-element/' },
-        { id: 715, title: 'Kth Largest Element', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/kth-largest-element-in-an-array/' },
-        { id: 716, title: 'Merge Intervals', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/merge-intervals/' },
-      ]},
-      { name: 'Advanced Arrays', problems: [
-        { id: 717, title: 'Majority Element', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/majority-element/' },
-        { id: 718, title: 'Move Zeroes', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/move-zeroes/' },
-        { id: 719, title: 'Remove Duplicates from Sorted Array', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/remove-duplicates-from-sorted-array/' },
-        { id: 720, title: 'Rotate Array', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/rotate-array/' },
-        { id: 721, title: 'Maximum Subarray', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/maximum-subarray/' },
-        { id: 722, title: 'Plus One', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/plus-one/' },
-        { id: 723, title: 'Pascal\'s Triangle', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/pascals-triangle/' },
-      ]},
-      { name: 'Stacks & Queues', problems: [
-        { id: 724, title: 'Valid Parentheses', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/valid-parentheses/' },
-        { id: 725, title: 'Min Stack', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/min-stack/' },
-        { id: 726, title: 'Evaluate Reverse Polish Notation', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/evaluate-reverse-polish-notation/' },
-        { id: 727, title: 'Daily Temperatures', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/daily-temperatures/' },
-        { id: 728, title: 'Largest Rectangle in Histogram', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/largest-rectangle-in-histogram/' },
-        { id: 729, title: 'Sliding Window Maximum', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/sliding-window-maximum/' },
-      ]},
-      { name: 'Heaps & Priority Queues', problems: [
-        { id: 730, title: 'Kth Largest Element in Stream', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/kth-largest-element-in-a-stream/' },
-        { id: 731, title: 'Last Stone Weight', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/last-stone-weight/' },
-        { id: 732, title: 'K Closest Points to Origin', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/k-closest-points-to-origin/' },
-        { id: 733, title: 'Top K Frequent Elements', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/top-k-frequent-elements/' },
-        { id: 734, title: 'Find Median from Data Stream', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/find-median-from-data-stream/' },
-      ]},
-      { name: 'Tries & Advanced Strings', problems: [
-        { id: 735, title: 'Implement Trie', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-trie-prefix-tree/' },
-        { id: 736, title: 'Add and Search Word', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/design-add-and-search-words-data-structure/' },
-        { id: 737, title: 'Word Search II', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/word-search-ii/' },
-        { id: 738, title: 'Longest Common Prefix', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-common-prefix/' },
-        { id: 739, title: 'Implement strStr()', difficulty: 'easy', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/implement-strstr/' },
-      ]},
-      { name: 'Graph Algorithms', problems: [
-        { id: 740, title: 'Number of Islands', difficulty: 'medium', completed: true, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-islands/' },
-        { id: 741, title: 'Max Area of Island', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/max-area-of-island/' },
-        { id: 742, title: 'Pacific Atlantic Water Flow', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/pacific-atlantic-water-flow/' },
-        { id: 743, title: 'Number of Connected Components', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/number-of-connected-components-in-an-undirected-graph/' },
-        { id: 744, title: 'Graph Valid Tree', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/graph-valid-tree/' },
-        { id: 745, title: 'Cheapest Flights Within K Stops', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/cheapest-flights-within-k-stops/' },
-      ]},
-      { name: 'Advanced DP', problems: [
-        { id: 746, title: 'House Robber II', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/house-robber-ii/' },
-        { id: 747, title: 'Longest Increasing Subsequence', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/longest-increasing-subsequence/' },
-        { id: 748, title: 'Partition Equal Subset Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/partition-equal-subset-sum/' },
-        { id: 749, title: 'Target Sum', difficulty: 'medium', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/target-sum/' },
-        { id: 750, title: 'Regular Expression Matching', difficulty: 'hard', completed: false, platform: 'leetcode', link: 'https://leetcode.com/problems/regular-expression-matching/' },
-      ]},
-    ],
-  };
-
-  const getDifficultyColor = (difficulty) => {
-    switch (difficulty) {
-      case 'easy':
-        return 'text-green-600 dark:text-green-400';
-      case 'medium':
-        return 'text-yellow-600 dark:text-yellow-400';
-      case 'hard':
-        return 'text-red-600 dark:text-red-400';
-      default:
-        return 'text-gray-600 dark:text-gray-400';
+  const sheetAuthorDetails = {
+    'striver-sde': {
+      name: 'Raj Vikramaditya',
+      description: 'This sheet is originally published by Raj Vikramaditya through Take U Forward and is widely used for structured interview preparation.'
+    },
+    'striver-a2z': {
+      name: 'Raj Vikramaditya',
+      description: 'The A2Z DSA course sheet is created by Raj Vikramaditya on Take U Forward as a step-by-step roadmap from fundamentals to advanced topics.'
+    },
+    'neetcode-150': {
+      name: 'NeetCode',
+      description: 'NeetCode 150 is curated by the NeetCode platform as a focused interview-prep list built around the most common coding patterns.'
+    },
+    'blind-75': {
+      name: 'Blind Community',
+      description: 'Blind 75 is a community-popularized interview list that became well known among engineers preparing for technical interviews.'
+    },
+    'grind-75': {
+      name: 'Yangshun Tay',
+      description: 'Grind 75 is created by Yangshun Tay through Tech Interview Handbook as a practical schedule for consistent interview prep.'
+    },
+    'leetcode-top-100': {
+      name: 'LeetCode',
+      description: 'This study plan is published by the LeetCode team based on some of the most liked problems on the platform.'
+    },
+    'love-babbar': {
+      name: 'Love Babbar',
+      description: 'The Love Babbar DSA Sheet is curated by Love Babbar as a broad list of important interview problems across major data structure topics.'
+    },
+    'raising-minds': {
+      name: 'Rising Brain',
+      description: 'This sheet comes from Rising Brain and organizes DSA practice around interview-friendly patterns and topic groups.'
+    },
+    'tuf-cp-sheet': {
+      name: 'Raj Vikramaditya',
+      description: 'The TUF CP Sheet is published by Raj Vikramaditya on Take U Forward for competitive programming progression.'
+    },
+    'striver-79': {
+      name: 'Raj Vikramaditya',
+      description: 'Striver 79 is another Take U Forward resource by Raj Vikramaditya focused on high-value last-minute revision topics.'
+    },
+    'top-interview-150': {
+      name: 'LeetCode',
+      description: 'Top Interview 150 is maintained by the LeetCode team as a structured interview study plan for high-frequency question types.'
+    },
+    algoexpert: {
+      name: 'AlgoExpert',
+      description: 'AlgoExpert publishes this question set as a curated interview-preparation resource covering the most common algorithm topics.'
+    },
+    'frontend-mastery': {
+      name: 'Frontend Mentor',
+      description: 'Frontend Mentor publishes a large set of hands-on front-end challenges to practice HTML, CSS, JavaScript, and real UI building.'
+    },
+    'backend-excellence': {
+      name: 'freeCodeCamp',
+      description: 'freeCodeCamp provides this backend curriculum with free, hands-on Node/Express and API exercises that can be practiced step by step.'
+    },
+    'full-stack-projects': {
+      name: 'The Odin Project',
+      description: 'The Odin Project full-stack JavaScript path includes project-heavy modules to practice building complete web applications.'
+    },
+    'web-step-by-step': {
+      name: 'freeCodeCamp',
+      description: 'This freeCodeCamp path is a free step-by-step web development practice track focused on gradual skill building instead of full project-first learning.'
+    },
+    'html-practice-sheet': {
+      name: 'W3Schools',
+      description: 'This sheet points to free HTML exercise sets by W3Schools for topic-wise beginner-to-intermediate web markup practice.'
+    },
+    'css-practice-sheet': {
+      name: 'W3Schools',
+      description: 'This sheet points to free CSS exercises by W3Schools for structured styling and layout practice.'
+    },
+    'javascript-practice-sheet': {
+      name: 'HackerRank',
+      description: 'This JavaScript sheet uses HackerRank practice tracks to build web-focused coding skills through progressive challenge sets.'
+    },
+    'react-practice-sheet': {
+      name: 'freeCodeCamp',
+      description: 'This React sheet uses freeCodeCamp front-end libraries content for practical React-focused exercises and drills.'
+    },
+    'node-practice-sheet': {
+      name: 'NodeSchool',
+      description: 'NodeSchool provides workshop-style Node.js practice challenges designed for step-by-step backend skill development.'
+    },
+    'express-practice-sheet': {
+      name: 'freeCodeCamp',
+      description: 'This Express sheet uses freeCodeCamp backend modules with guided exercises around routing, middleware, and API building.'
+    },
+    'mongodb-practice-sheet': {
+      name: 'freeCodeCamp',
+      description: 'This MongoDB sheet uses freeCodeCamp backend modules that include practical data modeling and database tasks.'
+    },
+    'rest-api-practice-sheet': {
+      name: 'freeCodeCamp',
+      description: 'This REST API sheet is based on freeCodeCamp backend practice covering API design, request handling, and integration basics.'
+    },
+    'ml-basics': {
+      name: 'Kaggle Learn',
+      description: 'This sheet uses Kaggle Learn for step-by-step machine learning practice with guided notebook-based exercises.'
+    },
+    'deep-learning': {
+      name: 'Kaggle Learn',
+      description: 'This deep learning sheet is based on Kaggle Learn and focuses on incremental practice through structured exercises.'
+    },
+    'nlp-llms': {
+      name: 'Kaggle Learn',
+      description: 'This NLP sheet uses Kaggle Learn for practical, step-based text and language modeling exercises.'
+    },
+    'computer-vision': {
+      name: 'Kaggle Learn',
+      description: 'This computer vision sheet uses Kaggle Learn with guided practice notebooks for image modeling skills.'
+    },
+    'intermediate-ml': {
+      name: 'Kaggle Learn',
+      description: 'This sheet provides intermediate machine learning practice in a guided, step-by-step Kaggle format.'
+    },
+    'feature-engineering': {
+      name: 'Kaggle Learn',
+      description: 'This sheet provides step-by-step feature engineering exercises from Kaggle Learn for practical model improvement.'
+    },
+    'time-series-ai': {
+      name: 'Kaggle Learn',
+      description: 'This sheet provides structured time series forecasting practice through guided Kaggle Learn exercises.'
+    },
+    'os-sheet': {
+      name: 'Raj Vikramaditya',
+      description: 'This operating systems sheet is published on Take U Forward by Raj Vikramaditya for interview-focused systems revision.'
+    },
+    'cn-sheet': {
+      name: 'Raj Vikramaditya',
+      description: 'This networking resource is another Take U Forward interview-prep sheet by Raj Vikramaditya.'
+    },
+    'dbms-sheet': {
+      name: 'Raj Vikramaditya',
+      description: 'This DBMS sheet is sourced from Take U Forward by Raj Vikramaditya and focuses on interview-oriented database concepts.'
+    },
+    'oop-concepts': {
+      name: 'GeeksforGeeks',
+      description: 'The original material is maintained by GeeksforGeeks and explains the core principles of object-oriented programming.'
+    },
+    'system-design': {
+      name: 'Donne Martin',
+      description: 'System Design Primer is an open-source resource created by Donne Martin and maintained with community contributions.'
+    },
+    'striver-system-design': {
+      name: 'Raj Vikramaditya',
+      description: 'This system design roadmap is published by Raj Vikramaditya on Take U Forward as an original interview-focused guide for SDEs.'
     }
   };
 
-  const getPlatformIcon = (platform) => {
-    switch (platform) {
-      case 'leetcode':
-        return '🟧';
-      case 'gfg':
-        return '🟩';
-      case 'kaggle':
-        return '🔵';
-      case 'codepen':
-        return '🖊️';
-      case 'codesandbox':
-        return '📦';
-      case 'theory':
-        return '📚';
-      default:
-        return '🔗';
+  const allSheets = Object.values(sheetCategories).flatMap((category) => category.sheets);
+  const requestedSheetId = searchParams.get('sheet');
+  const viewingSheet = user ? requestedSheetId : null;
+  const activeSheet = allSheets.find((sheet) => sheet.id === viewingSheet) || null;
+
+  useEffect(() => {
+    if (!requestedSheetId) {
+      return;
     }
+    const matchedCategory = Object.entries(sheetCategories).find(([, category]) =>
+      category.sheets.some((sheet) => sheet.id === requestedSheetId)
+    );
+    if (matchedCategory) {
+      setSelectedSheet(matchedCategory[0]);
+    }
+  }, [requestedSheetId]);
+
+  const handleOpenSheet = (sheetId) => {
+    if (user) {
+      setSearchParams({ sheet: sheetId });
+      return;
+    }
+
+    navigate('/login', {
+      state: {
+        redirectTo: `/sheets?sheet=${sheetId}`
+      }
+    });
+  };
+
+  const handleBackToSheets = () => {
+    setRedirectingSheetId(null);
+    setSearchParams({});
+  };
+
+  const handleGetOriginalSheet = (sheet) => {
+    if (!sheet?.source) {
+      return;
+    }
+
+    setRedirectingSheetId(sheet.id);
+    window.setTimeout(() => {
+      window.location.href = sheet.source;
+    }, 900);
   };
 
   const currentSheets = sheetCategories[selectedSheet]?.sheets || [];
-  const [viewingSheet, setViewingSheet] = useState(null);
-  const currentProblems = problemSets[viewingSheet] || [];
+  const activeAuthor = activeSheet ? sheetAuthorDetails[activeSheet.id] : null;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -608,13 +651,14 @@ const CodingSheets = () => {
 
       <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Category Tabs */}
-        <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+        <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2">
           {Object.keys(sheetCategories).map((key) => (
             <button
               key={key}
               onClick={() => {
                 setSelectedSheet(key);
-                setViewingSheet(null);
+                setRedirectingSheetId(null);
+                setSearchParams({});
               }}
               className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg font-medium transition whitespace-nowrap text-sm sm:text-base ${
                 selectedSheet === key
@@ -627,10 +671,10 @@ const CodingSheets = () => {
           ))}
         </div>
 
-        {/* Back Button when viewing sheet details */}
+        {/* Back Button */}
         {viewingSheet && (
           <button
-            onClick={() => setViewingSheet(null)}
+            onClick={handleBackToSheets}
             className="mb-4 sm:mb-6 px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2 text-sm sm:text-base"
           >
             ← Back to Sheets
@@ -641,7 +685,6 @@ const CodingSheets = () => {
         {!viewingSheet && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
             {currentSheets.map((sheet) => {
-              const progress = Math.round((sheet.completed / sheet.problems) * 100);
               return (
                 <div
                   key={sheet.id}
@@ -661,9 +704,8 @@ const CodingSheets = () => {
                       {/* Categories */}
                       {sheet.categories && (
                         <div className="mb-3">
-                          <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">📂 Topics Covered:</p>
                           <div className="flex flex-wrap gap-1.5">
-                            {sheet.categories.slice(0, 4).map((category, idx) => (
+                            {sheet.categories.slice(0, 3).map((category, idx) => (
                               <span
                                 key={idx}
                                 className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs"
@@ -671,192 +713,117 @@ const CodingSheets = () => {
                                 {category}
                               </span>
                             ))}
-                            {sheet.categories.length > 4 && (
+                            {sheet.categories.length > 3 && (
                               <span className="px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">
-                                +{sheet.categories.length - 4} more
+                                +{sheet.categories.length - 3} more
                               </span>
                             )}
                           </div>
                         </div>
                       )}
-                      {/* External Source Link */}
-                      {sheet.source && (
-                        <a
-                          href={sheet.source}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark transition mb-2"
-                        >
-                          🔗 View Original Sheet →
-                        </a>
-                      )}
-                      <div className="flex items-center gap-3 sm:gap-4 text-xs sm:text-sm mb-2 sm:mb-3 flex-wrap">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm mb-2">
                         <span className="text-gray-600 dark:text-gray-400">
-                          📝 {sheet.problems} Problems
+                          {sheet.problems} Problems
                         </span>
-                        <span className="text-green-600 dark:text-green-400">
-                          ✓ {sheet.completed} Solved
+                        <span className="text-gray-400 dark:text-gray-600">•</span>
+                        <span className="font-medium text-gray-500 dark:text-gray-400">
+                          {sheetAuthorDetails[sheet.id]?.name || 'Original author available inside'}
                         </span>
-                      </div>
-                      {/* Progress Bar */}
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-2">
-                        <div
-                          className="bg-gradient-to-r from-primary to-coral h-2.5 rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        ></div>
                       </div>
                       <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {progress}% Complete
+                        {user ? 'Open the sheet details to view the original author and source link.' : 'Login to open this sheet.'}
                       </div>
                     </div>
                   </div>
-                  {user ? (
-                    <button
-                      className="mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md text-sm sm:text-base"
-                      onClick={() => setViewingSheet(sheet.id)}
-                    >
-                      View Problems
-                    </button>
-                  ) : (
-                    <Link
-                      to="/login"
-                      className="mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition shadow-md text-center block text-sm sm:text-base"
-                    >
-                      🔒 Login to View
-                    </Link>
-                  )}
+                  <button
+                    className={`mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 rounded-lg font-medium transition shadow-md text-sm sm:text-base ${
+                      user
+                        ? 'bg-primary hover:bg-primary-dark text-white'
+                        : 'bg-gray-600 hover:bg-gray-700 text-white'
+                    }`}
+                    onClick={() => handleOpenSheet(sheet.id)}
+                  >
+                    {user ? 'Click to View' : 'Login to View'}
+                  </button>
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Problem Details View */}
-        {viewingSheet && currentProblems.length > 0 && (
+        {/* Sheet Details View */}
+        {viewingSheet && activeSheet && (
           <div>
-            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">
-              {currentSheets.find(s => s.id === viewingSheet)?.name}
-            </h2>
-            <div className="space-y-4">
-              {currentProblems.map((category) => {
-                const totalProblems = category.problems.length;
-                const solvedProblems = category.problems.filter(p => p.completed).length;
-                const progress = Math.round((solvedProblems / totalProblems) * 100);
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700">
+              <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${activeSheet.color} flex items-center justify-center text-3xl sm:text-4xl shadow-md mb-5`}>
+                {activeSheet.icon}
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+                {activeSheet.name}
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base mb-6">
+                {activeSheet.description}
+              </p>
 
-                return (
-                  <div
-                    key={category.name}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
+              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 mb-6">
+                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/60 p-4 sm:p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">
+                    Original Author
+                  </p>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                    {activeAuthor?.name || 'Source Author'}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-6">
+                    {activeAuthor?.description || 'This sheet links out to the original source so learners can use the authentic material directly.'}
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-primary/10 via-coral/10 to-secondary/10 p-4 sm:p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">
+                    Source Access
+                  </p>
+                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-6 mb-4">
+                    This page does not add any extra in-app problems. Use the original sheet directly from its published source.
+                  </p>
+                  <button
+                    onClick={() => handleGetOriginalSheet(activeSheet)}
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition text-sm font-semibold shadow-md"
                   >
-                    {/* Category Header */}
-                    <div className="p-4 sm:p-6 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700">
-                      <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2">
-                        <h3 className="text-base sm:text-lg font-bold text-gray-900 dark:text-white">
-                          {category.name}
-                        </h3>
-                        <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
-                          {solvedProblems}/{totalProblems} Solved
-                        </span>
-                      </div>
-                      {/* Progress Bar */}
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                        <div
-                          className="bg-gradient-to-r from-primary to-coral h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${progress}%` }}
-                        ></div>
-                      </div>
-                    </div>
+                    {redirectingSheetId === activeSheet.id ? 'Redirecting to original sheet...' : 'Get Original Sheet'}
+                  </button>
+                </div>
+              </div>
 
-                    {/* Problems List */}
-                    <div className="p-3 sm:p-4">
-                      <div className="space-y-2">
-                        {category.problems.map((problem) => (
-                          <div
-                            key={problem.id}
-                            className="flex items-center justify-between p-2 sm:p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-750 transition gap-2"
-                          >
-                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                              <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                                problem.completed
-                                  ? 'bg-green-500 border-green-500'
-                                  : 'border-gray-300 dark:border-gray-600'
-                              }`}>
-                                {problem.completed && (
-                                  <span className="text-white text-xs font-bold">✓</span>
-                                )}
-                              </div>
-                              <span className="text-gray-900 dark:text-white font-medium truncate text-sm sm:text-base">
-                                {problem.title}
-                              </span>
-                              {problem.platform && (
-                                <span className="text-xs sm:text-sm flex-shrink-0" title={problem.platform}>
-                                  {getPlatformIcon(problem.platform)}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 flex-shrink-0">
-                              <span className={`text-xs sm:text-sm font-medium hidden sm:inline ${getDifficultyColor(problem.difficulty)}`}>
-                                {problem.difficulty}
-                              </span>
-                              {user ? (
-                                <>
-                                  <button
-                                    onClick={() => openCodeEditor(problem)}
-                                    className="px-2 sm:px-3 py-1 sm:py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs sm:text-sm font-medium transition"
-                                    title="Open Code Editor"
-                                  >
-                                    💻 <span className="hidden sm:inline">Code</span>
-                                  </button>
-                                  {problem.link ? (
-                                    <a
-                                      href={problem.link}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="px-2 sm:px-3 py-1 sm:py-1.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-xs sm:text-sm font-medium transition"
-                                    >
-                                      <span className="hidden sm:inline">Solve</span> →
-                                    </a>
-                                  ) : (
-                                    <button className="px-2 sm:px-3 py-1 sm:py-1.5 bg-gray-400 text-white rounded-lg text-xs sm:text-sm font-medium cursor-not-allowed">
-                                      <span className="hidden sm:inline">Practice</span>
-                                      <span className="sm:hidden">–</span>
-                                    </button>
-                                  )}
-                                </>
-                              ) : (
-                                <Link
-                                  to="/login"
-                                  className="px-2 sm:px-4 py-1 sm:py-1.5 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-xs sm:text-sm font-medium transition"
-                                >
-                                  🔒<span className="hidden sm:inline ml-1">Login</span>
-                                </Link>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              {activeSheet.categories && activeSheet.categories.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">
+                    Covered Areas
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {activeSheet.categories.map((category) => (
+                      <span
+                        key={category}
+                        className="px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs sm:text-sm"
+                      >
+                        {category}
+                      </span>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              )}
             </div>
           </div>
         )}
 
-        {/* No problems message */}
-        {viewingSheet && currentProblems.length === 0 && (
+        {/* Invalid sheet message */}
+        {requestedSheetId && user && !activeSheet && (
           <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
             <p className="text-gray-600 dark:text-gray-400 text-lg">
-              Problems will be available soon for this sheet.
+              This coding sheet could not be found.
             </p>
           </div>
         )}
       </div>
-
-      {/* Code Editor Modal */}
-      {showCodeEditor && selectedProblem && (
-        <CodeEditor problem={selectedProblem} onClose={closeCodeEditor} />
-      )}
     </div>
   );
 };

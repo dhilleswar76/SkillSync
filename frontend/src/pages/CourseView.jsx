@@ -8,6 +8,7 @@ const CourseView = () => {
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState(null);
+  const [activeWeek, setActiveWeek] = useState(null);
   const [completedTopics, setCompletedTopics] = useState([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizModule, setQuizModule] = useState(null);
@@ -342,6 +343,68 @@ const CourseView = () => {
               },
             ],
           },
+        },
+      ],
+    },
+    'html-css-js': {
+      title: 'Modern Web Development: HTML, CSS & JavaScript',
+      description: 'Build responsive websites from scratch with modern HTML, CSS, and JavaScript.',
+      level: 'Beginner',
+      duration: '6 weeks',
+      totalScore: 650,
+      passingScore: 420,
+      instructor: 'Emma Rodriguez',
+      rating: 4.7,
+      enrolled: 3200,
+      image: '🌐',
+      syllabus: [
+        { week: 1, title: 'HTML Fundamentals & Structure', topics: ['HTML5 Semantics', 'Forms & Inputs', 'Accessibility Basics'] },
+        { week: 2, title: 'CSS Styling & Layouts', topics: ['Selectors & Box Model', 'Flexbox', 'CSS Grid'] },
+        { week: 3, title: 'Advanced CSS & Responsive Design', topics: ['Media Queries', 'Animations', 'Responsive Components'] },
+        { week: 4, title: 'JavaScript Basics & ES6', topics: ['Variables & Functions', 'Arrays & Objects', 'ES6 Syntax'] },
+        { week: 5, title: 'DOM Manipulation & Events', topics: ['DOM Selection', 'Event Handling', 'Form Validation'] },
+        { week: 6, title: 'Final Projects & Deployment', topics: ['Project Architecture', 'Performance Basics', 'Deployment Workflow'] },
+      ],
+      modules: [
+        {
+          id: 1,
+          title: 'HTML Fundamentals & Structure',
+          duration: '1 week',
+          topics: [
+            {
+              id: 'web-1',
+              name: 'HTML5 Semantics',
+              theory: {
+                title: 'Structuring Web Content - MDN',
+                url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content',
+              },
+              video: {
+                title: 'HTML Full Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=pQN-pnXPaVg',
+                channel: 'freeCodeCamp',
+              },
+            },
+          ],
+        },
+        {
+          id: 2,
+          title: 'CSS Styling & Layouts',
+          duration: '1 week',
+          topics: [
+            {
+              id: 'web-2',
+              name: 'Flexbox and CSS Grid',
+              theory: {
+                title: 'CSS Layout Guide - MDN',
+                url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/CSS_layout',
+              },
+              video: {
+                title: 'CSS Full Course - freeCodeCamp',
+                url: 'https://www.youtube.com/watch?v=OXGznpKZ_sA',
+                channel: 'freeCodeCamp',
+              },
+            },
+          ],
         },
       ],
     },
@@ -2265,7 +2328,362 @@ const CourseView = () => {
     },
   };
 
-  const course = courseData[courseId];
+  const normalizeSlug = (value = '') =>
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const buildCombinedCourse = ({
+    id,
+    title,
+    description,
+    duration,
+    level,
+    instructor,
+    image,
+    sourceIds,
+  }) => {
+    const parseDurationWeeks = (durationText = '') => {
+      const match = String(durationText).match(/(\d+)/);
+      return match ? Number(match[1]) : null;
+    };
+
+    const normalizeSyllabusWeeks = (rawSyllabus, durationText, courseTitle) => {
+      const targetWeeks = parseDurationWeeks(durationText);
+      const syllabusCopy = Array.isArray(rawSyllabus) ? [...rawSyllabus] : [];
+
+      if (!targetWeeks || targetWeeks <= 0) {
+        return syllabusCopy.map((week, index) => ({ ...week, week: index + 1 }));
+      }
+
+      let normalized = syllabusCopy;
+
+      if (normalized.length > targetWeeks) {
+        normalized = normalized.slice(0, targetWeeks);
+      }
+
+      if (normalized.length < targetWeeks) {
+        const remaining = targetWeeks - normalized.length;
+        for (let i = 0; i < remaining; i += 1) {
+          const sprintNumber = i + 1;
+          normalized.push({
+            week: normalized.length + 1,
+            title: `Capstone and Revision Sprint ${sprintNumber}`,
+            topics: [
+              `${courseTitle} Integration Project`,
+              'Case Studies and Architecture Review',
+              'Interview and Assessment Preparation',
+            ],
+          });
+        }
+      }
+
+      return normalized.map((week, index) => ({
+        ...week,
+        week: index + 1,
+      }));
+    };
+
+    const sources = sourceIds
+      .map((sourceId) => courseData[sourceId])
+      .filter(Boolean);
+
+    if (sources.length === 0) return null;
+
+    let weekCounter = 1;
+    const rawSyllabus = [];
+    sources.forEach((source) => {
+      (source.syllabus || []).forEach((week) => {
+        rawSyllabus.push({
+          ...week,
+          week: weekCounter,
+          title: week.title,
+        });
+        weekCounter += 1;
+      });
+    });
+
+    const syllabus = normalizeSyllabusWeeks(rawSyllabus, duration, title);
+
+    let moduleCounter = 1;
+    const modules = [];
+    sources.forEach((source) => {
+      (source.modules || []).forEach((module) => {
+        modules.push({
+          ...module,
+          id: moduleCounter,
+          title: `${source.title.split(':')[0]} • ${module.title}`,
+          topics: (module.topics || []).map((topic, topicIndex) => ({
+            ...topic,
+            id: `${id}-m${moduleCounter}-t${topicIndex + 1}`,
+          })),
+        });
+        moduleCounter += 1;
+      });
+    });
+
+    const totalScore = sources.reduce((sum, source) => sum + (source.totalScore || 0), 0);
+    const passingScore = sources.reduce((sum, source) => sum + (source.passingScore || 0), 0);
+    const enrolled = sources.reduce((sum, source) => sum + (source.enrolled || 0), 0);
+    const rating = Number((sources.reduce((sum, source) => sum + (source.rating || 0), 0) / sources.length).toFixed(1));
+
+    return {
+      title,
+      description,
+      level,
+      duration,
+      totalScore,
+      passingScore,
+      instructor,
+      rating,
+      enrolled,
+      image,
+      syllabus,
+      modules,
+    };
+  };
+
+  const buildStandaloneTrackCourse = ({
+    title,
+    description,
+    duration,
+    level,
+    instructor,
+    image,
+    totalScore,
+    passingScore,
+    syllabus,
+  }) => {
+    const match = String(duration).match(/(\d+)/);
+    const targetWeeks = match ? Number(match[1]) : null;
+    let normalizedSyllabus = Array.isArray(syllabus) ? [...syllabus] : [];
+
+    if (targetWeeks && targetWeeks > 0) {
+      if (normalizedSyllabus.length > targetWeeks) {
+        normalizedSyllabus = normalizedSyllabus.slice(0, targetWeeks);
+      }
+
+      while (normalizedSyllabus.length < targetWeeks) {
+        const sprint = normalizedSyllabus.length + 1;
+        normalizedSyllabus.push({
+          week: sprint,
+          title: `Domain Project Sprint ${sprint - (Array.isArray(syllabus) ? syllabus.length : 0)}`,
+          topics: [
+            `${title} Practical Implementation`,
+            'Advanced Case Study and Evaluation',
+            'Portfolio and Interview Preparation',
+          ],
+        });
+      }
+    }
+
+    normalizedSyllabus = normalizedSyllabus.map((week, index) => ({
+      ...week,
+      week: index + 1,
+    }));
+
+    return {
+      title,
+      description,
+      duration,
+      level,
+      instructor,
+      image,
+      totalScore,
+      passingScore,
+      rating: 4.8,
+      enrolled: 2500,
+      syllabus: normalizedSyllabus,
+      modules: [],
+    };
+  };
+
+  const combinedTrackData = {
+    'complete-dsa-track': buildCombinedCourse({
+      id: 'complete-dsa-track',
+      title: 'Complete Data Structures & Algorithms Track',
+      description: 'Unified DSA journey from fundamentals to advanced interview patterns.',
+      duration: '24 weeks',
+      level: 'Intermediate',
+      instructor: 'Dr. Sarah Johnson & Prof. Michael Zhang',
+      image: '🧠',
+      sourceIds: ['dsa-fundamentals', 'advanced-dsa'],
+    }),
+    'fullstack-web-development': buildCombinedCourse({
+      id: 'fullstack-web-development',
+      title: 'Frontend and Backend Web Development (Full Stack)',
+      description: 'Single full-stack track combining frontend foundations, React, and backend engineering.',
+      duration: '21 weeks',
+      level: 'Intermediate',
+      instructor: 'Emma Rodriguez, John Smith & Aisha Patel',
+      image: '🌍',
+      sourceIds: ['html-css-js', 'react-mastery', 'mern-fullstack'],
+    }),
+    'frontend-engineering-track': buildCombinedCourse({
+      id: 'frontend-engineering-track',
+      title: 'Frontend Engineering Track',
+      description: 'Complete frontend track from web foundations to advanced React architecture and optimization.',
+      duration: '11 weeks',
+      level: 'Intermediate',
+      instructor: 'Emma Rodriguez & John Smith',
+      image: '🎨',
+      sourceIds: ['html-css-js', 'react-mastery'],
+    }),
+    'backend-engineering-track': buildCombinedCourse({
+      id: 'backend-engineering-track',
+      title: 'Backend Engineering Track',
+      description: 'Comprehensive backend track covering APIs, databases, authentication, and scalable backend systems.',
+      duration: '11 weeks',
+      level: 'Advanced',
+      instructor: 'Aisha Patel',
+      image: '🧩',
+      sourceIds: ['mern-fullstack', 'dbms-course', 'devops-basics'],
+    }),
+    'machine-learning-engineering-track': buildCombinedCourse({
+      id: 'machine-learning-engineering-track',
+      title: 'Machine Learning Engineering Track',
+      description: 'Comprehensive ML engineering track from fundamentals to deep learning and production-grade workflows.',
+      duration: '20 weeks',
+      level: 'Advanced',
+      instructor: 'Dr. Rajesh Kumar & Dr. Maria Chen',
+      image: '🤖',
+      sourceIds: ['ml-basics', 'deep-learning'],
+    }),
+    'cs-fundamentals-core-track': buildCombinedCourse({
+      id: 'cs-fundamentals-core-track',
+      title: 'Core Computer Science Fundamentals Track',
+      description: 'Focused CS fundamentals track for OS, Networks, and DBMS with balanced timeline.',
+      duration: '20 weeks',
+      level: 'Intermediate',
+      instructor: 'Core CS Fundamentals Faculty Team',
+      image: '🏛️',
+      sourceIds: ['operating-systems', 'computer-networks', 'dbms-course'],
+    }),
+    'system-design-architecture-track': buildCombinedCourse({
+      id: 'system-design-architecture-track',
+      title: 'System Design and Scalable Architecture Track',
+      description: 'Dedicated system design journey for scalable architecture and high-availability systems.',
+      duration: '18 weeks',
+      level: 'Advanced',
+      instructor: 'Alex Morrison',
+      image: '🏗️',
+      sourceIds: ['system-design'],
+    }),
+    'mobile-app-development-track': buildCombinedCourse({
+      id: 'mobile-app-development-track',
+      title: 'Mobile App Development Track (React Native + Android)',
+      description: 'Cross-platform and native mobile development in one long-form learning track.',
+      duration: '18 weeks',
+      level: 'Intermediate',
+      instructor: 'Sophie Martinez & Kevin Park',
+      image: '📲',
+      sourceIds: ['react-native', 'android-kotlin'],
+    }),
+    'devops-engineering-track': buildCombinedCourse({
+      id: 'devops-engineering-track',
+      title: 'DevOps Engineering Track',
+      description: 'Dedicated DevOps track for CI/CD, platform automation, containers, and reliability engineering.',
+      duration: '18 weeks',
+      level: 'Advanced',
+      instructor: 'Robert Chen',
+      image: '⚙️',
+      sourceIds: ['devops-basics'],
+    }),
+    'cloud-computing-architecture-track': buildCombinedCourse({
+      id: 'cloud-computing-architecture-track',
+      title: 'Cloud Computing and Architecture Track',
+      description: 'Cloud-first track for architecture design, security, cost optimization, and scalable deployments.',
+      duration: '18 weeks',
+      level: 'Advanced',
+      instructor: 'Rachel Brown',
+      image: '☁️',
+      sourceIds: ['aws-cloud'],
+    }),
+    'data-science-track': buildStandaloneTrackCourse({
+      title: 'Data Science Full Domain Track',
+      description: 'End-to-end data science curriculum from statistics and EDA to machine learning and model communication.',
+      duration: '20 weeks',
+      level: 'Advanced',
+      instructor: 'Dr. Ananya Rao',
+      image: '📊',
+      totalScore: 1800,
+      passingScore: 1260,
+      syllabus: [
+        { week: 1, title: 'Statistics and Probability Foundations', topics: ['Descriptive Statistics', 'Probability', 'Distributions'] },
+        { week: 2, title: 'Python for Data Science', topics: ['NumPy', 'Pandas', 'Data Cleaning'] },
+        { week: 3, title: 'Exploratory Data Analysis', topics: ['EDA Workflow', 'Outlier Detection', 'Feature Insight'] },
+        { week: 4, title: 'Data Visualization', topics: ['Matplotlib', 'Seaborn', 'Storytelling with Charts'] },
+        { week: 5, title: 'Feature Engineering', topics: ['Encoding', 'Scaling', 'Feature Selection'] },
+        { week: 6, title: 'Supervised Learning', topics: ['Regression', 'Classification', 'Model Metrics'] },
+        { week: 7, title: 'Unsupervised Learning', topics: ['Clustering', 'Dimensionality Reduction', 'Pattern Discovery'] },
+        { week: 8, title: 'Experimentation and A/B Testing', topics: ['Hypothesis Testing', 'Experiment Design', 'Inference'] },
+        { week: 9, title: 'Model Validation and Tuning', topics: ['Cross Validation', 'Hyperparameter Tuning', 'Bias-Variance'] },
+        { week: 10, title: 'Model Interpretation', topics: ['SHAP', 'Feature Importance', 'Error Analysis'] },
+      ],
+    }),
+    'data-analytics-track': buildStandaloneTrackCourse({
+      title: 'Data Analytics and Business Intelligence Track',
+      description: 'Business-focused analytics path with SQL, dashboarding, KPI design, and decision analytics.',
+      duration: '18 weeks',
+      level: 'Intermediate',
+      instructor: 'Neha Verma',
+      image: '📈',
+      totalScore: 1500,
+      passingScore: 1020,
+      syllabus: [
+        { week: 1, title: 'SQL Foundations for Analytics', topics: ['SELECT/JOIN', 'Aggregations', 'Filtering'] },
+        { week: 2, title: 'Advanced SQL Analytics', topics: ['Window Functions', 'CTEs', 'Query Optimization'] },
+        { week: 3, title: 'Data Modeling for BI', topics: ['Star Schema', 'Fact/Dimension', 'ETL Basics'] },
+        { week: 4, title: 'Dashboard Design Principles', topics: ['KPI Selection', 'Visualization Choice', 'UX for Dashboards'] },
+        { week: 5, title: 'Power BI / Tableau Workflows', topics: ['Reports', 'Interactivity', 'Publishing'] },
+        { week: 6, title: 'Business Metrics and Decisioning', topics: ['North Star Metrics', 'Funnel Analytics', 'Cohort Analysis'] },
+        { week: 7, title: 'Analytics Storytelling', topics: ['Narrative Structure', 'Executive Reporting', 'Recommendation Framing'] },
+        { week: 8, title: 'Analytics Case Projects', topics: ['Product Analytics', 'Marketing Analytics', 'Operations Analytics'] },
+      ],
+    }),
+    'cybersecurity-engineering-track': buildStandaloneTrackCourse({
+      title: 'Cybersecurity Engineering Track',
+      description: 'Full cybersecurity domain track across application security, network defense, and cloud security operations.',
+      duration: '20 weeks',
+      level: 'Advanced',
+      instructor: 'Ritika Sharma',
+      image: '🛡️',
+      totalScore: 1900,
+      passingScore: 1330,
+      syllabus: [
+        { week: 1, title: 'Security Foundations', topics: ['CIA Triad', 'Threat Landscape', 'Security Principles'] },
+        { week: 2, title: 'Network Security', topics: ['Firewalls', 'IDS/IPS', 'Network Segmentation'] },
+        { week: 3, title: 'Web Application Security', topics: ['OWASP Top 10', 'XSS', 'SQL Injection'] },
+        { week: 4, title: 'Authentication and Access Control', topics: ['IAM', 'MFA', 'Least Privilege'] },
+        { week: 5, title: 'Secure Coding Practices', topics: ['Input Validation', 'Secrets Management', 'Dependency Security'] },
+        { week: 6, title: 'Cloud Security', topics: ['Cloud IAM', 'Workload Security', 'Misconfiguration Risks'] },
+        { week: 7, title: 'Monitoring and Incident Response', topics: ['SIEM Basics', 'Playbooks', 'Postmortems'] },
+        { week: 8, title: 'Vulnerability Management', topics: ['Scanning', 'Prioritization', 'Patch Governance'] },
+        { week: 9, title: 'Threat Modeling and Risk', topics: ['STRIDE', 'Risk Assessment', 'Control Mapping'] },
+        { week: 10, title: 'Security Engineering Projects', topics: ['Hardening Project', 'Detection Rules', 'Security Review'] },
+      ],
+    }),
+  };
+
+  const allCourseData = {
+    ...courseData,
+    ...Object.fromEntries(Object.entries(combinedTrackData).filter(([, value]) => Boolean(value))),
+  };
+
+  const resolvedCourseKey = useMemo(() => {
+    if (allCourseData[courseId]) return courseId;
+
+    const normalizedId = normalizeSlug(courseId || '');
+    const matchedEntry = Object.entries(allCourseData).find(([key, value]) => {
+      return key === normalizedId || normalizeSlug(value.title) === normalizedId;
+    });
+
+    return matchedEntry ? matchedEntry[0] : courseId;
+  }, [courseId]);
+
+  const course = allCourseData[resolvedCourseKey];
 
   const createTopicFallbackResources = (topicName) => {
     const topic = (topicName || '').toLowerCase();
@@ -2275,21 +2693,25 @@ const CourseView = () => {
         keys: ['array'],
         theory: { title: 'Array Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/array-data-structure/' },
         video: { title: 'Arrays Introduction - freeCodeCamp', url: 'https://www.youtube.com/watch?v=rZ41y93P2Qo', channel: 'freeCodeCamp' },
+        practice: { title: 'LeetCode Array Problems', url: 'https://leetcode.com/tag/array/' },
       },
       {
         keys: ['linked list'],
         theory: { title: 'Linked List Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/data-structures/linked-list/' },
         video: { title: 'Linked List Tutorial - mycodeschool', url: 'https://www.youtube.com/watch?v=92S4zgXN17o', channel: 'mycodeschool' },
+        practice: { title: 'LeetCode Linked List Problems', url: 'https://leetcode.com/tag/linked-list/' },
       },
       {
         keys: ['stack'],
         theory: { title: 'Stack Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/stack-data-structure/' },
         video: { title: 'Stack Data Structure Tutorial - mycodeschool', url: 'https://www.youtube.com/watch?v=F1F2imiOJfk', channel: 'mycodeschool' },
+        practice: { title: 'LeetCode Stack Problems', url: 'https://leetcode.com/tag/stack/' },
       },
       {
         keys: ['queue'],
         theory: { title: 'Queue Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/queue-data-structure/' },
         video: { title: 'Queue Data Structure Tutorial - Abdul Bari', url: 'https://www.youtube.com/watch?v=XuCbpw6Bj1U', channel: 'Abdul Bari' },
+        practice: { title: 'LeetCode Queue Problems', url: 'https://leetcode.com/tag/queue/' },
       },
       {
         keys: ['sorting', 'sort'],
@@ -2325,86 +2747,115 @@ const CourseView = () => {
         keys: ['react', 'jsx', 'component', 'hook', 'router', 'redux'],
         theory: { title: 'React Documentation - Learn React', url: 'https://react.dev/learn' },
         video: { title: 'React Course for Beginners - freeCodeCamp', url: 'https://www.youtube.com/watch?v=bMknfKXIFA8', channel: 'freeCodeCamp' },
+        practice: { title: 'React Challenges - Frontend Mentor', url: 'https://www.frontendmentor.io/challenges?languages=React' },
       },
       {
         keys: ['html'],
         theory: { title: 'HTML Tutorial - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content' },
         video: { title: 'HTML Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=pQN-pnXPaVg', channel: 'freeCodeCamp' },
+        practice: { title: 'HTML Exercises - W3Schools', url: 'https://www.w3schools.com/html/exercise.asp' },
       },
       {
         keys: ['css', 'flexbox', 'grid', 'responsive'],
         theory: { title: 'CSS - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS' },
         video: { title: 'CSS Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=OXGznpKZ_sA', channel: 'freeCodeCamp' },
+        practice: { title: 'CSS Challenges - Frontend Mentor', url: 'https://www.frontendmentor.io/challenges' },
       },
       {
         keys: ['javascript', 'dom', 'es6'],
         theory: { title: 'JavaScript Guide - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide' },
         video: { title: 'JavaScript Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=PkZNo7MFNFg', channel: 'freeCodeCamp' },
+        practice: { title: 'JavaScript Challenges - Codewars', url: 'https://www.codewars.com/' },
       },
       {
         keys: ['node', 'npm', 'module', 'file system', 'stream', 'cli'],
         theory: { title: 'Node.js Documentation - Learn', url: 'https://nodejs.org/en/learn/getting-started/introduction-to-nodejs' },
         video: { title: 'Node.js Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=Oe421EPjeBE', channel: 'freeCodeCamp' },
+        practice: { title: 'Node.js Project Ideas', url: 'https://roadmap.sh/projects?g=backend' },
       },
       {
         keys: ['express', 'rest api', 'middleware', 'api'],
         theory: { title: 'Express.js Guide', url: 'https://expressjs.com/en/guide/routing.html' },
         video: { title: 'Express JS Crash Course - Traversy Media', url: 'https://www.youtube.com/watch?v=L72fhGm1tfE', channel: 'Traversy Media' },
+        practice: { title: 'Build REST APIs - freeCodeCamp', url: 'https://www.freecodecamp.org/news/rest-api-design-best-practices-build-a-rest-api/' },
       },
       {
         keys: ['mongo', 'mongoose', 'database', 'dbms', 'sql', 'normalization'],
         theory: { title: 'MongoDB Manual - CRUD Operations', url: 'https://www.mongodb.com/docs/manual/crud/' },
         video: { title: 'MongoDB Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=ofme2o29ngU', channel: 'freeCodeCamp' },
+        practice: { title: 'SQLBolt Interactive SQL Practice', url: 'https://sqlbolt.com/' },
       },
       {
         keys: ['auth', 'jwt', 'oauth', 'security', 'encryption'],
         theory: { title: 'OWASP Top 10', url: 'https://owasp.org/www-project-top-ten/' },
         video: { title: 'JWT Authentication Tutorial - Web Dev Simplified', url: 'https://www.youtube.com/watch?v=mbsmsi7l3r4', channel: 'Web Dev Simplified' },
+        practice: { title: 'JWT Hands-on Guide', url: 'https://jwt.io/introduction' },
       },
       {
         keys: ['machine learning', 'ml', 'regression', 'classification', 'svm', 'k-means', 'pca', 'feature'],
         theory: { title: 'Machine Learning Crash Course - Google', url: 'https://developers.google.com/machine-learning/crash-course' },
         video: { title: 'Machine Learning Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=NWONeJKn6kc', channel: 'freeCodeCamp' },
+        practice: { title: 'Kaggle Learn', url: 'https://www.kaggle.com/learn' },
+      },
+      {
+        keys: ['data science', 'eda', 'feature engineering', 'hypothesis testing', 'a/b testing'],
+        theory: { title: 'Data Science Tutorial - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/data-science-tutorial/' },
+        video: { title: 'Data Science Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=ua-CiDNNj30', channel: 'freeCodeCamp' },
+        practice: { title: 'Kaggle Learn - Data Science Path', url: 'https://www.kaggle.com/learn' },
+      },
+      {
+        keys: ['analytics', 'sql analytics', 'dashboard', 'kpi', 'power bi', 'tableau', 'business intelligence'],
+        theory: { title: 'Data Analytics Tutorial - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/data-analytics/' },
+        video: { title: 'Data Analytics Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=r-uOLxNrNk8', channel: 'freeCodeCamp' },
+        practice: { title: 'SQLBolt Interactive SQL Practice', url: 'https://sqlbolt.com/' },
       },
       {
         keys: ['deep learning', 'neural', 'cnn', 'rnn', 'lstm', 'transformer', 'bert', 'gpt'],
         theory: { title: 'Deep Learning Specialization Notes - DeepLearning.AI', url: 'https://www.deeplearning.ai/courses/deep-learning-specialization/' },
         video: { title: 'Neural Networks - 3Blue1Brown', url: 'https://www.youtube.com/watch?v=aircAruvnKk', channel: '3Blue1Brown' },
+        practice: { title: 'TensorFlow Tutorials', url: 'https://www.tensorflow.org/tutorials' },
       },
       {
         keys: ['operating system', 'os', 'process', 'thread', 'cpu scheduling', 'memory management', 'deadlock'],
         theory: { title: 'Operating Systems Notes - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/operating-systems/' },
         video: { title: 'Operating System Full Course - Neso Academy', url: 'https://www.youtube.com/watch?v=26QPDBe-NB8', channel: 'Neso Academy' },
+        practice: { title: 'OS Interview Questions - GFG', url: 'https://www.geeksforgeeks.org/operating-systems-interview-questions/' },
       },
       {
         keys: ['network', 'tcp', 'udp', 'http', 'dns', 'osi'],
         theory: { title: 'Computer Networking - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/computer-network-tutorials/' },
         video: { title: 'Computer Networking Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=qiQR5rTSshw', channel: 'freeCodeCamp' },
+        practice: { title: 'Network Labs (Cisco Packet Tracer)', url: 'https://www.netacad.com/courses/packet-tracer' },
       },
       {
         keys: ['system design', 'scalability', 'load balancer', 'caching', 'distributed'],
         theory: { title: 'System Design Primer', url: 'https://github.com/donnemartin/system-design-primer' },
         video: { title: 'System Design Basics - Gaurav Sen', url: 'https://www.youtube.com/watch?v=UzLMhqg3_Wc', channel: 'Gaurav Sen' },
+        practice: { title: 'System Design Practice Questions', url: 'https://www.hellointerview.com/learn/system-design/in-a-hurry/introduction' },
       },
       {
         keys: ['android', 'kotlin', 'jetpack', 'room', 'sharedpreferences', 'datastore'],
         theory: { title: 'Android Developer Guides', url: 'https://developer.android.com/guide' },
         video: { title: 'Android Development Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=fis26HvvDII', channel: 'freeCodeCamp' },
+        practice: { title: 'Android Codelabs', url: 'https://developer.android.com/courses' },
       },
       {
         keys: ['react native', 'mobile app'],
         theory: { title: 'React Native Documentation', url: 'https://reactnative.dev/docs/getting-started' },
         video: { title: 'React Native Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=0-S5a0eXPoc', channel: 'freeCodeCamp' },
+        practice: { title: 'React Native Examples', url: 'https://reactnative.dev/showcase' },
       },
       {
         keys: ['devops', 'docker', 'kubernetes', 'ci/cd', 'jenkins', 'terraform', 'aws', 'cloud'],
         theory: { title: 'DevOps Roadmap', url: 'https://roadmap.sh/devops' },
         video: { title: 'DevOps Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=9pZ2xmsSDdo', channel: 'freeCodeCamp' },
+        practice: { title: 'Kubernetes By Example', url: 'https://kubernetesbyexample.com/' },
       },
       {
         keys: ['cybersecurity', 'pentest', 'xss', 'sql injection', 'vulnerability'],
         theory: { title: 'Cybersecurity Roadmap', url: 'https://roadmap.sh/cyber-security' },
         video: { title: 'Cybersecurity Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=U_P23SqJaDc', channel: 'freeCodeCamp' },
+        practice: { title: 'PortSwigger Web Security Academy', url: 'https://portswigger.net/web-security' },
       },
     ];
 
@@ -2416,6 +2867,7 @@ const CourseView = () => {
       return {
         theory: match.theory,
         video: match.video,
+        practice: match.practice || { title: 'Practice Exercises', url: 'https://www.geeksforgeeks.org/practice-for-cracking-any-coding-interview/' },
       };
     }
 
@@ -2428,6 +2880,10 @@ const CourseView = () => {
         title: `${topicName} - freeCodeCamp`,
         url: `https://www.youtube.com/results?search_query=${encodeURIComponent(topicName + ' freeCodeCamp')}`,
         channel: 'freeCodeCamp',
+      },
+      practice: {
+        title: `${topicName} Practice`,
+        url: `https://www.geeksforgeeks.org/?s=${encodeURIComponent(topicName + ' practice')}`,
       },
     };
   };
@@ -2445,10 +2901,357 @@ const CourseView = () => {
     };
   };
 
+  const getInDepthSubtopics = (topicName) => {
+    const topic = (topicName || '').toLowerCase();
+
+    const depthMap = [
+      { keys: ['array'], items: ['Prefix sums and difference arrays', 'In-place transformations and stability', 'Edge cases: empty, single, overflow bounds'] },
+      { keys: ['linked list'], items: ['Two-pointer patterns on linked lists', 'Cycle detection and intersection', 'Reversal variants and dummy-node tricks'] },
+      { keys: ['stack'], items: ['Monotonic stack patterns', 'Expression parsing and evaluation', 'Amortized complexity in stack operations'] },
+      { keys: ['queue'], items: ['Deque and sliding window patterns', 'Circular queue boundary handling', 'Queue-backed BFS modeling'] },
+      { keys: ['sort', 'sorting'], items: ['Stability and in-place trade-offs', 'Partitioning strategy comparisons', 'When to use non-comparison sorts'] },
+      { keys: ['search', 'binary'], items: ['Lower/upper bound templates', 'Search on answer space', 'Failure modes in boundary checks'] },
+      { keys: ['recursion', 'backtracking'], items: ['State-space tree pruning', 'Memoization vs tabulation choices', 'Base-case design for correctness'] },
+      { keys: ['tree', 'bst'], items: ['Traversal-based problem decomposition', 'Balanced tree invariants', 'Tree DP and rerooting intuition'] },
+      { keys: ['graph', 'bfs', 'dfs'], items: ['Visited-state modeling in graphs', 'Topological ordering and DAG reasoning', 'Shortest path algorithm selection'] },
+      { keys: ['dynamic programming', 'dp'], items: ['State definition and transition design', 'Space optimization patterns', 'Recognizing overlapping subproblems quickly'] },
+      { keys: ['react', 'jsx', 'hook', 'component'], items: ['Component boundaries and re-render control', 'State colocation vs lifting strategy', 'Hook dependency correctness'] },
+      { keys: ['javascript', 'dom'], items: ['Event delegation and propagation', 'Asynchronous control flow patterns', 'Data structure choices in UI logic'] },
+      { keys: ['node', 'express', 'api'], items: ['Middleware flow and error propagation', 'Request lifecycle and validation strategy', 'Performance bottlenecks in I/O heavy APIs'] },
+      { keys: ['database', 'sql', 'mongo'], items: ['Schema/index design trade-offs', 'Transaction boundaries and consistency', 'Query plan interpretation and optimization'] },
+      { keys: ['machine learning', 'regression', 'classification'], items: ['Bias-variance trade-off diagnostics', 'Feature leakage and data-split hygiene', 'Metric selection by business goal'] },
+      { keys: ['deep learning', 'neural', 'cnn', 'transformer'], items: ['Training stability and learning-rate schedules', 'Regularization and generalization tactics', 'Model debugging through ablation checks'] },
+      { keys: ['operating system', 'os', 'thread', 'memory'], items: ['Scheduling fairness vs throughput', 'Synchronization correctness proofs', 'Virtual memory and paging behavior'] },
+      { keys: ['network', 'tcp', 'http', 'dns'], items: ['Latency budgeting across layers', 'Protocol reliability and failure handling', 'Tracing requests across distributed paths'] },
+      { keys: ['system design', 'scalability', 'cache'], items: ['Read/write path decomposition', 'Data consistency and availability trade-offs', 'Capacity planning with realistic assumptions'] },
+      { keys: ['android', 'kotlin', 'react native', 'mobile'], items: ['Lifecycle-aware state management', 'Offline-first data synchronization', 'Performance profiling on constrained devices'] },
+      { keys: ['devops', 'docker', 'kubernetes', 'aws', 'cloud'], items: ['Infrastructure drift prevention', 'Observability signal design', 'Rollback and disaster recovery planning'] },
+    ];
+
+    const match = depthMap.find((entry) => entry.keys.some((key) => topic.includes(key)));
+    if (match) return match.items;
+
+    return [
+      'Core theory with implementation-level details',
+      'Interview and production-grade edge cases',
+      'Optimization and debugging strategies',
+    ];
+  };
+
+  const getExpandedTopicsForWeek = (weekTitle = '', weekTopics = []) => {
+    const title = weekTitle.toLowerCase();
+    const topics = Array.isArray(weekTopics) ? [...weekTopics] : [];
+
+    const addUnique = (list, items) => {
+      const seen = new Set(list.map((item) => item.toLowerCase()));
+      items.forEach((item) => {
+        const key = item.toLowerCase();
+        if (!seen.has(key)) {
+          list.push(item);
+          seen.add(key);
+        }
+      });
+      return list;
+    };
+
+    if (title.includes('html')) {
+      return addUnique(topics, [
+        'Document Structure and Boilerplate',
+        'Semantic Tags and Accessibility',
+        'Head Metadata and SEO Basics',
+        'Forms, Input Types, and Validation',
+        'Tables, Lists, and Media Embeds',
+        'ARIA Roles and Screen Reader Support',
+      ]);
+    }
+
+    if (title.includes('css')) {
+      return addUnique(topics, [
+        'CSS Selectors and Specificity',
+        'Box Model, Margin Collapsing, and Units',
+        'Positioning, Stacking Context, and Z-Index',
+        'Flexbox Layout Patterns',
+        'CSS Grid Layout Systems',
+        'Responsive Design with Media Queries',
+        'Animations and Transitions',
+      ]);
+    }
+
+    if (title.includes('javascript') || title.includes('dom')) {
+      return addUnique(topics, [
+        'Data Types, Scope, and Hoisting',
+        'Functions, Closures, and Higher-Order Patterns',
+        'ES6+ Features and Modules',
+        'DOM Traversal and Manipulation',
+        'Event Loop, Promises, and Async/Await',
+        'Error Handling and Debugging Techniques',
+        'Browser Storage and Performance Basics',
+      ]);
+    }
+
+    if (title.includes('react')) {
+      return addUnique(topics, [
+        'Component Composition and Reusability',
+        'Props, State, and Derived State',
+        'Hooks Rules and Dependency Arrays',
+        'Context API and State Management Strategy',
+        'Routing, Guards, and Nested Routes',
+        'Performance Optimization with Memoization',
+        'Testing Components and User Flows',
+      ]);
+    }
+
+    if (title.includes('node') || title.includes('express') || title.includes('api')) {
+      return addUnique(topics, [
+        'Node Runtime, Event Loop, and Non-Blocking I/O',
+        'Module Systems and Project Architecture',
+        'Express Routing and Middleware Pipeline',
+        'REST API Design and Status Code Strategy',
+        'Input Validation, Auth, and Security Basics',
+        'Error Handling, Logging, and Monitoring',
+        'Testing APIs and Deployment Readiness',
+      ]);
+    }
+
+    if (title.includes('array')) {
+      return addUnique(topics, [
+        'Array Traversal Patterns',
+        'Two Pointer Technique',
+        'Sliding Window Fundamentals',
+        'Prefix Sum and Difference Arrays',
+        'In-place Rearrangement Techniques',
+      ]);
+    }
+
+    if (title.includes('linked list')) {
+      return addUnique(topics, [
+        'Pointer Manipulation Patterns',
+        'Fast and Slow Pointer Techniques',
+        'Cycle Detection and Removal',
+        'Merge and Reversal Variants',
+      ]);
+    }
+
+    if (title.includes('stack') || title.includes('queue')) {
+      return addUnique(topics, [
+        'Monotonic Stack Applications',
+        'Deque and Window Problems',
+        'Expression Conversion and Evaluation',
+        'Queue Simulation and BFS Modeling',
+      ]);
+    }
+
+    if (title.includes('tree')) {
+      return addUnique(topics, [
+        'Tree Traversal Strategies',
+        'Balanced Trees and Rotations',
+        'Lowest Common Ancestor',
+        'Tree DP and Path Problems',
+      ]);
+    }
+
+    if (title.includes('graph')) {
+      return addUnique(topics, [
+        'Graph Representations and Trade-offs',
+        'Connected Components and Traversals',
+        'Shortest Path Algorithms',
+        'MST and Topological Ordering',
+      ]);
+    }
+
+    if (title.includes('dynamic programming') || title.includes('dp')) {
+      return addUnique(topics, [
+        'State Definition and Transition Design',
+        'Memoization vs Tabulation',
+        'Space Optimization Techniques',
+        'Classic DP Pattern Recognition',
+      ]);
+    }
+
+    if (title.includes('machine learning') || title.includes('regression') || title.includes('classification')) {
+      return addUnique(topics, [
+        'Feature Engineering and Data Leakage',
+        'Model Evaluation and Validation',
+        'Hyperparameter Tuning Workflows',
+        'Bias-Variance Trade-off',
+      ]);
+    }
+
+    if (title.includes('deep') || title.includes('neural') || title.includes('transformer')) {
+      return addUnique(topics, [
+        'Activation and Loss Function Selection',
+        'Regularization and Generalization',
+        'Training Stability and Optimization',
+        'Transfer Learning and Fine-tuning',
+      ]);
+    }
+
+    if (title.includes('operating system') || title.includes('thread') || title.includes('memory')) {
+      return addUnique(topics, [
+        'Process and Thread Scheduling',
+        'Concurrency and Synchronization Primitives',
+        'Paging, Segmentation, and Virtual Memory',
+        'Deadlock Detection and Avoidance',
+      ]);
+    }
+
+    if (title.includes('network') || title.includes('tcp') || title.includes('routing')) {
+      return addUnique(topics, [
+        'Layered Protocol Models',
+        'Congestion and Flow Control',
+        'Routing Algorithms and Metrics',
+        'Security Protocols and TLS Basics',
+      ]);
+    }
+
+    if (title.includes('database') || title.includes('sql') || title.includes('mongodb')) {
+      return addUnique(topics, [
+        'Schema Design and Normal Forms',
+        'Indexing and Query Plan Analysis',
+        'Transactions and Isolation Levels',
+        'Replication, Partitioning, and Scaling',
+      ]);
+    }
+
+    if (title.includes('system design') || title.includes('scalability') || title.includes('architecture')) {
+      return addUnique(topics, [
+        'Requirement Clarification and Capacity Estimation',
+        'API Contracts and Data Modeling',
+        'Caching, Queues, and Asynchronous Workloads',
+        'Reliability, Observability, and Failover',
+      ]);
+    }
+
+    if (title.includes('android') || title.includes('react native') || title.includes('mobile')) {
+      return addUnique(topics, [
+        'App Lifecycle and State Preservation',
+        'Navigation and Deep Linking',
+        'Offline Storage and Sync Strategy',
+        'Performance and Battery Optimization',
+      ]);
+    }
+
+    if (title.includes('devops') || title.includes('docker') || title.includes('kubernetes') || title.includes('aws')) {
+      return addUnique(topics, [
+        'CI/CD Pipeline Design',
+        'Containerization and Orchestration',
+        'Infrastructure as Code Practices',
+        'Monitoring, Alerting, and Incident Response',
+      ]);
+    }
+
+    return addUnique(topics, [
+      'Core Concepts and Terminology',
+      'Hands-on Implementation',
+      'Edge Cases and Best Practices',
+      'Performance and Optimization',
+    ]);
+  };
+
+  const ensureBulkTopics = (topics, weekTitle = '') => {
+    const list = Array.isArray(topics) ? [...topics] : [];
+    const seen = new Set(list.map((item) => item.toLowerCase()));
+
+    const basePool = [
+      'Common Mistakes and Debugging',
+      'Interview-style Problems and Patterns',
+      'Real-world Use Cases',
+      'Best Practices and Code Quality',
+      'Optimization Strategies',
+      'Mini Project and Hands-on Exercise',
+      'Assessment Checklist and Revision',
+      'Advanced Problem Variants',
+      'Practical Assignments and Practice Set',
+      'Implementation Walkthrough',
+      'Testing and Validation Strategy',
+      'Production Considerations',
+    ];
+
+    const title = weekTitle.toLowerCase();
+    const domainPool =
+      title.includes('html') || title.includes('css') || title.includes('javascript')
+        ? [
+            'Browser Compatibility and Fallbacks',
+            'Accessibility and Semantic Standards',
+            'Responsive Design Case Study',
+            'Reusable UI Component Patterns',
+          ]
+        : title.includes('react') || title.includes('node') || title.includes('api')
+        ? [
+            'Architecture and Folder Structure',
+            'State/Data Flow Decisions',
+            'Error Handling and Observability',
+            'Deployment and Performance Tuning',
+          ]
+        : title.includes('ml') || title.includes('deep') || title.includes('nlp')
+        ? [
+            'Dataset Preparation and Leakage Checks',
+            'Evaluation Metrics Comparison',
+            'Model Improvement Loop',
+            'Experiment Tracking and Reproducibility',
+          ]
+        : title.includes('system design') || title.includes('network') || title.includes('operating')
+        ? [
+            'Trade-off Analysis and Design Decisions',
+            'Failure Scenarios and Recovery',
+            'Scalability and Reliability Checklist',
+            'Monitoring and Capacity Planning',
+          ]
+        : [
+            'Complexity Analysis and Trade-offs',
+            'Pattern Recognition and Reusability',
+            'Challenging Problem Set',
+            'Revision and Mastery Checklist',
+          ];
+
+    const pool = [...domainPool, ...basePool];
+    for (const candidate of pool) {
+      const normalized = candidate.toLowerCase();
+      if (!seen.has(normalized)) {
+        list.push(candidate);
+        seen.add(normalized);
+      }
+      if (list.length >= 10) break;
+    }
+
+    return list;
+  };
+
+  const expandedSyllabus = useMemo(() => {
+    if (!course || !Array.isArray(course.syllabus)) return [];
+
+    const seenTopics = new Set();
+
+    return course.syllabus.map((week) => {
+      const expandedTopics = ensureBulkTopics(
+        getExpandedTopicsForWeek(week.title, week.topics),
+        week.title
+      );
+      const uniqueTopicsForWeek = [];
+
+      expandedTopics.forEach((topic) => {
+        const normalized = (topic || '').toLowerCase().trim();
+        if (!seenTopics.has(normalized)) {
+          seenTopics.add(normalized);
+          uniqueTopicsForWeek.push(topic);
+        }
+      });
+
+      if (uniqueTopicsForWeek.length === 0) {
+        uniqueTopicsForWeek.push(`${week.title} - Advanced Practice`);
+      }
+
+      return {
+        ...week,
+        topics: uniqueTopicsForWeek,
+      };
+    });
+  }, [course]);
+
   const learningModules = useMemo(() => {
     if (!course) return [];
 
-    const syllabus = Array.isArray(course.syllabus) ? course.syllabus : [];
+    const syllabus = expandedSyllabus;
     const baseModules = Array.isArray(course.modules) ? course.modules : [];
 
     if (syllabus.length === 0) {
@@ -2513,6 +3316,7 @@ const CourseView = () => {
             name: topicName,
             theory: matchedExistingTopic?.theory || fallback.theory,
             video: matchedExistingTopic?.video || fallback.video,
+            practice: matchedExistingTopic?.practice || fallback.practice,
           };
         });
 
@@ -2533,6 +3337,7 @@ const CourseView = () => {
           name: topicName,
           theory: fallback.theory,
           video: fallback.video,
+          practice: fallback.practice,
         };
       });
 
@@ -2549,8 +3354,29 @@ const CourseView = () => {
       };
     });
 
-    return expandedFromSyllabus;
-  }, [course, courseId]);
+    return expandedFromSyllabus.map((module) => ({
+      ...module,
+      topics: (module.topics || []).map((topic) => ({
+        ...topic,
+        deepDive: topic.deepDive || getInDepthSubtopics(topic.name),
+      })),
+    }));
+  }, [course, courseId, expandedSyllabus]);
+
+  const weekPlans = useMemo(() => {
+    return learningModules.map((module, index) => {
+      const completedCount = (module.topics || []).filter((topic) => completedTopics.includes(topic.id)).length;
+      const totalCount = (module.topics || []).length;
+
+      return {
+        week: index + 1,
+        module,
+        completedCount,
+        totalCount,
+        isCompleted: totalCount > 0 && completedCount === totalCount,
+      };
+    });
+  }, [learningModules, completedTopics]);
 
   // Check enrollment status and load progress
   useEffect(() => {
@@ -2743,7 +3569,7 @@ const CourseView = () => {
           <div className="md:col-span-2">
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">📋 Course Syllabus</h2>
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-              {course.syllabus.map((week, index) => (
+              {expandedSyllabus.map((week, index) => (
                 <div key={index} className="p-6 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-primary to-coral rounded-lg flex items-center justify-center text-white font-bold text-lg">
@@ -2763,6 +3589,54 @@ const CourseView = () => {
                 </div>
               ))}
             </div>
+
+            {weekPlans.length > 0 && (
+              <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">🗓️ Week-wise Learning Plan</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Open any week to view topic-wise resources and continue learning.
+                </p>
+                <div className="space-y-3">
+                  {weekPlans.map((plan) => (
+                    <div key={plan.week} className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <div className="font-semibold text-gray-900 dark:text-white mb-1">Week {plan.week}: {plan.module.title}</div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">
+                            {plan.completedCount}/{plan.totalCount} topics completed
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setActiveWeek(activeWeek === plan.week ? null : plan.week)}
+                          className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition"
+                        >
+                          {plan.isCompleted ? 'Review' : plan.completedCount > 0 ? 'Continue' : 'Start'}
+                        </button>
+                      </div>
+
+                      {activeWeek === plan.week && (
+                        <div className="mt-4 space-y-3">
+                          {plan.module.topics.map((topic, topicIndex) => (
+                            <div key={topic.id} className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                              <div className="font-semibold text-gray-900 dark:text-white mb-2">
+                                {topicIndex + 1}. {topic.name}
+                              </div>
+                              <div className="text-sm flex flex-wrap gap-3">
+                                <a href={topic.theory.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Theory</a>
+                                <a href={topic.video.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Video</a>
+                                {topic.practice?.url && (
+                                  <a href={topic.practice.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Practice</a>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Course Stats */}
@@ -2933,6 +3807,41 @@ const CourseView = () => {
                                 </div>
                               </a>
                             </div>
+
+                            {/* Practice Resource */}
+                            {topic.practice?.url && (
+                              <div className="mt-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-2xl">🧪</span>
+                                  <h5 className="font-semibold text-gray-900 dark:text-white">Practice Resource</h5>
+                                </div>
+                                <a
+                                  href={topic.practice.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-primary hover:text-primary-dark font-medium hover:underline"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    {topic.practice.title}
+                                    <span>→</span>
+                                  </div>
+                                </a>
+                              </div>
+                            )}
+
+                            {Array.isArray(topic.deepDive) && topic.deepDive.length > 0 && (
+                              <div className="mt-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-2xl">🔍</span>
+                                  <h5 className="font-semibold text-gray-900 dark:text-white">In-depth Coverage</h5>
+                                </div>
+                                <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                                  {topic.deepDive.map((point, pointIndex) => (
+                                    <li key={pointIndex}>• {point}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>

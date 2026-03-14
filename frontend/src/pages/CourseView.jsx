@@ -2,6 +2,7 @@ import { useState, useContext, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from '../api/axios';
+import CodeEditor from '../components/CodeEditor';
 
 const CourseView = () => {
   const { courseId } = useParams();
@@ -9,13 +10,44 @@ const CourseView = () => {
   const navigate = useNavigate();
   const [activeModule, setActiveModule] = useState(null);
   const [activeWeek, setActiveWeek] = useState(null);
-  const [completedTopics, setCompletedTopics] = useState([]);
   const [showQuiz, setShowQuiz] = useState(false);
   const [quizModule, setQuizModule] = useState(null);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
   const [loading, setLoading] = useState(true);
   const [quizScores, setQuizScores] = useState({});
+  const [readArticles, setReadArticles] = useState([]);
+  const [solvedProblems, setSolvedProblems] = useState([]);
+  const [quizAttempts, setQuizAttempts] = useState({});
+  const [activeProblem, setActiveProblem] = useState(null);
+  const [showSyllabus, setShowSyllabus] = useState(false);
+
+  const dsa24WeekSyllabus = [
+    { week: 1, title: 'Complexity Analysis and STL Foundations', topics: ['Big O, Big Theta, Big Omega', 'Amortized Analysis', 'STL Containers Overview'] },
+    { week: 2, title: 'Array Basics and Patterns', topics: ['Traversal and Prefix Sums', 'Two Pointers', 'Sliding Window Basics'] },
+    { week: 3, title: 'Array Problem Solving Intensive', topics: ['Subarray Sum Techniques', 'Difference Arrays', 'Greedy on Arrays'] },
+    { week: 4, title: 'Strings and Hashing Fundamentals', topics: ['Character Frequency Maps', 'String Matching Basics', 'Rolling Hash Intro'] },
+    { week: 5, title: 'Recursion and Backtracking Basics', topics: ['Recursion Trees', 'Subset and Permutation Patterns', 'Constraint Pruning'] },
+    { week: 6, title: 'Linked List Deep Dive', topics: ['Reversal Patterns', 'Fast and Slow Pointers', 'Merge and Cycle Problems'] },
+    { week: 7, title: 'Stacks, Queues, and Deque Patterns', topics: ['Monotonic Stack', 'Queue Simulation', 'Sliding Window Maximum'] },
+    { week: 8, title: 'Binary Search Mastery', topics: ['Lower and Upper Bound', 'Binary Search on Answer', 'Search in Rotated Array'] },
+    { week: 9, title: 'Sorting and Custom Comparators', topics: ['Stability and In-place Concepts', 'Partition Techniques', 'Comparator-based Sorting'] },
+    { week: 10, title: 'Bit Manipulation', topics: ['Bitwise Operators', 'XOR Patterns', 'Bitmasking for Subsets'] },
+    { week: 11, title: 'Binary Trees Fundamentals', topics: ['DFS Traversals', 'BFS Level Order', 'Height and Diameter'] },
+    { week: 12, title: 'Binary Search Trees and Balanced Trees', topics: ['BST Operations', 'AVL and Red-Black Concepts', 'Order Statistics Basics'] },
+    { week: 13, title: 'Heaps and Priority Queues', topics: ['Heap Construction', 'Top K Problems', 'Median from Data Stream'] },
+    { week: 14, title: 'Tries and String Data Structures', topics: ['Prefix Trees', 'Autocomplete Patterns', 'Bitwise Trie Use Cases'] },
+    { week: 15, title: 'Graph Representation and Traversals', topics: ['Adjacency Structures', 'BFS and DFS on Graphs', 'Connected Components'] },
+    { week: 16, title: 'Shortest Path Algorithms', topics: ['Dijkstra', 'Bellman-Ford', '0-1 BFS Concepts'] },
+    { week: 17, title: 'Minimum Spanning Tree and DSU', topics: ['Kruskal', 'Prim', 'Union Find Optimizations'] },
+    { week: 18, title: 'Directed Graph Algorithms', topics: ['Topological Sort', 'Cycle Detection in Directed Graph', 'Strongly Connected Components'] },
+    { week: 19, title: 'Dynamic Programming Intro', topics: ['1D DP', '2D DP', 'State Transition Design'] },
+    { week: 20, title: 'Dynamic Programming Intermediate', topics: ['Knapsack Variants', 'LCS and LIS', 'Grid and Path DP'] },
+    { week: 21, title: 'Dynamic Programming Advanced', topics: ['Tree DP', 'Bitmask DP Intro', 'Digit DP Concepts'] },
+    { week: 22, title: 'Greedy and Interval Strategies', topics: ['Activity Selection', 'Interval Merging', 'Exchange Arguments'] },
+    { week: 23, title: 'Advanced Interview Patterns', topics: ['Meet in the Middle', 'Monotonic Data Structures', 'Problem Decomposition'] },
+    { week: 24, title: 'Mock Interviews and Contest Readiness', topics: ['Mixed Pattern Sets', 'Time Management in Contests', 'Post-Contest Analysis'] },
+  ];
 
   // Course data with modules, topics, and resources
   const courseData = {
@@ -2370,7 +2402,7 @@ const CourseView = () => {
           const sprintNumber = i + 1;
           normalized.push({
             week: normalized.length + 1,
-            title: `Capstone and Revision Sprint ${sprintNumber}`,
+            title: `Capstone and Mastery Sprint ${sprintNumber}`,
             topics: [
               `${courseTitle} Integration Project`,
               'Case Studies and Architecture Review',
@@ -2500,16 +2532,51 @@ const CourseView = () => {
     };
   };
 
+  const buildWeeklyChallenges = (modules, key) => {
+    return modules.map((module, index) => {
+      const problems = (module.topics || []).slice(0, 4).map((topic, problemIndex) => {
+        const level = problemIndex === 0 ? 'easy' : problemIndex <= 2 ? 'medium' : 'hard';
+
+        return {
+          id: `${key}-week-${index + 1}-problem-${problemIndex + 1}`,
+          title: `${topic.name} Challenge ${problemIndex + 1}`,
+          topicName: topic.name,
+          difficulty: level,
+          platform: 'Practice Set',
+          link: topic.practice?.url || `https://www.geeksforgeeks.org/?s=${encodeURIComponent(topic.name + ' problems')}`,
+          description: `Solve this problem using ${topic.name}. Focus on writing correct and efficient code, then optimize if possible.`,
+          starterCode: `// ${topic.name} Challenge\n// Write your function and test it with sample inputs\nfunction solve(input) {\n  // TODO\n  return input;\n}\n\nconsole.log(solve('sample'));`,
+          language: 'javascript',
+          constraints: ['Optimize for time and space complexity', 'Handle edge cases', 'Write clean and readable logic'],
+          examples: [
+            { input: 'Sample Input', output: 'Expected Output', explanation: `Build your solution using ${topic.name} concepts.` },
+          ],
+        };
+      });
+
+      return {
+        week: index + 1,
+        contest: {
+          id: `${key}-contest-week-${index + 1}`,
+          title: `Week ${index + 1} Contest - ${module.title}`,
+          url: 'https://www.codechef.com/practice',
+        },
+        problems,
+      };
+    });
+  };
+
   const combinedTrackData = {
-    'complete-dsa-track': buildCombinedCourse({
-      id: 'complete-dsa-track',
+    'complete-dsa-track': buildStandaloneTrackCourse({
       title: 'Complete Data Structures & Algorithms Track',
-      description: 'Unified DSA journey from fundamentals to advanced interview patterns.',
+      description: 'A 24-week crystal-clear DSA roadmap with progressive concepts, weekly problem sets, and weekly contests.',
       duration: '24 weeks',
       level: 'Intermediate',
       instructor: 'Dr. Sarah Johnson & Prof. Michael Zhang',
       image: '🧠',
-      sourceIds: ['dsa-fundamentals', 'advanced-dsa'],
+      totalScore: 2400,
+      passingScore: 1560,
+      syllabus: dsa24WeekSyllabus,
     }),
     'fullstack-web-development': buildCombinedCourse({
       id: 'fullstack-web-development',
@@ -2684,6 +2751,36 @@ const CourseView = () => {
   }, [courseId]);
 
   const course = allCourseData[resolvedCourseKey];
+
+  const buildTopicPracticeResource = (topicName, preferredUrl) => {
+    const normalizedTopic = String(topicName || '').trim();
+    const topic = normalizedTopic.toLowerCase();
+    const searchUrl = `https://www.geeksforgeeks.org/?s=${encodeURIComponent(`${normalizedTopic} problems`)}`;
+
+    const keywordLinkMap = [
+      { keys: ['array'], url: 'https://leetcode.com/tag/array/' },
+      { keys: ['linked list'], url: 'https://leetcode.com/tag/linked-list/' },
+      { keys: ['stack'], url: 'https://leetcode.com/tag/stack/' },
+      { keys: ['queue'], url: 'https://leetcode.com/tag/queue/' },
+      { keys: ['tree', 'bst'], url: 'https://leetcode.com/tag/tree/' },
+      { keys: ['graph', 'bfs', 'dfs'], url: 'https://leetcode.com/tag/graph/' },
+      { keys: ['dynamic programming', 'dp'], url: 'https://leetcode.com/tag/dynamic-programming/' },
+      { keys: ['binary search'], url: 'https://leetcode.com/tag/binary-search/' },
+      { keys: ['string'], url: 'https://leetcode.com/tag/string/' },
+      { keys: ['heap', 'priority queue'], url: 'https://leetcode.com/tag/heap-priority-queue/' },
+      { keys: ['backtracking'], url: 'https://leetcode.com/tag/backtracking/' },
+      { keys: ['greedy'], url: 'https://leetcode.com/tag/greedy/' },
+    ];
+
+    const keywordMatch = keywordLinkMap.find((entry) =>
+      entry.keys.some((key) => topic.includes(key))
+    );
+
+    return {
+      title: `${normalizedTopic} Problem Set`,
+      url: keywordMatch?.url || preferredUrl || searchUrl,
+    };
+  };
 
   const createTopicFallbackResources = (topicName) => {
     const topic = (topicName || '').toLowerCase();
@@ -2867,7 +2964,7 @@ const CourseView = () => {
       return {
         theory: match.theory,
         video: match.video,
-        practice: match.practice || { title: 'Practice Exercises', url: 'https://www.geeksforgeeks.org/practice-for-cracking-any-coding-interview/' },
+        practice: buildTopicPracticeResource(topicName, match.practice?.url),
       };
     }
 
@@ -2882,8 +2979,8 @@ const CourseView = () => {
         channel: 'freeCodeCamp',
       },
       practice: {
-        title: `${topicName} Practice`,
-        url: `https://www.geeksforgeeks.org/?s=${encodeURIComponent(topicName + ' practice')}`,
+        title: `${topicName} Problem Set`,
+        url: `https://www.geeksforgeeks.org/?s=${encodeURIComponent(topicName + ' problems')}`,
       },
     };
   };
@@ -3159,7 +3256,7 @@ const CourseView = () => {
       'Best Practices and Code Quality',
       'Optimization Strategies',
       'Mini Project and Hands-on Exercise',
-      'Assessment Checklist and Revision',
+      'Assessment Checklist and Mastery',
       'Advanced Problem Variants',
       'Practical Assignments and Practice Set',
       'Implementation Walkthrough',
@@ -3201,7 +3298,7 @@ const CourseView = () => {
             'Complexity Analysis and Trade-offs',
             'Pattern Recognition and Reusability',
             'Challenging Problem Set',
-            'Revision and Mastery Checklist',
+            'Consolidation and Mastery Checklist',
           ];
 
     const pool = [...domainPool, ...basePool];
@@ -3311,12 +3408,16 @@ const CourseView = () => {
           });
 
           const fallback = createTopicFallbackResources(topicName);
+          const topicSpecificPractice = buildTopicPracticeResource(
+            topicName,
+            matchedExistingTopic?.practice?.url || fallback.practice?.url
+          );
           return {
             id: matchedExistingTopic?.id || `${courseId}-week-${week.week}-topic-${topicIndex + 1}`,
             name: topicName,
             theory: matchedExistingTopic?.theory || fallback.theory,
             video: matchedExistingTopic?.video || fallback.video,
-            practice: matchedExistingTopic?.practice || fallback.practice,
+            practice: topicSpecificPractice,
           };
         });
 
@@ -3365,8 +3466,13 @@ const CourseView = () => {
 
   const weekPlans = useMemo(() => {
     return learningModules.map((module, index) => {
-      const completedCount = (module.topics || []).filter((topic) => completedTopics.includes(topic.id)).length;
-      const totalCount = (module.topics || []).length;
+      const articleKeys = (module.topics || []).flatMap((topic) => [
+        `${courseId}:${topic.id}:theory`,
+        `${courseId}:${topic.id}:video`,
+        `${courseId}:${topic.id}:practice`,
+      ]);
+      const completedCount = articleKeys.filter((key) => readArticles.includes(key)).length;
+      const totalCount = articleKeys.length;
 
       return {
         week: index + 1,
@@ -3376,7 +3482,24 @@ const CourseView = () => {
         isCompleted: totalCount > 0 && completedCount === totalCount,
       };
     });
-  }, [learningModules, completedTopics]);
+  }, [learningModules, courseId, readArticles]);
+
+  const weeklyChallenges = useMemo(
+    () => buildWeeklyChallenges(learningModules, courseId),
+    [learningModules, courseId]
+  );
+
+  const totalArticles = useMemo(
+    () => learningModules.reduce((acc, module) => acc + ((module.topics || []).length * 3), 0),
+    [learningModules]
+  );
+
+  const totalProblems = useMemo(
+    () => weeklyChallenges.reduce((acc, week) => acc + (week.problems || []).length, 0),
+    [weeklyChallenges]
+  );
+
+  const totalQuizzes = learningModules.length;
 
   // Check enrollment status and load progress
   useEffect(() => {
@@ -3393,14 +3516,22 @@ const CourseView = () => {
           
           // Load saved progress from localStorage
           if (enrolled) {
-            const savedTopics = localStorage.getItem(`completedTopics_${courseId}`);
             const savedScores = localStorage.getItem(`quizScores_${courseId}`);
+            const savedArticles = localStorage.getItem(`readArticles_${courseId}`);
+            const savedProblems = localStorage.getItem(`solvedProblems_${courseId}`);
+            const savedQuizAttempts = localStorage.getItem(`quizAttempts_${courseId}`);
             
-            if (savedTopics) {
-              setCompletedTopics(JSON.parse(savedTopics));
-            }
             if (savedScores) {
               setQuizScores(JSON.parse(savedScores));
+            }
+            if (savedArticles) {
+              setReadArticles(JSON.parse(savedArticles));
+            }
+            if (savedProblems) {
+              setSolvedProblems(JSON.parse(savedProblems));
+            }
+            if (savedQuizAttempts) {
+              setQuizAttempts(JSON.parse(savedQuizAttempts));
             }
           }
         }
@@ -3448,17 +3579,18 @@ const CourseView = () => {
     }
   };
 
-  const handleTopicComplete = (topicId) => {
-    let updatedTopics;
-    if (!completedTopics.includes(topicId)) {
-      updatedTopics = [...completedTopics, topicId];
-      setCompletedTopics(updatedTopics);
-    } else {
-      updatedTopics = completedTopics.filter(id => id !== topicId);
-      setCompletedTopics(updatedTopics);
-    }
-    // Save to localStorage
-    localStorage.setItem(`completedTopics_${courseId}`, JSON.stringify(updatedTopics));
+  const markArticleAsRead = (articleKey) => {
+    if (readArticles.includes(articleKey)) return;
+    const updated = [...readArticles, articleKey];
+    setReadArticles(updated);
+    localStorage.setItem(`readArticles_${courseId}`, JSON.stringify(updated));
+  };
+
+  const markProblemSolved = (problemId) => {
+    if (solvedProblems.includes(problemId)) return;
+    const updated = [...solvedProblems, problemId];
+    setSolvedProblems(updated);
+    localStorage.setItem(`solvedProblems_${courseId}`, JSON.stringify(updated));
   };
 
   const startQuiz = (moduleId) => {
@@ -3469,20 +3601,46 @@ const CourseView = () => {
   const handleQuizComplete = (moduleId, score) => {
     const updatedScores = { ...quizScores, [moduleId]: score };
     setQuizScores(updatedScores);
+    const updatedQuizAttempts = { ...quizAttempts, [moduleId]: true };
+    setQuizAttempts(updatedQuizAttempts);
     // Save to localStorage
     localStorage.setItem(`quizScores_${courseId}`, JSON.stringify(updatedScores));
+    localStorage.setItem(`quizAttempts_${courseId}`, JSON.stringify(updatedQuizAttempts));
     setShowQuiz(false);
   };
 
   const calculateProgress = () => {
     if (!course) return 0;
-    const totalTopics = learningModules.reduce((acc, module) => acc + module.topics.length, 0);
-    return totalTopics > 0 ? Math.round((completedTopics.length / totalTopics) * 100) : 0;
+    const completedArticles = readArticles.length;
+    const completedQuizzes = Object.keys(quizAttempts).length;
+    const completedProblems = solvedProblems.length;
+    const totalUnits = totalArticles + totalQuizzes + totalProblems;
+    const completedUnits = completedArticles + completedQuizzes + completedProblems;
+    return totalUnits > 0 ? Math.round((completedUnits / totalUnits) * 100) : 0;
+  };
+
+  const isCourseCompleted = () => {
+    const allQuizzesAttempted = learningModules.every((module) => quizAttempts[module.id]);
+    const allProblemIds = weeklyChallenges.flatMap((week) => (week.problems || []).map((problem) => problem.id));
+    const allProblemsSolved = allProblemIds.every((problemId) => solvedProblems.includes(problemId));
+    return allQuizzesAttempted && allProblemsSolved;
   };
 
   const getTotalScore = () => {
-    const scores = Object.values(quizScores);
-    return scores.reduce((acc, score) => acc + score, 0);
+    const quizPossible = learningModules.reduce(
+      (acc, module) => acc + (module.quiz?.questions?.length || 0),
+      0
+    );
+    const quizEarned = Object.values(quizScores).reduce((acc, score) => acc + score, 0);
+
+    const problemPossible = totalProblems * 10;
+    const problemEarned = solvedProblems.length * 10;
+
+    const rawPossible = quizPossible + problemPossible;
+    const rawEarned = quizEarned + problemEarned;
+
+    if (rawPossible === 0) return 0;
+    return Math.round((rawEarned / rawPossible) * course.totalScore);
   };
 
   if (loading) {
@@ -3567,34 +3725,45 @@ const CourseView = () => {
         <div className="grid md:grid-cols-3 gap-8 mb-12">
           {/* Week-wise Syllabus */}
           <div className="md:col-span-2">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">📋 Course Syllabus</h2>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden">
-              {expandedSyllabus.map((week, index) => (
-                <div key={index} className="p-6 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-primary to-coral rounded-lg flex items-center justify-center text-white font-bold text-lg">
-                      W{week.week}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{week.title}</h3>
-                      <div className="flex flex-wrap gap-2">
-                        {week.topics.map((topic, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
-                            {topic}
-                          </span>
-                        ))}
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">📋 Course Syllabus</h2>
+              <button
+                onClick={() => setShowSyllabus((prev) => !prev)}
+                className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold text-sm transition"
+              >
+                {showSyllabus ? 'Hide Syllabus' : 'View Syllabus'}
+              </button>
+            </div>
+
+            {showSyllabus && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden mb-6">
+                {expandedSyllabus.map((week, index) => (
+                  <div key={index} className="p-6 border-b border-gray-100 dark:border-gray-700 last:border-b-0 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-br from-primary to-coral rounded-lg flex items-center justify-center text-white font-bold text-lg">
+                        W{week.week}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">{week.title}</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {week.topics.map((topic, idx) => (
+                            <span key={idx} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {weekPlans.length > 0 && (
               <div className="mt-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-6">
                 <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">🗓️ Week-wise Learning Plan</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                  Open any week to view topic-wise resources and continue learning.
+                  Open any week to read articles, solve problems in IDE, and complete the weekly contest.
                 </p>
                 <div className="space-y-3">
                   {weekPlans.map((plan) => (
@@ -3603,7 +3772,7 @@ const CourseView = () => {
                         <div>
                           <div className="font-semibold text-gray-900 dark:text-white mb-1">Week {plan.week}: {plan.module.title}</div>
                           <div className="text-sm text-gray-600 dark:text-gray-400">
-                            {plan.completedCount}/{plan.totalCount} topics completed
+                            {plan.completedCount}/{plan.totalCount} learning articles marked as read
                           </div>
                         </div>
                         <button
@@ -3621,15 +3790,83 @@ const CourseView = () => {
                               <div className="font-semibold text-gray-900 dark:text-white mb-2">
                                 {topicIndex + 1}. {topic.name}
                               </div>
-                              <div className="text-sm flex flex-wrap gap-3">
-                                <a href={topic.theory.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Theory</a>
-                                <a href={topic.video.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Video</a>
-                                {topic.practice?.url && (
-                                  <a href={topic.practice.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Practice</a>
-                                )}
+                              <div className="text-sm grid sm:grid-cols-3 gap-2">
+                                <div className="p-2 rounded border border-blue-200 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+                                  <a href={topic.theory.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Theory</a>
+                                  <button
+                                    onClick={() => markArticleAsRead(`${courseId}:${topic.id}:theory`)}
+                                    className="block mt-2 text-xs px-2 py-1 rounded bg-primary text-white"
+                                  >
+                                    {readArticles.includes(`${courseId}:${topic.id}:theory`) ? 'Read' : 'Mark as Read'}
+                                  </button>
+                                </div>
+                                <div className="p-2 rounded border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20">
+                                  <a href={topic.video.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Video</a>
+                                  <button
+                                    onClick={() => markArticleAsRead(`${courseId}:${topic.id}:video`)}
+                                    className="block mt-2 text-xs px-2 py-1 rounded bg-primary text-white"
+                                  >
+                                    {readArticles.includes(`${courseId}:${topic.id}:video`) ? 'Read' : 'Mark as Read'}
+                                  </button>
+                                </div>
+                                <div className="p-2 rounded border border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20">
+                                  <a href={topic.practice?.url || buildTopicPracticeResource(topic.name).url} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary-dark hover:underline">Practice</a>
+                                  <button
+                                    onClick={() => markArticleAsRead(`${courseId}:${topic.id}:practice`)}
+                                    className="block mt-2 text-xs px-2 py-1 rounded bg-primary text-white"
+                                  >
+                                    {readArticles.includes(`${courseId}:${topic.id}:practice`) ? 'Read' : 'Mark as Read'}
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           ))}
+
+                          {weeklyChallenges[plan.week - 1] && (
+                            <div className="p-4 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+                              <div className="font-bold text-gray-900 dark:text-white mb-2">🏁 Weekly Contest</div>
+                              <a
+                                href={weeklyChallenges[plan.week - 1].contest.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-primary hover:text-primary-dark hover:underline"
+                              >
+                                {weeklyChallenges[plan.week - 1].contest.title}
+                              </a>
+                            </div>
+                          )}
+
+                          {weeklyChallenges[plan.week - 1]?.problems?.length > 0 && (
+                            <div className="p-4 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20">
+                              <div className="font-bold text-gray-900 dark:text-white mb-3">🧩 Weekly Problems</div>
+                              <div className="space-y-3">
+                                {weeklyChallenges[plan.week - 1].problems.map((problem) => (
+                                  <div key={problem.id} className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                                    <div className="flex flex-wrap items-center justify-between gap-2">
+                                      <div>
+                                        <div className="font-semibold text-gray-900 dark:text-white">{problem.title}</div>
+                                        <div className="text-xs text-gray-600 dark:text-gray-400">{problem.difficulty.toUpperCase()} • {problem.topicName}</div>
+                                      </div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setActiveProblem(problem)}
+                                          className="px-3 py-1.5 bg-primary text-white text-xs rounded"
+                                        >
+                                          Solve in IDE
+                                        </button>
+                                        <button
+                                          onClick={() => markProblemSolved(problem.id)}
+                                          className="px-3 py-1.5 bg-emerald-600 text-white text-xs rounded"
+                                        >
+                                          {solvedProblems.includes(problem.id) ? 'Solved' : 'Mark Solved'}
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -3671,7 +3908,14 @@ const CourseView = () => {
                   <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
                     <div className="text-center">
                       <div className="text-4xl font-bold text-coral mb-2">{getTotalScore()}</div>
-                      <div className="text-gray-600 dark:text-gray-400">Quiz Score</div>
+                      <div className="text-gray-600 dark:text-gray-400">Performance Score</div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-indigo-600 mb-2">{solvedProblems.length}/{totalProblems}</div>
+                      <div className="text-gray-600 dark:text-gray-400">Problems Solved</div>
                     </div>
                   </div>
                 </>
@@ -3720,7 +3964,7 @@ const CourseView = () => {
                 />
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                {completedTopics.length} of {learningModules.reduce((acc, m) => acc + m.topics.length, 0)} topics completed
+                {readArticles.length}/{totalArticles} articles read • {Object.keys(quizAttempts).length}/{totalQuizzes} quizzes attempted • {solvedProblems.length}/{totalProblems} problems solved
               </p>
             </div>
 
@@ -3764,12 +4008,6 @@ const CourseView = () => {
                               <h4 className="text-lg font-bold text-gray-900 dark:text-white">
                                 {topicIndex + 1}. {topic.name}
                               </h4>
-                              <input
-                                type="checkbox"
-                                checked={completedTopics.includes(topic.id)}
-                                onChange={() => handleTopicComplete(topic.id)}
-                                className="w-5 h-5 text-primary rounded cursor-pointer"
-                              />
                             </div>
 
                             {/* Theory Resource */}
@@ -3786,6 +4024,12 @@ const CourseView = () => {
                               >
                                 {topic.theory.title} <span>→</span>
                               </a>
+                              <button
+                                onClick={() => markArticleAsRead(`${courseId}:${topic.id}:theory`)}
+                                className="mt-3 px-3 py-1.5 bg-primary text-white rounded text-xs"
+                              >
+                                {readArticles.includes(`${courseId}:${topic.id}:theory`) ? 'Read' : 'Mark as Read'}
+                              </button>
                             </div>
 
                             {/* Video Resource */}
@@ -3806,6 +4050,12 @@ const CourseView = () => {
                                   <span>→</span>
                                 </div>
                               </a>
+                              <button
+                                onClick={() => markArticleAsRead(`${courseId}:${topic.id}:video`)}
+                                className="mt-3 px-3 py-1.5 bg-primary text-white rounded text-xs"
+                              >
+                                {readArticles.includes(`${courseId}:${topic.id}:video`) ? 'Read' : 'Mark as Read'}
+                              </button>
                             </div>
 
                             {/* Practice Resource */}
@@ -3826,6 +4076,12 @@ const CourseView = () => {
                                     <span>→</span>
                                   </div>
                                 </a>
+                                <button
+                                  onClick={() => markArticleAsRead(`${courseId}:${topic.id}:practice`)}
+                                  className="mt-3 px-3 py-1.5 bg-primary text-white rounded text-xs"
+                                >
+                                  {readArticles.includes(`${courseId}:${topic.id}:practice`) ? 'Read' : 'Mark as Read'}
+                                </button>
                               </div>
                             )}
 
@@ -3860,6 +4116,52 @@ const CourseView = () => {
                           )}
                         </button>
                       </div>
+
+                      {weeklyChallenges[module.id - 1] && (
+                        <div className="pt-6 border-t border-gray-200 dark:border-gray-700 mt-6 space-y-4">
+                          <div className="p-4 rounded-lg border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20">
+                            <div className="font-bold text-gray-900 dark:text-white mb-2">🏁 End of Week Contest</div>
+                            <a
+                              href={weeklyChallenges[module.id - 1].contest.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:text-primary-dark hover:underline"
+                            >
+                              {weeklyChallenges[module.id - 1].contest.title}
+                            </a>
+                          </div>
+
+                          <div className="p-4 rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20">
+                            <div className="font-bold text-gray-900 dark:text-white mb-3">🧩 End of Week Problems</div>
+                            <div className="space-y-3">
+                              {weeklyChallenges[module.id - 1].problems.map((problem) => (
+                                <div key={problem.id} className="p-3 bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700">
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <div>
+                                      <div className="font-semibold text-gray-900 dark:text-white">{problem.title}</div>
+                                      <div className="text-xs text-gray-600 dark:text-gray-400">{problem.difficulty.toUpperCase()} • {problem.topicName}</div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => setActiveProblem(problem)}
+                                        className="px-3 py-1.5 bg-primary text-white text-xs rounded"
+                                      >
+                                        Solve in IDE
+                                      </button>
+                                      <button
+                                        onClick={() => markProblemSolved(problem.id)}
+                                        className="px-3 py-1.5 bg-emerald-600 text-white text-xs rounded"
+                                      >
+                                        {solvedProblems.includes(problem.id) ? 'Solved' : 'Mark Solved'}
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -3867,7 +4169,7 @@ const CourseView = () => {
             </div>
 
             {/* Certificate Section */}
-            {calculateProgress() === 100 && getTotalScore() >= course.passingScore && (
+            {isCourseCompleted() && getTotalScore() >= course.passingScore && (
               <div className="mt-8 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-xl p-8 border border-green-200 dark:border-green-800">
                 <div className="text-center">
                   <span className="text-6xl mb-4 block">🎓</span>
@@ -3889,6 +4191,21 @@ const CourseView = () => {
                 </div>
               </div>
             )}
+
+            {isCourseCompleted() && getTotalScore() < course.passingScore && (
+              <div className="mt-8 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-xl p-8 border border-yellow-200 dark:border-yellow-800">
+                <div className="text-center">
+                  <span className="text-5xl mb-4 block">📝</span>
+                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">Course Work Completed</h3>
+                  <p className="text-gray-700 dark:text-gray-300 mb-2">
+                    You completed all required quizzes and problems, but the certificate unlocks only after reaching {course.passingScore}/{course.totalScore}.
+                  </p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Current score: {getTotalScore()}/{course.totalScore}. Retake quizzes to improve.
+                  </p>
+                </div>
+              </div>
+            )}
           </>
         )}
       </div>
@@ -3899,6 +4216,13 @@ const CourseView = () => {
           module={learningModules.find(m => m.id === quizModule)}
           onClose={() => setShowQuiz(false)}
           onComplete={handleQuizComplete}
+        />
+      )}
+
+      {activeProblem && (
+        <CodeEditor
+          problem={activeProblem}
+          onClose={() => setActiveProblem(null)}
         />
       )}
     </div>

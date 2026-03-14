@@ -61,6 +61,7 @@ app.use("/api/certificates", require("./routes/certificateRoutes"));
 app.use("/api/comments", require("./routes/commentRoutes"));
 app.use("/api/quiz", require("./routes/quizRoutes"));
 app.use("/api/admin", require("./routes/adminRoutes"));
+app.use("/api/coding-sheets", require("./routes/codingSheetRoutes"));
 
 // 404 handler for undefined routes
 app.use((req, res, next) => {

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import axios from '../api/axios';
@@ -2267,6 +2267,291 @@ const CourseView = () => {
 
   const course = courseData[courseId];
 
+  const createTopicFallbackResources = (topicName) => {
+    const topic = (topicName || '').toLowerCase();
+
+    const curatedResources = [
+      {
+        keys: ['array'],
+        theory: { title: 'Array Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/array-data-structure/' },
+        video: { title: 'Arrays Introduction - freeCodeCamp', url: 'https://www.youtube.com/watch?v=rZ41y93P2Qo', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['linked list'],
+        theory: { title: 'Linked List Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/data-structures/linked-list/' },
+        video: { title: 'Linked List Tutorial - mycodeschool', url: 'https://www.youtube.com/watch?v=92S4zgXN17o', channel: 'mycodeschool' },
+      },
+      {
+        keys: ['stack'],
+        theory: { title: 'Stack Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/stack-data-structure/' },
+        video: { title: 'Stack Data Structure Tutorial - mycodeschool', url: 'https://www.youtube.com/watch?v=F1F2imiOJfk', channel: 'mycodeschool' },
+      },
+      {
+        keys: ['queue'],
+        theory: { title: 'Queue Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/queue-data-structure/' },
+        video: { title: 'Queue Data Structure Tutorial - Abdul Bari', url: 'https://www.youtube.com/watch?v=XuCbpw6Bj1U', channel: 'Abdul Bari' },
+      },
+      {
+        keys: ['sorting', 'sort'],
+        theory: { title: 'Sorting Algorithms - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/sorting-algorithms/' },
+        video: { title: 'Sorting Algorithms Explained - freeCodeCamp', url: 'https://www.youtube.com/watch?v=kgBjXUE_Nwc', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['search'],
+        theory: { title: 'Searching Algorithms - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/searching-algorithms/' },
+        video: { title: 'Binary Search - Abdul Bari', url: 'https://www.youtube.com/watch?v=uEUXGcc2VXM', channel: 'Abdul Bari' },
+      },
+      {
+        keys: ['recursion', 'backtracking', 'divide and conquer'],
+        theory: { title: 'Recursion - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/recursion/' },
+        video: { title: 'Recursion Explained - freeCodeCamp', url: 'https://www.youtube.com/watch?v=IJDJ0kBx2LM', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['tree', 'bst', 'binary tree', 'avl', 'red-black'],
+        theory: { title: 'Tree Data Structure - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/tree-data-structure/' },
+        video: { title: 'Binary Trees - mycodeschool', url: 'https://www.youtube.com/watch?v=H5JubkIy_p8', channel: 'mycodeschool' },
+      },
+      {
+        keys: ['graph', 'bfs', 'dfs', 'shortest path'],
+        theory: { title: 'Graph Data Structure and Algorithms - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/graph-data-structure-and-algorithms/' },
+        video: { title: 'Graph Theory Basics - freeCodeCamp', url: 'https://www.youtube.com/watch?v=09_LlHjoEiY', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['dynamic programming', 'dp'],
+        theory: { title: 'Dynamic Programming - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/dynamic-programming/' },
+        video: { title: 'Dynamic Programming - Aditya Verma', url: 'https://www.youtube.com/watch?v=oBt53YbR9Kk', channel: 'Aditya Verma' },
+      },
+      {
+        keys: ['react', 'jsx', 'component', 'hook', 'router', 'redux'],
+        theory: { title: 'React Documentation - Learn React', url: 'https://react.dev/learn' },
+        video: { title: 'React Course for Beginners - freeCodeCamp', url: 'https://www.youtube.com/watch?v=bMknfKXIFA8', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['html'],
+        theory: { title: 'HTML Tutorial - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Structuring_content' },
+        video: { title: 'HTML Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=pQN-pnXPaVg', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['css', 'flexbox', 'grid', 'responsive'],
+        theory: { title: 'CSS - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/CSS' },
+        video: { title: 'CSS Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=OXGznpKZ_sA', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['javascript', 'dom', 'es6'],
+        theory: { title: 'JavaScript Guide - MDN Web Docs', url: 'https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide' },
+        video: { title: 'JavaScript Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=PkZNo7MFNFg', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['node', 'npm', 'module', 'file system', 'stream', 'cli'],
+        theory: { title: 'Node.js Documentation - Learn', url: 'https://nodejs.org/en/learn/getting-started/introduction-to-nodejs' },
+        video: { title: 'Node.js Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=Oe421EPjeBE', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['express', 'rest api', 'middleware', 'api'],
+        theory: { title: 'Express.js Guide', url: 'https://expressjs.com/en/guide/routing.html' },
+        video: { title: 'Express JS Crash Course - Traversy Media', url: 'https://www.youtube.com/watch?v=L72fhGm1tfE', channel: 'Traversy Media' },
+      },
+      {
+        keys: ['mongo', 'mongoose', 'database', 'dbms', 'sql', 'normalization'],
+        theory: { title: 'MongoDB Manual - CRUD Operations', url: 'https://www.mongodb.com/docs/manual/crud/' },
+        video: { title: 'MongoDB Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=ofme2o29ngU', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['auth', 'jwt', 'oauth', 'security', 'encryption'],
+        theory: { title: 'OWASP Top 10', url: 'https://owasp.org/www-project-top-ten/' },
+        video: { title: 'JWT Authentication Tutorial - Web Dev Simplified', url: 'https://www.youtube.com/watch?v=mbsmsi7l3r4', channel: 'Web Dev Simplified' },
+      },
+      {
+        keys: ['machine learning', 'ml', 'regression', 'classification', 'svm', 'k-means', 'pca', 'feature'],
+        theory: { title: 'Machine Learning Crash Course - Google', url: 'https://developers.google.com/machine-learning/crash-course' },
+        video: { title: 'Machine Learning Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=NWONeJKn6kc', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['deep learning', 'neural', 'cnn', 'rnn', 'lstm', 'transformer', 'bert', 'gpt'],
+        theory: { title: 'Deep Learning Specialization Notes - DeepLearning.AI', url: 'https://www.deeplearning.ai/courses/deep-learning-specialization/' },
+        video: { title: 'Neural Networks - 3Blue1Brown', url: 'https://www.youtube.com/watch?v=aircAruvnKk', channel: '3Blue1Brown' },
+      },
+      {
+        keys: ['operating system', 'os', 'process', 'thread', 'cpu scheduling', 'memory management', 'deadlock'],
+        theory: { title: 'Operating Systems Notes - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/operating-systems/' },
+        video: { title: 'Operating System Full Course - Neso Academy', url: 'https://www.youtube.com/watch?v=26QPDBe-NB8', channel: 'Neso Academy' },
+      },
+      {
+        keys: ['network', 'tcp', 'udp', 'http', 'dns', 'osi'],
+        theory: { title: 'Computer Networking - GeeksforGeeks', url: 'https://www.geeksforgeeks.org/computer-network-tutorials/' },
+        video: { title: 'Computer Networking Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=qiQR5rTSshw', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['system design', 'scalability', 'load balancer', 'caching', 'distributed'],
+        theory: { title: 'System Design Primer', url: 'https://github.com/donnemartin/system-design-primer' },
+        video: { title: 'System Design Basics - Gaurav Sen', url: 'https://www.youtube.com/watch?v=UzLMhqg3_Wc', channel: 'Gaurav Sen' },
+      },
+      {
+        keys: ['android', 'kotlin', 'jetpack', 'room', 'sharedpreferences', 'datastore'],
+        theory: { title: 'Android Developer Guides', url: 'https://developer.android.com/guide' },
+        video: { title: 'Android Development Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=fis26HvvDII', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['react native', 'mobile app'],
+        theory: { title: 'React Native Documentation', url: 'https://reactnative.dev/docs/getting-started' },
+        video: { title: 'React Native Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=0-S5a0eXPoc', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['devops', 'docker', 'kubernetes', 'ci/cd', 'jenkins', 'terraform', 'aws', 'cloud'],
+        theory: { title: 'DevOps Roadmap', url: 'https://roadmap.sh/devops' },
+        video: { title: 'DevOps Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=9pZ2xmsSDdo', channel: 'freeCodeCamp' },
+      },
+      {
+        keys: ['cybersecurity', 'pentest', 'xss', 'sql injection', 'vulnerability'],
+        theory: { title: 'Cybersecurity Roadmap', url: 'https://roadmap.sh/cyber-security' },
+        video: { title: 'Cybersecurity Full Course - freeCodeCamp', url: 'https://www.youtube.com/watch?v=U_P23SqJaDc', channel: 'freeCodeCamp' },
+      },
+    ];
+
+    const match = curatedResources.find((resource) =>
+      resource.keys.some((key) => topic.includes(key))
+    );
+
+    if (match) {
+      return {
+        theory: match.theory,
+        video: match.video,
+      };
+    }
+
+    return {
+      theory: {
+        title: `${topicName} - GeeksforGeeks`,
+        url: `https://www.geeksforgeeks.org/?s=${encodeURIComponent(topicName)}`,
+      },
+      video: {
+        title: `${topicName} - freeCodeCamp`,
+        url: `https://www.youtube.com/results?search_query=${encodeURIComponent(topicName + ' freeCodeCamp')}`,
+        channel: 'freeCodeCamp',
+      },
+    };
+  };
+
+  const buildAutoQuiz = (module, week) => {
+    const primaryTopic = week?.topics?.[0] || module?.topics?.[0]?.name || 'Core concepts';
+    return {
+      questions: [
+        {
+          question: `Which topic is part of ${module.title}?`,
+          options: [primaryTopic, 'Unrelated topic', 'Optional appendix only', 'Not covered in this module'],
+          correct: 0,
+        },
+      ],
+    };
+  };
+
+  const learningModules = useMemo(() => {
+    if (!course) return [];
+
+    const syllabus = Array.isArray(course.syllabus) ? course.syllabus : [];
+    const baseModules = Array.isArray(course.modules) ? course.modules : [];
+
+    if (syllabus.length === 0) {
+      return baseModules.map((module, index) => ({
+        ...module,
+        id: index + 1,
+        quiz: module.quiz || buildAutoQuiz(module),
+      }));
+    }
+
+    const usedModuleIndexes = new Set();
+
+    const normalizeTitle = (value = '') =>
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const expandedFromSyllabus = syllabus.map((week, index) => {
+      const normalizedWeekTitle = normalizeTitle(week.title);
+      let existingModuleIndex = baseModules.findIndex(
+        (module, moduleIndex) =>
+          !usedModuleIndexes.has(moduleIndex) &&
+          normalizeTitle(module.title) === normalizedWeekTitle
+      );
+
+      if (existingModuleIndex === -1) {
+        existingModuleIndex = baseModules.findIndex(
+          (module, moduleIndex) =>
+            !usedModuleIndexes.has(moduleIndex) &&
+            (normalizeTitle(module.title).includes(normalizedWeekTitle) ||
+              normalizedWeekTitle.includes(normalizeTitle(module.title)))
+        );
+      }
+
+      if (existingModuleIndex === -1 && baseModules[index] && !usedModuleIndexes.has(index)) {
+        existingModuleIndex = index;
+      }
+
+      const existingModule = existingModuleIndex >= 0 ? baseModules[existingModuleIndex] : null;
+
+      if (existingModule) {
+        usedModuleIndexes.add(existingModuleIndex);
+
+        const existingTopics = Array.isArray(existingModule.topics) ? existingModule.topics : [];
+        const orderedTopics = (week.topics || []).map((topicName, topicIndex) => {
+          const normalizedSyllabusTopic = normalizeTitle(topicName);
+
+          const matchedExistingTopic = existingTopics.find((topic) => {
+            const normalizedExistingTopic = normalizeTitle(topic.name);
+            return (
+              normalizedExistingTopic === normalizedSyllabusTopic ||
+              normalizedExistingTopic.includes(normalizedSyllabusTopic) ||
+              normalizedSyllabusTopic.includes(normalizedExistingTopic)
+            );
+          });
+
+          const fallback = createTopicFallbackResources(topicName);
+          return {
+            id: matchedExistingTopic?.id || `${courseId}-week-${week.week}-topic-${topicIndex + 1}`,
+            name: topicName,
+            theory: matchedExistingTopic?.theory || fallback.theory,
+            video: matchedExistingTopic?.video || fallback.video,
+          };
+        });
+
+        return {
+          ...existingModule,
+          id: index + 1,
+          title: week.title || existingModule.title,
+          duration: existingModule.duration || '1 week',
+          topics: orderedTopics,
+          quiz: existingModule.quiz || buildAutoQuiz(existingModule, week),
+        };
+      }
+
+      const generatedTopics = (week.topics || []).map((topicName, topicIndex) => {
+        const fallback = createTopicFallbackResources(topicName);
+        return {
+          id: `${courseId}-week-${week.week}-topic-${topicIndex + 1}`,
+          name: topicName,
+          theory: fallback.theory,
+          video: fallback.video,
+        };
+      });
+
+      const generatedModule = {
+        id: index + 1,
+        title: week.title || `Week ${week.week}`,
+        duration: '1 week',
+        topics: generatedTopics,
+      };
+
+      return {
+        ...generatedModule,
+        quiz: buildAutoQuiz(generatedModule, week),
+      };
+    });
+
+    return expandedFromSyllabus;
+  }, [course, courseId]);
+
   // Check enrollment status and load progress
   useEffect(() => {
     const checkEnrollment = async () => {
@@ -2365,7 +2650,7 @@ const CourseView = () => {
 
   const calculateProgress = () => {
     if (!course) return 0;
-    const totalTopics = course.modules.reduce((acc, module) => acc + module.topics.length, 0);
+    const totalTopics = learningModules.reduce((acc, module) => acc + module.topics.length, 0);
     return totalTopics > 0 ? Math.round((completedTopics.length / totalTopics) * 100) : 0;
   };
 
@@ -2486,7 +2771,7 @@ const CourseView = () => {
             <div className="space-y-4">
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-primary mb-2">{course.modules.length}</div>
+                  <div className="text-4xl font-bold text-primary mb-2">{learningModules.length}</div>
                   <div className="text-gray-600 dark:text-gray-400">Total Modules</div>
                 </div>
               </div>
@@ -2494,7 +2779,7 @@ const CourseView = () => {
               <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-primary mb-2">
-                    {course.modules.reduce((acc, m) => acc + m.topics.length, 0)}
+                    {learningModules.reduce((acc, m) => acc + m.topics.length, 0)}
                   </div>
                   <div className="text-gray-600 dark:text-gray-400">Total Topics</div>
                 </div>
@@ -2561,14 +2846,14 @@ const CourseView = () => {
                 />
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                {completedTopics.length} of {course.modules.reduce((acc, m) => acc + m.topics.length, 0)} topics completed
+                {completedTopics.length} of {learningModules.reduce((acc, m) => acc + m.topics.length, 0)} topics completed
               </p>
             </div>
 
             {/* Modules */}
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">📚 Course Modules</h2>
             <div className="space-y-6">
-              {course.modules.map((module) => (
+              {learningModules.map((module) => (
                 <div
                   key={module.id}
                   className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 overflow-hidden"
@@ -2702,7 +2987,7 @@ const CourseView = () => {
       {/* Quiz Modal */}
       {showQuiz && (
         <QuizModal
-          module={course.modules.find(m => m.id === quizModule)}
+          module={learningModules.find(m => m.id === quizModule)}
           onClose={() => setShowQuiz(false)}
           onComplete={handleQuizComplete}
         />

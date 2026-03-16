@@ -69,6 +69,19 @@ const getGithubRedirectUri = () => {
   return `${externalUrl.replace(/\/$/, "")}/api/auth/github/callback`;
 };
 
+const getMissingGithubConfigKeys = () => {
+  const missing = [];
+  if (!getGithubClientId()) missing.push("GITHUB_CLIENT_ID");
+  if (!getGithubClientSecret()) missing.push("GITHUB_CLIENT_SECRET");
+  if (!getGithubRedirectUri()) missing.push("GITHUB_REDIRECT_URI");
+  return missing;
+};
+
+const getMissingSmtpConfigKeys = () => {
+  const required = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"];
+  return required.filter((key) => !pickEnv(key));
+};
+
 const googleClient = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
   ? new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
@@ -301,7 +314,10 @@ exports.startGithubOAuth = async (req, res) => {
   const githubRedirectUri = getGithubRedirectUri();
 
   if (!githubClientId || !githubRedirectUri) {
-    return res.status(503).json({ message: "GitHub OAuth is not configured" });
+    return res.status(503).json({
+      message: "GitHub OAuth is not configured",
+      missing: getMissingGithubConfigKeys(),
+    });
   }
 
   if (!role) {
@@ -328,7 +344,11 @@ exports.githubOAuthCallback = async (req, res) => {
 
   try {
     if (!githubClientId || !githubClientSecret || !githubRedirectUri) {
-      return res.redirect(buildFrontendRedirect({ role, error: "GitHub OAuth is not configured", provider: "github" }));
+      const missing = getMissingGithubConfigKeys();
+      const errorMessage = missing.length
+        ? `GitHub OAuth is not configured: missing ${missing.join(", ")}`
+        : "GitHub OAuth is not configured";
+      return res.redirect(buildFrontendRedirect({ role, error: errorMessage, provider: "github" }));
     }
 
     const { code } = req.query;
@@ -453,7 +473,10 @@ exports.requestEmailOtp = async (req, res) => {
     }
 
     if (!wasDelivered && !isEmailConfigured() && process.env.NODE_ENV === "production") {
-      return res.status(503).json({ message: "Email OTP is not configured on the server." });
+      return res.status(503).json({
+        message: "Email OTP is not configured on the server.",
+        missing: getMissingSmtpConfigKeys(),
+      });
     }
 
     res.json(response);

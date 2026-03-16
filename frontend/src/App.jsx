@@ -27,6 +27,7 @@ function App() {
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin-login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/all-courses" element={<AllCourses />} />
           <Route path="/sheets" element={<CodingSheets />} />

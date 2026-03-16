@@ -8,7 +8,9 @@ const Register = () => {
   const [form, setForm] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
+    role: "student",
   });
 
   const [error, setError] = useState("");
@@ -67,6 +69,31 @@ const Register = () => {
               }
               required
             />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone (optional)</label>
+            <input
+              type="tel"
+              placeholder="Enter phone for OTP login"
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              value={form.phone}
+              onChange={(e) =>
+                setForm({ ...form, phone: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+            <select
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
+              value={form.role}
+              onChange={(e) => setForm({ ...form, role: e.target.value })}
+            >
+              <option value="student">Student</option>
+              <option value="instructor">Instructor</option>
+            </select>
           </div>
 
           <div className="mb-6">

@@ -5,8 +5,13 @@ module.exports = mongoose.model(
   new mongoose.Schema({
     name: String,
     email: { type: String, unique: true },
+    phone: { type: String, unique: true, sparse: true },
     password: String,
-    role: { type: String, enum: ["student", "admin"], default: "student" },
+    role: { type: String, enum: ["student", "instructor", "admin"], default: "student" },
+    oauthProvider: { type: String, enum: ["google", "github"], default: undefined },
+    otpCode: String,
+    otpExpiresAt: Date,
+    otpChannel: { type: String, enum: ["email", "phone"], default: undefined },
     enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }]
   }, { timestamps: true })
 );

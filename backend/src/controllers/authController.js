@@ -24,8 +24,29 @@ const issueOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 
 const getFrontendAuthPath = (role) => (role === "admin" ? "/admin-login" : "/login");
 
+const getBackendPublicUrl = (req) => {
+  const configured = pickEnv("BACKEND_PUBLIC_URL", "RENDER_EXTERNAL_URL");
+  if (configured) {
+    return configured.replace(/\/$/, "");
+  }
+
+  if (!req) {
+    return "";
+  }
+
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
+  const host = req.headers["x-forwarded-host"] || req.get("host");
+  if (!host) {
+    return "";
+  }
+
+  return `${protocol}://${host}`.replace(/\/$/, "");
+};
+
+const getFrontendBaseUrl = () => pickEnv("FRONTEND_URL", "PUBLIC_FRONTEND_URL") || "http://localhost:3000";
+
 const buildFrontendRedirect = ({ role, token, user, error, provider }) => {
-  const base = `${process.env.FRONTEND_URL || "https://skill-sync-learning-portal.vercel.app"}${getFrontendAuthPath(role)}`;
+  const base = `${getFrontendBaseUrl()}${getFrontendAuthPath(role)}`;
   const searchParams = new URLSearchParams();
 
   if (provider) searchParams.set("provider", provider);
@@ -59,21 +80,25 @@ const pickEnv = (...keys) => {
 
 const getGithubClientId = () => pickEnv("GITHUB_CLIENT_ID", "GITHUB_ID", "GITHUB_OAUTH_CLIENT_ID");
 const getGithubClientSecret = () => pickEnv("GITHUB_CLIENT_SECRET", "GITHUB_SECRET", "GITHUB_OAUTH_CLIENT_SECRET");
-const getGithubRedirectUri = () => {
+const getGithubRedirectUri = (req) => {
   const configured = pickEnv("GITHUB_REDIRECT_URI", "GITHUB_CALLBACK_URL");
   if (configured) {
     return configured;
   }
 
-  const externalUrl = pickEnv("RENDER_EXTERNAL_URL") || "https://skillsync-wi9y.onrender.com";
-  return `${externalUrl.replace(/\/$/, "")}/api/auth/github/callback`;
+  const backendBaseUrl = getBackendPublicUrl(req);
+  if (!backendBaseUrl) {
+    return "";
+  }
+
+  return `${backendBaseUrl}/api/auth/github/callback`;
 };
 
-const getMissingGithubConfigKeys = () => {
+const getMissingGithubConfigKeys = (req) => {
   const missing = [];
   if (!getGithubClientId()) missing.push("GITHUB_CLIENT_ID");
   if (!getGithubClientSecret()) missing.push("GITHUB_CLIENT_SECRET");
-  if (!getGithubRedirectUri()) missing.push("GITHUB_REDIRECT_URI");
+  if (!getGithubRedirectUri(req)) missing.push("GITHUB_REDIRECT_URI");
   return missing;
 };
 
@@ -311,12 +336,12 @@ exports.googleOAuthCallback = async (req, res) => {
 exports.startGithubOAuth = async (req, res) => {
   const role = normalizeRole(req.query.role || "student");
   const githubClientId = getGithubClientId();
-  const githubRedirectUri = getGithubRedirectUri();
+  const githubRedirectUri = getGithubRedirectUri(req);
 
   if (!githubClientId || !githubRedirectUri) {
     return res.status(503).json({
       message: "GitHub OAuth is not configured",
-      missing: getMissingGithubConfigKeys(),
+      missing: getMissingGithubConfigKeys(req),
     });
   }
 
@@ -340,11 +365,11 @@ exports.githubOAuthCallback = async (req, res) => {
   const role = normalizeRole(state.role || "student") || "student";
   const githubClientId = getGithubClientId();
   const githubClientSecret = getGithubClientSecret();
-  const githubRedirectUri = getGithubRedirectUri();
+  const githubRedirectUri = getGithubRedirectUri(req);
 
   try {
     if (!githubClientId || !githubClientSecret || !githubRedirectUri) {
-      const missing = getMissingGithubConfigKeys();
+      const missing = getMissingGithubConfigKeys(req);
       const errorMessage = missing.length
         ? `GitHub OAuth is not configured: missing ${missing.join(", ")}`
         : "GitHub OAuth is not configured";

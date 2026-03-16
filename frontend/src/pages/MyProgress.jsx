@@ -118,7 +118,7 @@ const MyProgress = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-lg text-white">
           <div className="text-3xl font-bold mb-1">{stats.totalCourses}</div>
           <div className="text-blue-100 text-sm">Total Courses</div>

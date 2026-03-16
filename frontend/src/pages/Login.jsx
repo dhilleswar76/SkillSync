@@ -214,8 +214,8 @@ const Login = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-20 px-4">
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
+    <div className="max-w-md mx-auto mt-8 sm:mt-14 md:mt-20 px-4 pb-8">
+      <div className="bg-white dark:bg-gray-800 p-5 sm:p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700">
         <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
           {isAdminRoute ? "Admin Login" : "Welcome Back"}
         </h2>

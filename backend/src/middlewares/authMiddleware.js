@@ -3,9 +3,15 @@ const User = require("../models/User");
 
 module.exports = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id);
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
+    req.user = user;
     next();
   } catch {
     res.status(401).json({ message: "Unauthorized" });

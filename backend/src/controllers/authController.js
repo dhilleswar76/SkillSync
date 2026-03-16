@@ -47,6 +47,28 @@ const decodeState = (state) => {
   }
 };
 
+const pickEnv = (...keys) => {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return "";
+};
+
+const getGithubClientId = () => pickEnv("GITHUB_CLIENT_ID", "GITHUB_ID", "GITHUB_OAUTH_CLIENT_ID");
+const getGithubClientSecret = () => pickEnv("GITHUB_CLIENT_SECRET", "GITHUB_SECRET", "GITHUB_OAUTH_CLIENT_SECRET");
+const getGithubRedirectUri = () => {
+  const configured = pickEnv("GITHUB_REDIRECT_URI", "GITHUB_CALLBACK_URL");
+  if (configured) {
+    return configured;
+  }
+
+  const externalUrl = pickEnv("RENDER_EXTERNAL_URL") || "https://skillsync-wi9y.onrender.com";
+  return `${externalUrl.replace(/\/$/, "")}/api/auth/github/callback`;
+};
+
 const googleClient = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
   ? new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
@@ -275,8 +297,10 @@ exports.googleOAuthCallback = async (req, res) => {
 
 exports.startGithubOAuth = async (req, res) => {
   const role = normalizeRole(req.query.role || "student");
+  const githubClientId = getGithubClientId();
+  const githubRedirectUri = getGithubRedirectUri();
 
-  if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_REDIRECT_URI) {
+  if (!githubClientId || !githubRedirectUri) {
     return res.status(503).json({ message: "GitHub OAuth is not configured" });
   }
 
@@ -286,8 +310,8 @@ exports.startGithubOAuth = async (req, res) => {
 
   const state = encodeState({ role, provider: "github" });
   const params = new URLSearchParams({
-    client_id: process.env.GITHUB_CLIENT_ID,
-    redirect_uri: process.env.GITHUB_REDIRECT_URI,
+    client_id: githubClientId,
+    redirect_uri: githubRedirectUri,
     scope: "read:user user:email",
     state,
   });
@@ -298,9 +322,12 @@ exports.startGithubOAuth = async (req, res) => {
 exports.githubOAuthCallback = async (req, res) => {
   const state = decodeState(req.query.state || "");
   const role = normalizeRole(state.role || "student") || "student";
+  const githubClientId = getGithubClientId();
+  const githubClientSecret = getGithubClientSecret();
+  const githubRedirectUri = getGithubRedirectUri();
 
   try {
-    if (!process.env.GITHUB_CLIENT_ID || !process.env.GITHUB_CLIENT_SECRET || !process.env.GITHUB_REDIRECT_URI) {
+    if (!githubClientId || !githubClientSecret || !githubRedirectUri) {
       return res.redirect(buildFrontendRedirect({ role, error: "GitHub OAuth is not configured", provider: "github" }));
     }
 
@@ -316,10 +343,10 @@ exports.githubOAuthCallback = async (req, res) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        client_id: process.env.GITHUB_CLIENT_ID,
-        client_secret: process.env.GITHUB_CLIENT_SECRET,
+        client_id: githubClientId,
+        client_secret: githubClientSecret,
         code: String(code),
-        redirect_uri: process.env.GITHUB_REDIRECT_URI,
+        redirect_uri: githubRedirectUri,
       }),
     });
     const tokenData = await tokenResponse.json();

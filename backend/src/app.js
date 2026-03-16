@@ -14,6 +14,7 @@ app.use(cors({
     
     const allowedOrigins = [
       "http://localhost:3000",
+      "https://skill-sync-learning-portal.vercel.app",
       process.env.FRONTEND_URL
     ].filter(Boolean);
     

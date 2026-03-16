@@ -25,7 +25,7 @@ const issueOtp = () => String(Math.floor(100000 + Math.random() * 900000));
 const getFrontendAuthPath = (role) => (role === "admin" ? "/admin-login" : "/login");
 
 const buildFrontendRedirect = ({ role, token, user, error, provider }) => {
-  const base = `${process.env.FRONTEND_URL || "http://localhost:5173"}${getFrontendAuthPath(role)}`;
+  const base = `${process.env.FRONTEND_URL || "https://skill-sync-learning-portal.vercel.app"}${getFrontendAuthPath(role)}`;
   const searchParams = new URLSearchParams();
 
   if (provider) searchParams.set("provider", provider);
@@ -418,6 +418,7 @@ exports.requestEmailOtp = async (req, res) => {
     const response = otpResponse(user, "email", otp);
     if (wasDelivered) {
       response.message = `OTP sent to ${user.email}.`;
+      delete response.devOtp; // never leak OTP when real email was delivered
     } else if (!isEmailConfigured()) {
       response.message = process.env.NODE_ENV === "production"
         ? "Email OTP is not configured on the server."
@@ -588,5 +589,32 @@ exports.firebasePhoneLogin = async (req, res) => {
   } catch (error) {
     console.error("Firebase phone login error:", error);
     res.status(500).json({ message: "Server error during Firebase phone login", error: error.message });
+  }
+};
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    if (!name && !email) {
+      return res.status(400).json({ message: "Name or email is required" });
+    }
+
+    const updates = {};
+    if (name) updates.name = String(name).trim();
+    if (email) {
+      const normalizedEmail = String(email).toLowerCase().trim();
+      const emailTaken = await User.findOne({ email: normalizedEmail, _id: { $ne: req.user._id } });
+      if (emailTaken) {
+        return res.status(400).json({ message: "Email is already in use" });
+      }
+      updates.email = normalizedEmail;
+    }
+
+    const updated = await User.findByIdAndUpdate(req.user._id, { $set: updates }, { new: true });
+    res.json({ token: generateToken(updated._id), user: sanitizeUser(updated) });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Server error during profile update", error: error.message });
   }
 };

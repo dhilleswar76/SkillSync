@@ -4,7 +4,7 @@ A RESTful API built with Node.js, Express, and MongoDB for managing a student le
 
 ## Features
 
-- **Authentication & Authorization**: JWT-based authentication with role-based access control (Admin/Student)
+- **Authentication & Authorization**: JWT-based authentication with role-based access control plus Google and GitHub OAuth login
 - **Course Management**: Create, update, and manage courses and lessons
 - **Progress Tracking**: Track student progress through courses
 - **Quiz System**: Create and manage quizzes with automated grading
@@ -124,6 +124,11 @@ http://localhost:5000/api-docs
 ### Authentication
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login user
+- `POST /api/auth/oauth-login` - Exchange an OAuth profile for a JWT session
+- `GET /api/auth/google/start` - Start Google OAuth login
+- `GET /api/auth/google/callback` - Google OAuth callback
+- `GET /api/auth/github/start` - Start GitHub OAuth login
+- `GET /api/auth/github/callback` - GitHub OAuth callback
 - `GET /api/auth/me` - Get current user
 
 ### Courses
@@ -205,6 +210,13 @@ src/
 | CLOUDINARY_API_KEY | Cloudinary API key | No |
 | CLOUDINARY_API_SECRET | Cloudinary API secret | No |
 | FRONTEND_URL | Frontend URL for CORS | Yes |
+| BACKEND_PUBLIC_URL | Public backend URL used to build OAuth callbacks | No |
+| GOOGLE_CLIENT_ID | Google OAuth client ID | No |
+| GOOGLE_CLIENT_SECRET | Google OAuth client secret | No |
+| GOOGLE_REDIRECT_URI | Google OAuth callback URL | No |
+| GITHUB_CLIENT_ID | GitHub OAuth client ID | No |
+| GITHUB_CLIENT_SECRET | GitHub OAuth client secret | No |
+| GITHUB_REDIRECT_URI | GitHub OAuth callback URL | No |
 
 ## Troubleshooting
 
@@ -230,6 +242,31 @@ src/
 - Enable CORS only for trusted domains in production
 - Use HTTPS in production
 - Regularly update dependencies
+
+## OAuth Setup (Google & GitHub)
+
+1. Google (OAuth 2.0)
+  - Go to Google Cloud Console → APIs & Services → Credentials → Create Credentials → OAuth client ID.
+  - Choose "Web application" and set the Authorized redirect URIs to:
+    - `http://localhost:5000/api/auth/google/callback` (development)
+    - or `{BACKEND_PUBLIC_URL}/api/auth/google/callback` for production
+  - Set `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` in your `.env`.
+
+2. GitHub (OAuth App)
+  - Go to GitHub → Settings → Developer settings → OAuth Apps → New OAuth App.
+  - Set the Authorization callback URL to:
+    - `http://localhost:5000/api/auth/github/callback` (development)
+    - or `{BACKEND_PUBLIC_URL}/api/auth/github/callback` for production
+  - Set `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, and optionally `GITHUB_REDIRECT_URI` in your `.env`.
+
+3. Frontend configuration
+  - Ensure the frontend can reach the backend via `VITE_API_URL` (see `frontend/.env.example`).
+  - The login page calls `/auth/google/start` and `/auth/github/start` on the backend; providers will redirect back to the backend callback endpoints which then redirect to the frontend with a `token` and encoded `user`.
+
+4. Notes
+  - For local development with tunneling (ngrok), set `BACKEND_PUBLIC_URL` to the public tunnel URL and register the same callback URLs in provider consoles.
+  - Admin accounts cannot be created via OAuth for safety — use the register endpoint or seed an admin account.
+
 
 ## License
 

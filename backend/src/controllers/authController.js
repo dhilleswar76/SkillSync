@@ -19,6 +19,15 @@ const normalizeRole = (role) => {
   return VALID_ROLES.includes(normalized) ? normalized : null;
 };
 
+const isValidEmail = (value) => {
+  if (typeof value !== "string") {
+    return false;
+  }
+
+  const email = value.trim().toLowerCase();
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 // issueOtp removed
 
 const getFrontendAuthPath = (role) => (role === "admin" ? "/admin-login" : "/login");
@@ -112,12 +121,22 @@ const googleClient = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_S
   : null;
 
 const findOrCreateOAuthUser = async ({ email, name, role, provider }) => {
-  let user = await User.findOne({ email: email.toLowerCase() });
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+
+  if (!isValidEmail(normalizedEmail)) {
+    return null;
+  }
+
+  let user = await User.findOne({ email: normalizedEmail });
 
   if (!user) {
+    if (role === "admin") {
+      return null;
+    }
+
     user = await User.create({
       name: name || email.split("@")[0],
-      email: email.toLowerCase(),
+      email: normalizedEmail,
       role,
       oauthProvider: provider,
     });
@@ -238,12 +257,21 @@ exports.oauthLogin = async (req, res) => {
       return res.status(400).json({ message: "Email is required for OAuth login" });
     }
 
-    let user = await User.findOne({ email: email.toLowerCase() });
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ message: "OAuth email is invalid" });
+    }
+
+    if (normalizedRole === "admin") {
+      return res.status(403).json({ message: "Admin accounts cannot be created through OAuth login" });
+    }
+
+    const normalizedEmail = email.toLowerCase();
+    let user = await User.findOne({ email: normalizedEmail });
 
     if (!user) {
       user = await User.create({
         name: name || email.split("@")[0],
-        email: email.toLowerCase(),
+        email: normalizedEmail,
         role: normalizedRole,
         oauthProvider: normalizedProvider,
       });
@@ -309,12 +337,20 @@ exports.googleOAuthCallback = async (req, res) => {
       return res.redirect(buildFrontendRedirect({ role, error: "Google account email was not available", provider: "google" }));
     }
 
+    if (!isValidEmail(profile.email)) {
+      return res.redirect(buildFrontendRedirect({ role, error: "Google account email was invalid", provider: "google" }));
+    }
+
     const user = await findOrCreateOAuthUser({
       email: profile.email,
       name: profile.name,
       role,
       provider: "google",
     });
+
+    if (!user) {
+      return res.redirect(buildFrontendRedirect({ role, error: "Admin accounts cannot be created through Google OAuth", provider: "google" }));
+    }
 
     if (user.role !== role) {
       return res.redirect(buildFrontendRedirect({ role, error: `This account is not authorized for ${role} login`, provider: "google" }));
@@ -415,12 +451,20 @@ exports.githubOAuthCallback = async (req, res) => {
       return res.redirect(buildFrontendRedirect({ role, error: "GitHub account email was not available", provider: "github" }));
     }
 
+    if (!isValidEmail(primaryEmail)) {
+      return res.redirect(buildFrontendRedirect({ role, error: "GitHub account email was invalid", provider: "github" }));
+    }
+
     const user = await findOrCreateOAuthUser({
       email: primaryEmail,
       name: profile.name || profile.login,
       role,
       provider: "github",
     });
+
+    if (!user) {
+      return res.redirect(buildFrontendRedirect({ role, error: "Admin accounts cannot be created through GitHub OAuth", provider: "github" }));
+    }
 
     if (user.role !== role) {
       return res.redirect(buildFrontendRedirect({ role, error: `This account is not authorized for ${role} login`, provider: "github" }));

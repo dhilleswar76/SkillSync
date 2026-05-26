@@ -23,6 +23,17 @@ const Login = () => {
     return "Student";
   }, [role]);
 
+  const isValidEmail = (value) => typeof value === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
+
+  const providerButtonBase =
+    "w-full flex items-center justify-center gap-2 px-3 py-3 rounded-xl border text-sm font-semibold transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed";
+
+  const googleButtonClass =
+    `${providerButtonBase} border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 hover:border-[#d0d7de] hover:shadow-md hover:-translate-y-0.5`;
+
+  const githubButtonClass =
+    `${providerButtonBase} border-gray-900 bg-gray-900 text-white hover:bg-black hover:shadow-md hover:-translate-y-0.5`;
+
   const onAuthSuccess = (payload) => {
     login(payload);
     if (payload?.user?.role === "admin") {
@@ -46,6 +57,16 @@ const Login = () => {
     if (token && rawUser) {
       try {
         const user = JSON.parse(decodeURIComponent(rawUser));
+        if (!token.trim()) {
+          setError("OAuth login response was missing a token.");
+          return;
+        }
+
+        if (!user || typeof user !== "object" || !isValidEmail(user.email) || !user.role) {
+          setError("OAuth login response was invalid.");
+          return;
+        }
+
         onAuthSuccess({ token, user });
       } catch {
         setError("OAuth login response could not be processed.");
@@ -93,7 +114,7 @@ const Login = () => {
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           {isAdminRoute
-            ? "Secure admin access with Google, GitHub, or password"
+            ? "Secure admin access with password. Google and GitHub login are reserved for student and instructor accounts."
             : "Login as student or instructor using Google, GitHub, or password"}
         </p>
 
@@ -122,24 +143,41 @@ const Login = () => {
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          <button
-            type="button"
-            onClick={() => startOAuth("google")}
-            disabled={loading}
-            className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-semibold text-gray-800 dark:text-gray-200 hover:border-primary"
-          >
-            Continue with Google
-          </button>
-          <button
-            type="button"
-            onClick={() => startOAuth("github")}
-            disabled={loading}
-            className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-sm font-semibold text-gray-800 dark:text-gray-200 hover:border-primary"
-          >
-            Continue with GitHub
-          </button>
-        </div>
+        {!isAdminRoute && (
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <button
+              type="button"
+              onClick={() => startOAuth("google")}
+              disabled={loading}
+              className={googleButtonClass}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 shrink-0" fill="none">
+                <path fill="#4285F4" d="M12 10.2v3.9h5.5c-.2 1.4-.8 2.6-1.8 3.4l2.9 2.3c1.7-1.6 2.7-4 2.7-6.8 0-.7-.1-1.3-.2-1.9H12Z" />
+                <path fill="#34A853" d="M6.6 14.3l-.7.5-2.4 1.9A9.99 9.99 0 0 0 12 22c2.7 0 5-.9 6.8-2.4l-2.9-2.3c-.8.6-1.8 1-3.1 1-2.4 0-4.4-1.6-5.1-3.7Z" />
+                <path fill="#FBBC05" d="M3.5 7.9a9.96 9.96 0 0 0 0 8l3.1-2.4a5.9 5.9 0 0 1 0-3.2l-3.1-2.4Z" />
+                <path fill="#EA4335" d="M12 5.6c1.5 0 2.8.5 3.9 1.5l2.9-2.9A9.8 9.8 0 0 0 12 2C8.3 2 5.1 4 3.5 7.9l3.1 2.4C7.6 7.2 9.5 5.6 12 5.6Z" />
+              </svg>
+              Continue with Google
+            </button>
+            <button
+              type="button"
+              onClick={() => startOAuth("github")}
+              disabled={loading}
+              className={githubButtonClass}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 shrink-0" fill="currentColor">
+                <path d="M12 .5A11.5 11.5 0 0 0 8.4 23c.6.1.8-.2.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1 .1 1.7 1.8 1.7 1.8 1.5 2.5 4 .8 5 .6.1-.8.4-1.4.7-1.7-2.7-.3-5.6-1.3-5.6-5.8 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.2 0 4.6-2.9 5.5-5.6 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6A11.5 11.5 0 0 0 12 .5Z" />
+              </svg>
+              Continue with GitHub
+            </button>
+          </div>
+        )}
+
+        {isAdminRoute && (
+          <div className="mb-4 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-sm text-gray-700 dark:text-gray-300">
+            Direct OAuth login is available on the student and instructor login page.
+          </div>
+        )}
 
         {/* Only password login + OAuth available */}
 

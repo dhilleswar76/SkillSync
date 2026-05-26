@@ -2,8 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const generateToken = require("../utils/generateToken");
 const { OAuth2Client } = require("google-auth-library");
-const { getFirebaseAdminAuth } = require("../config/firebaseAdmin");
-const { isEmailConfigured, sendOtpEmail } = require("../utils/sendOtpEmail");
+// OTP and Firebase phone auth removed; keep OAuth and password flows only
 
 const VALID_ROLES = ["student", "instructor", "admin"];
 
@@ -20,7 +19,7 @@ const normalizeRole = (role) => {
   return VALID_ROLES.includes(normalized) ? normalized : null;
 };
 
-const issueOtp = () => String(Math.floor(100000 + Math.random() * 900000));
+// issueOtp removed
 
 const getFrontendAuthPath = (role) => (role === "admin" ? "/admin-login" : "/login");
 
@@ -102,10 +101,7 @@ const getMissingGithubConfigKeys = (req) => {
   return missing;
 };
 
-const getMissingSmtpConfigKeys = () => {
-  const required = ["SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "SMTP_FROM"];
-  return required.filter((key) => !pickEnv(key));
-};
+// SMTP helper removed
 
 const googleClient = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
   ? new OAuth2Client(
@@ -130,18 +126,7 @@ const findOrCreateOAuthUser = async ({ email, name, role, provider }) => {
   return user;
 };
 
-const otpResponse = (user, channel, otp) => {
-  const response = {
-    message: `OTP sent to your ${channel}.`,
-    expiresInSeconds: 300,
-  };
-
-  if (process.env.NODE_ENV !== "production") {
-    response.devOtp = otp;
-  }
-
-  return response;
-};
+// OTP response helper removed
 
 exports.register = async (req, res) => {
   try {
@@ -193,14 +178,25 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
+    const { email, phone, password, role } = req.body;
 
-    // Validate required fields
-    if (!email || !password) {
-      return res.status(400).json({ message: "Email and password are required" });
+    if (!password || (!email && !phone)) {
+      return res.status(400).json({ message: "Email or phone and password are required" });
     }
 
-    const user = await User.findOne({ email: String(email).toLowerCase() });
+    let user = null;
+
+    if (phone) {
+      user = await User.findOne({ phone });
+    } else if (email) {
+      if (String(email).includes("@")) {
+        user = await User.findOne({ email: String(email).toLowerCase() });
+      } else {
+        // allow login where user typed phone into the email field
+        user = await User.findOne({ phone: String(email) });
+      }
+    }
+
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -439,233 +435,7 @@ exports.githubOAuthCallback = async (req, res) => {
   }
 };
 
-exports.requestEmailOtp = async (req, res) => {
-  try {
-    const { email, role } = req.body;
-    const normalizedRole = normalizeRole(role || "student");
-
-    if (!email) {
-      return res.status(400).json({ message: "Email is required" });
-    }
-
-    if (!normalizedRole) {
-      return res.status(400).json({ message: "Invalid role" });
-    }
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(404).json({ message: "No account found with this email" });
-    }
-
-    if (user.role !== normalizedRole) {
-      return res.status(403).json({ message: `This account is not authorized for ${normalizedRole} login` });
-    }
-
-    const otp = issueOtp();
-    user.otpCode = otp;
-    user.otpChannel = "email";
-    user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    await user.save();
-
-    let wasDelivered = false;
-
-    if (isEmailConfigured()) {
-      try {
-        wasDelivered = await sendOtpEmail({
-          email: user.email,
-          name: user.name,
-          otp,
-        });
-      } catch (mailError) {
-        console.error("Email OTP delivery error:", mailError);
-
-        if (process.env.NODE_ENV === "production") {
-          return res.status(500).json({ message: "OTP email could not be sent. Please try again." });
-        }
-      }
-    }
-
-    console.log(`[OTP][email] ${user.email}: ${otp}`);
-
-    const response = otpResponse(user, "email", otp);
-    if (wasDelivered) {
-      response.message = `OTP sent to ${user.email}.`;
-      delete response.devOtp; // never leak OTP when real email was delivered
-    } else if (!isEmailConfigured()) {
-      response.message = process.env.NODE_ENV === "production"
-        ? "Email OTP is not configured on the server."
-        : `SMTP is not configured, so OTP is available in development mode only for ${user.email}.`;
-    }
-
-    if (!wasDelivered && !isEmailConfigured() && process.env.NODE_ENV === "production") {
-      return res.status(503).json({
-        message: "Email OTP is not configured on the server.",
-        missing: getMissingSmtpConfigKeys(),
-      });
-    }
-
-    res.json(response);
-  } catch (error) {
-    console.error("Request email OTP error:", error);
-    res.status(500).json({ message: "Server error while requesting email OTP", error: error.message });
-  }
-};
-
-exports.verifyEmailOtp = async (req, res) => {
-  try {
-    const { email, otp, role } = req.body;
-    const normalizedRole = normalizeRole(role || "student");
-
-    if (!email || !otp) {
-      return res.status(400).json({ message: "Email and OTP are required" });
-    }
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user) {
-      return res.status(404).json({ message: "No account found with this email" });
-    }
-
-    if (user.role !== normalizedRole) {
-      return res.status(403).json({ message: `This account is not authorized for ${normalizedRole} login` });
-    }
-
-    const isExpired = !user.otpExpiresAt || new Date(user.otpExpiresAt).getTime() < Date.now();
-    if (user.otpCode !== String(otp) || user.otpChannel !== "email" || isExpired) {
-      return res.status(401).json({ message: "Invalid or expired OTP" });
-    }
-
-    user.otpCode = null;
-    user.otpChannel = null;
-    user.otpExpiresAt = null;
-    await user.save();
-
-    res.json({ token: generateToken(user._id), user: sanitizeUser(user) });
-  } catch (error) {
-    console.error("Verify email OTP error:", error);
-    res.status(500).json({ message: "Server error while verifying email OTP", error: error.message });
-  }
-};
-
-exports.requestPhoneOtp = async (req, res) => {
-  try {
-    const { phone, role } = req.body;
-    const normalizedRole = normalizeRole(role || "student");
-
-    if (!phone) {
-      return res.status(400).json({ message: "Phone number is required" });
-    }
-
-    if (!normalizedRole) {
-      return res.status(400).json({ message: "Invalid role" });
-    }
-
-    const user = await User.findOne({ phone });
-    if (!user) {
-      return res.status(404).json({ message: "No account found with this phone number" });
-    }
-
-    if (user.role !== normalizedRole) {
-      return res.status(403).json({ message: `This account is not authorized for ${normalizedRole} login` });
-    }
-
-    const otp = issueOtp();
-    user.otpCode = otp;
-    user.otpChannel = "phone";
-    user.otpExpiresAt = new Date(Date.now() + 5 * 60 * 1000);
-    await user.save();
-
-    console.log(`[OTP][phone] ${user.phone}: ${otp}`);
-    res.json(otpResponse(user, "phone", otp));
-  } catch (error) {
-    console.error("Request phone OTP error:", error);
-    res.status(500).json({ message: "Server error while requesting phone OTP", error: error.message });
-  }
-};
-
-exports.verifyPhoneOtp = async (req, res) => {
-  try {
-    const { phone, otp, role } = req.body;
-    const normalizedRole = normalizeRole(role || "student");
-
-    if (!phone || !otp) {
-      return res.status(400).json({ message: "Phone and OTP are required" });
-    }
-
-    const user = await User.findOne({ phone });
-    if (!user) {
-      return res.status(404).json({ message: "No account found with this phone number" });
-    }
-
-    if (user.role !== normalizedRole) {
-      return res.status(403).json({ message: `This account is not authorized for ${normalizedRole} login` });
-    }
-
-    const isExpired = !user.otpExpiresAt || new Date(user.otpExpiresAt).getTime() < Date.now();
-    if (user.otpCode !== String(otp) || user.otpChannel !== "phone" || isExpired) {
-      return res.status(401).json({ message: "Invalid or expired OTP" });
-    }
-
-    user.otpCode = null;
-    user.otpChannel = null;
-    user.otpExpiresAt = null;
-    await user.save();
-
-    res.json({ token: generateToken(user._id), user: sanitizeUser(user) });
-  } catch (error) {
-    console.error("Verify phone OTP error:", error);
-    res.status(500).json({ message: "Server error while verifying phone OTP", error: error.message });
-  }
-};
-
-exports.firebasePhoneLogin = async (req, res) => {
-  try {
-    const { idToken, role, name } = req.body;
-    const normalizedRole = normalizeRole(role || "student");
-    const firebaseAdminAuth = getFirebaseAdminAuth();
-
-    if (!normalizedRole) {
-      return res.status(400).json({ message: "Invalid role" });
-    }
-
-    if (!firebaseAdminAuth) {
-      return res.status(503).json({ message: "Firebase phone auth is not configured" });
-    }
-
-    if (!idToken) {
-      return res.status(400).json({ message: "Firebase ID token is required" });
-    }
-
-    const decodedToken = await firebaseAdminAuth.verifyIdToken(idToken);
-    const phone = decodedToken.phone_number;
-
-    if (!phone) {
-      return res.status(400).json({ message: "Verified Firebase user does not include a phone number" });
-    }
-
-    let user = await User.findOne({ phone });
-
-    if (!user) {
-      user = await User.create({
-        name: name || decodedToken.name || `User ${phone.slice(-4)}`,
-        email: decodedToken.email,
-        phone,
-        role: normalizedRole,
-      });
-    }
-
-    if (user.role !== normalizedRole) {
-      return res.status(403).json({ message: `This account is not authorized for ${normalizedRole} login` });
-    }
-
-    res.json({
-      token: generateToken(user._id),
-      user: sanitizeUser(user),
-    });
-  } catch (error) {
-    console.error("Firebase phone login error:", error);
-    res.status(500).json({ message: "Server error during Firebase phone login", error: error.message });
-  }
-};
+// OTP and Firebase phone login removed. Use email/phone + password or OAuth flows.
 
 exports.updateProfile = async (req, res) => {
   try {

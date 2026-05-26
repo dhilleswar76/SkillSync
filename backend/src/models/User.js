@@ -9,9 +9,7 @@ module.exports = mongoose.model(
     password: String,
     role: { type: String, enum: ["student", "instructor", "admin"], default: "student" },
     oauthProvider: { type: String, enum: ["google", "github"], default: undefined },
-    otpCode: String,
-    otpExpiresAt: Date,
-    otpChannel: { type: String, enum: ["email", "phone"], default: undefined },
+    // OTP fields removed; authentication uses password or OAuth
     enrolledCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: "Course" }]
   }, { timestamps: true })
 );

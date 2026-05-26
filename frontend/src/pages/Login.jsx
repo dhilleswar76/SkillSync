@@ -1,28 +1,21 @@
-import { useState, useContext, useMemo, useEffect, useRef } from "react";
+import { useState, useContext, useMemo, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import axios from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
-import { firebaseAuth, isFirebaseConfigured } from "../config/firebase";
 
 const Login = () => {
   const { login } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
-  const recaptchaContainerRef = useRef(null);
   const isAdminRoute = location.pathname === "/admin-login";
   const redirectTo = location.state?.redirectTo || location.state?.from?.pathname || "/dashboard";
   const apiBaseUrl = axios.defaults.baseURL || import.meta.env.VITE_API_URL || "";
 
   const [role, setRole] = useState(isAdminRoute ? "admin" : "student");
-  const [method, setMethod] = useState("password");
-  const [form, setForm] = useState({ email: "", password: "", phone: "", otp: "", name: "" });
+  const [form, setForm] = useState({ email: "", password: "", phone: "" });
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [devOtp, setDevOtp] = useState("");
-  const [phoneConfirmation, setPhoneConfirmation] = useState(null);
 
   const roleLabel = useMemo(() => {
     if (role === "admin") return "Admin";
@@ -60,12 +53,7 @@ const Login = () => {
     }
   }, [location.search]);
 
-  useEffect(() => {
-    setOtpSent(false);
-    setDevOtp("");
-    setForm((current) => ({ ...current, otp: "" }));
-    setPhoneConfirmation(null);
-  }, [method, role]);
+  // No OTP flows: only password and OAuth
 
   const buildOAuthStartUrl = (provider) => `${apiBaseUrl}/auth/${provider}/start?role=${encodeURIComponent(role)}`;
 
@@ -95,123 +83,7 @@ const Login = () => {
     }
   };
 
-  const handleRequestEmailOtp = async () => {
-    setError("");
-    setMessage("");
-    setDevOtp("");
-
-    if (!form.email) {
-      setError("Enter your email to request OTP.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await axios.post("/auth/otp/email/request", { email: form.email, role });
-      setOtpSent(true);
-      setMessage(res.data?.message || "OTP sent successfully.");
-      if (res.data?.devOtp) {
-        setDevOtp(res.data.devOtp);
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || "Email OTP request failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyEmailOtp = async () => {
-    setError("");
-    setMessage("");
-
-    if (!form.otp) {
-      setError("Enter OTP.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await axios.post("/auth/otp/email/verify", {
-        email: form.email,
-        otp: form.otp,
-        role,
-      });
-      onAuthSuccess(res.data);
-    } catch (err) {
-      setError(err.response?.data?.message || "OTP verification failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRequestFirebasePhoneOtp = async () => {
-    setError("");
-    setMessage("");
-
-    if (!form.phone) {
-      setError("Enter your phone number.");
-      return;
-    }
-
-    if (!firebaseAuth || !isFirebaseConfigured) {
-      setError("Firebase Phone OTP is not configured.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      if (!window.firebaseRecaptchaVerifier) {
-        window.firebaseRecaptchaVerifier = new RecaptchaVerifier(firebaseAuth, recaptchaContainerRef.current, {
-          size: "normal",
-        });
-        await window.firebaseRecaptchaVerifier.render();
-      }
-
-      const confirmationResult = await signInWithPhoneNumber(
-        firebaseAuth,
-        form.phone,
-        window.firebaseRecaptchaVerifier
-      );
-      setPhoneConfirmation(confirmationResult);
-      setOtpSent(true);
-      setMessage("Firebase OTP sent to your phone.");
-    } catch (err) {
-      setError(err.message || "Firebase Phone OTP request failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyFirebasePhoneOtp = async () => {
-    setError("");
-    setMessage("");
-
-    if (!phoneConfirmation) {
-      setError("Request Firebase OTP first.");
-      return;
-    }
-
-    if (!form.otp) {
-      setError("Enter OTP.");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const confirmation = await phoneConfirmation.confirm(form.otp);
-      const idToken = await confirmation.user.getIdToken();
-      const res = await axios.post("/auth/firebase/phone-login", {
-        idToken,
-        role,
-        name: form.name,
-      });
-      onAuthSuccess(res.data);
-    } catch (err) {
-      setError(err.response?.data?.message || err.message || "Firebase Phone OTP verification failed.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // OTP handlers removed; login via email/password or OAuth
 
   return (
     <div className="max-w-md mx-auto mt-8 sm:mt-14 md:mt-20 px-4 pb-8">
@@ -221,8 +93,8 @@ const Login = () => {
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6">
           {isAdminRoute
-            ? "Secure admin access with Google, GitHub, Email OTP, or Firebase Phone OTP"
-            : "Login as student or instructor using Google, GitHub, Email OTP, Firebase Phone OTP, or password"}
+            ? "Secure admin access with Google, GitHub, or password"
+            : "Login as student or instructor using Google, GitHub, or password"}
         </p>
 
         {!isAdminRoute && (
@@ -269,29 +141,7 @@ const Login = () => {
           </button>
         </div>
 
-        <div className="mb-4 grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            onClick={() => setMethod("password")}
-            className={`px-2 py-2 rounded-lg border text-xs font-semibold ${method === "password" ? "bg-primary text-white border-primary" : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"}`}
-          >
-            Password
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod("email-otp")}
-            className={`px-2 py-2 rounded-lg border text-xs font-semibold ${method === "email-otp" ? "bg-primary text-white border-primary" : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"}`}
-          >
-            Email OTP
-          </button>
-          <button
-            type="button"
-            onClick={() => setMethod("phone-otp")}
-            className={`px-2 py-2 rounded-lg border text-xs font-semibold ${method === "phone-otp" ? "bg-primary text-white border-primary" : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300"}`}
-          >
-            Firebase Phone OTP
-          </button>
-        </div>
+        {/* Only password login + OAuth available */}
 
         {error && (
           <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-primary border border-red-200 dark:border-red-800 rounded-lg text-sm">
@@ -305,30 +155,15 @@ const Login = () => {
           </div>
         )}
 
-        {devOtp && (
-          <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 rounded-lg text-sm">
-            Dev OTP: <span className="font-bold">{devOtp}</span>
-          </div>
-        )}
 
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Display Name (optional)</label>
-          <input
-            type="text"
-            placeholder="Used for new OAuth/Firebase accounts"
-            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
-        </div>
+        {/* Display name removed; not used in login */}
 
-        {method === "password" && (
-          <form onSubmit={handlePasswordLogin}>
+        <form onSubmit={handlePasswordLogin}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email or Phone</label>
+                <input
+                  type="text"
+                  placeholder="Enter your email or phone"
                 className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -355,103 +190,7 @@ const Login = () => {
               {loading ? "Logging in..." : `Login as ${roleLabel}`}
             </button>
           </form>
-        )}
-
-        {method === "email-otp" && (
-          <div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
-            </div>
-
-            {!otpSent ? (
-              <button
-                type="button"
-                onClick={handleRequestEmailOtp}
-                disabled={loading}
-                className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold disabled:opacity-50"
-              >
-                {loading ? "Sending OTP..." : "Send Email OTP"}
-              </button>
-            ) : (
-              <>
-                <div className="mb-4 mt-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">OTP</label>
-                  <input
-                    type="text"
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    value={form.otp}
-                    onChange={(e) => setForm({ ...form, otp: e.target.value })}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleVerifyEmailOtp}
-                  disabled={loading}
-                  className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold disabled:opacity-50"
-                >
-                  {loading ? "Verifying..." : `Verify Email OTP as ${roleLabel}`}
-                </button>
-              </>
-            )}
-          </div>
-        )}
-
-        {method === "phone-otp" && (
-          <div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
-              <input
-                type="tel"
-                placeholder="Enter phone number with country code"
-                className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-              />
-            </div>
-
-            <div ref={recaptchaContainerRef} className="mb-4" />
-
-            {!otpSent ? (
-              <button
-                type="button"
-                onClick={handleRequestFirebasePhoneOtp}
-                disabled={loading}
-                className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold disabled:opacity-50"
-              >
-                {loading ? "Sending Firebase OTP..." : "Send Firebase Phone OTP"}
-              </button>
-            ) : (
-              <>
-                <div className="mb-4 mt-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">OTP</label>
-                  <input
-                    type="text"
-                    placeholder="Enter 6-digit OTP"
-                    className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white"
-                    value={form.otp}
-                    onChange={(e) => setForm({ ...form, otp: e.target.value })}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleVerifyFirebasePhoneOtp}
-                  disabled={loading}
-                  className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold disabled:opacity-50"
-                >
-                  {loading ? "Verifying..." : `Verify Firebase Phone OTP as ${roleLabel}`}
-                </button>
-              </>
-            )}
-          </div>
-        )}
+        {/* Email/phone OTP and Firebase flows removed */}
       </div>
     </div>
   );

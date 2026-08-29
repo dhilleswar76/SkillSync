@@ -3,6 +3,16 @@ const mongoose = require("mongoose");
 let isConnecting = false;
 let lastDbError = null;
 
+const sanitizeMongoUri = (raw) => {
+  if (!raw || typeof raw !== "string") return "";
+  let s = raw.trim();
+  // Strip accidental "MONGO_URI=" or "MONGO_URI:" prefix
+  s = s.replace(/^MONGO_URI\s*[:=]\s*/i, "").trim();
+  // Strip wrapping single/double quotes
+  s = s.replace(/^["']|["']$/g, "").trim();
+  return s;
+};
+
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) {
     return mongoose.connection;
@@ -14,8 +24,9 @@ const connectDB = async () => {
 
   isConnecting = true;
 
-  const rawUri = process.env.MONGO_URI?.trim();
-  const uri = rawUri || "mongodb://127.0.0.1:27017/student_portal";
+  const rawUri = process.env.MONGO_URI;
+  const cleanUri = sanitizeMongoUri(rawUri);
+  const uri = cleanUri || "mongodb://127.0.0.1:27017/student_portal";
 
   const options = {
     serverSelectionTimeoutMS: 8000,

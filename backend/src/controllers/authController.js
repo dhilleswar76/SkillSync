@@ -178,6 +178,10 @@ const googleStart = (req, res) => {
     state
   )}`;
 
+  if (req.query.format === "json") {
+    return res.json({ url });
+  }
+
   res.redirect(url);
 };
 
@@ -317,6 +321,10 @@ const githubStart = (req, res) => {
   )}&redirect_uri=${encodeURIComponent(
     redirectUri
   )}&scope=read:user%20user:email&state=${encodeURIComponent(state)}`;
+
+  if (req.query.format === "json") {
+    return res.json({ url });
+  }
 
   res.redirect(url);
 };

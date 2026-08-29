@@ -31,7 +31,8 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      default: "",
+      default: undefined,
+      sparse: true,
     },
     bio: {
       type: String,

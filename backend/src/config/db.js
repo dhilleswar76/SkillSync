@@ -38,6 +38,17 @@ const connectDB = async () => {
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
     lastDbError = null;
     isConnecting = false;
+
+    // Drop legacy phone_1 unique index if it exists in the collection
+    try {
+      const collections = await conn.connection.db.listCollections({ name: "users" }).toArray();
+      if (collections.length > 0) {
+        await conn.connection.db.collection("users").dropIndex("phone_1").catch(() => {});
+      }
+    } catch (idxErr) {
+      // Ignore if index doesn't exist
+    }
+
     return conn;
   } catch (error) {
     lastDbError = error.message;

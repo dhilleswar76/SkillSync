@@ -54,7 +54,7 @@ const register = async (req, res) => {
       email: email.toLowerCase(),
       password,
       role,
-      phone,
+      phone: phone ? phone.trim() : undefined,
     });
 
     res.status(201).json({

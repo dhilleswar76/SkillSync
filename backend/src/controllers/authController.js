@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const generateToken = require("../utils/generateToken");
+const { ensureConnected } = require("../config/db");
 
 // Helper to determine frontend URL for OAuth callback redirects
 const getFrontendUrl = (req, stateOrigin) => {
@@ -264,6 +265,15 @@ const googleCallback = async (req, res) => {
     const avatar = profile.picture || "";
     const googleId = profile.sub;
 
+    const isDbConnected = await ensureConnected();
+    if (!isDbConnected) {
+      return res.redirect(
+        `${frontendUrl}/login?error=${encodeURIComponent(
+          "Database connection is currently unavailable on server. Please check MongoDB Atlas password and Network Access in Render."
+        )}`
+      );
+    }
+
     let user = await User.findOne({ email });
     if (!user) {
       user = await User.create({
@@ -451,6 +461,15 @@ const githubCallback = async (req, res) => {
     const name = profile.name || profile.login || normalizedEmail.split("@")[0];
     const avatar = profile.avatar_url || "";
     const githubId = String(profile.id);
+
+    const isDbConnected = await ensureConnected();
+    if (!isDbConnected) {
+      return res.redirect(
+        `${frontendUrl}/login?error=${encodeURIComponent(
+          "Database connection is currently unavailable on server. Please check MongoDB Atlas password and Network Access in Render."
+        )}`
+      );
+    }
 
     let user = await User.findOne({ email: normalizedEmail });
     if (!user) {

@@ -47,7 +47,12 @@ app.get("/", (req, res) => {
 
 // Health check route
 app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", message: "Server is running" });
+  const { getDbStatus } = require("./config/db");
+  res.json({ 
+    status: "OK", 
+    message: "Server is running",
+    database: getDbStatus(),
+  });
 });
 
 // Routes

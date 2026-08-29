@@ -17,10 +17,8 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: function () {
-        return !this.provider || this.provider === "local";
-      },
-      minlength: 6,
+      required: false,
+      default: "",
     },
     role: {
       type: String,
@@ -68,6 +66,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password || !enteredPassword) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

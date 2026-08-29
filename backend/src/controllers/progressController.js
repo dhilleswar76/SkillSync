@@ -1,6 +1,7 @@
 const Progress = require("../models/Progress");
 const Course = require("../models/Course");
 const Certificate = require("../models/Certificate");
+const User = require("../models/User");
 
 // @desc Get user progress across all courses
 // @route GET /api/progress
@@ -63,6 +64,23 @@ const updateProgress = async (req, res) => {
         percentage: 0,
         totalPoints: 0,
       });
+    }
+
+    // Ensure course is in user's enrolledCourses list
+    try {
+      const user = await User.findById(req.user._id);
+      if (user) {
+        if (!user.enrolledCourses) user.enrolledCourses = [];
+        const isEnrolled = user.enrolledCourses.some(
+          (c) => c && c.toString() === courseId.toString()
+        );
+        if (!isEnrolled) {
+          user.enrolledCourses.push(courseId);
+          await user.save();
+        }
+      }
+    } catch (uErr) {
+      console.warn("Could not sync user enrolledCourses:", uErr.message);
     }
 
     if (completedTopic && !progress.completedTopics.includes(completedTopic)) {

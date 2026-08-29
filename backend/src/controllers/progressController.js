@@ -47,7 +47,7 @@ const getCourseProgress = async (req, res) => {
 const updateProgress = async (req, res) => {
   try {
     const { courseId } = req.params;
-    const { completedTopic, completedLesson, quizResult } = req.body;
+    const { completedTopic, completedTopics, uncompletedTopic, toggleTopic, completedLesson, quizResult } = req.body;
 
     let progress = await Progress.findOne({
       user: req.user._id,
@@ -83,7 +83,17 @@ const updateProgress = async (req, res) => {
       console.warn("Could not sync user enrolledCourses:", uErr.message);
     }
 
-    if (completedTopic && !progress.completedTopics.includes(completedTopic)) {
+    if (Array.isArray(completedTopics)) {
+      progress.completedTopics = completedTopics;
+    } else if (toggleTopic) {
+      if (progress.completedTopics.includes(toggleTopic)) {
+        progress.completedTopics = progress.completedTopics.filter((t) => t !== toggleTopic);
+      } else {
+        progress.completedTopics.push(toggleTopic);
+      }
+    } else if (uncompletedTopic) {
+      progress.completedTopics = progress.completedTopics.filter((t) => t !== uncompletedTopic);
+    } else if (completedTopic && !progress.completedTopics.includes(completedTopic)) {
       progress.completedTopics.push(completedTopic);
     }
 
@@ -117,9 +127,11 @@ const updateProgress = async (req, res) => {
         );
       }
 
-      if (progress.percentage >= 100 && !progress.isCompleted) {
-        progress.isCompleted = true;
-        progress.completedAt = new Date();
+      if (progress.percentage >= 100) {
+        if (!progress.isCompleted) {
+          progress.isCompleted = true;
+          progress.completedAt = new Date();
+        }
 
         // Auto-generate certificate if not exists
         const certExists = await Certificate.findOne({ user: req.user._id, course: courseId });
@@ -132,6 +144,8 @@ const updateProgress = async (req, res) => {
             score: 95,
           });
         }
+      } else {
+        progress.isCompleted = false;
       }
     }
 

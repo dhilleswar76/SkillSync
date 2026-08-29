@@ -265,20 +265,56 @@ const getEnrolledCourses = async (req, res) => {
         isCompleted: false,
       };
 
+      const completedSet = new Set(progress.completedTopics || []);
       let totalTopics = 0;
+      let completedTopicsCount = 0;
+      let totalModules = 0;
+      let completedModulesCount = 0;
+      let nextTopic = null;
+
       if (courseObj.modules && Array.isArray(courseObj.modules)) {
-        courseObj.modules.forEach((m) => {
-          totalTopics += m.topics ? m.topics.length : 0;
+        totalModules = courseObj.modules.length;
+        courseObj.modules.forEach((m, modIdx) => {
+          let modTopicsTotal = m.topics ? m.topics.length : 0;
+          let modTopicsDone = 0;
+
+          if (m.topics && Array.isArray(m.topics)) {
+            m.topics.forEach((t, tIdx) => {
+              totalTopics += 1;
+              const key = `${modIdx}-${tIdx}`;
+              if (completedSet.has(key)) {
+                completedTopicsCount += 1;
+                modTopicsDone += 1;
+              } else if (!nextTopic) {
+                nextTopic = {
+                  title: t.title,
+                  moduleTitle: m.title,
+                  key,
+                };
+              }
+            });
+          }
+
+          if (modTopicsTotal > 0 && modTopicsDone === modTopicsTotal) {
+            completedModulesCount += 1;
+          }
         });
       }
+
+      const calculatedPercent = totalTopics > 0
+        ? Math.round((completedTopicsCount / totalTopics) * 100)
+        : (progress.percentage || 0);
 
       return {
         ...courseObj,
         progress: {
-          percentage: progress.percentage || 0,
-          completedTopicsCount: progress.completedTopics ? progress.completedTopics.length : 0,
-          totalTopics: totalTopics,
-          isCompleted: progress.isCompleted || false,
+          percentage: calculatedPercent,
+          completedTopicsCount,
+          totalTopics,
+          completedModulesCount,
+          totalModules,
+          nextTopic,
+          isCompleted: calculatedPercent >= 100 || progress.isCompleted,
           updatedAt: progress.updatedAt || null,
         },
       };

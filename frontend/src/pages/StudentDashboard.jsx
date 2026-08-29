@@ -7,24 +7,22 @@ export default function StudentDashboard() {
   const { user, requireAuth } = useAuth();
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [availableCourses, setAvailableCourses] = useState([]);
-  const [progressList, setProgressList] = useState([]);
   const [solvedProblemCount, setSolvedProblemCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [enrollingId, setEnrollingId] = useState(null);
+  const [expandedCourseId, setExpandedCourseId] = useState(null);
 
   // Fetch live enrolled courses and overall progress
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      const [enrolledRes, allCoursesRes, progressRes] = await Promise.all([
+      const [enrolledRes, allCoursesRes] = await Promise.all([
         API.get("/courses/enrolled").catch(() => ({ data: [] })),
         API.get("/courses").catch(() => ({ data: [] })),
-        API.get("/progress").catch(() => ({ data: [] })),
       ]);
 
       setEnrolledCourses(enrolledRes.data || []);
       setAvailableCourses(allCoursesRes.data || []);
-      setProgressList(progressRes.data || []);
 
       // Calculate solved coding sheet problems from localStorage
       try {
@@ -68,7 +66,9 @@ export default function StudentDashboard() {
     }, "Sign in to enroll in courses and track your real-time learning progress.");
   };
 
-  // Real Stats (Zero-based accurate calculations for new & existing users)
+  // Real Stats Calculations
+  const totalEnrolled = enrolledCourses.length;
+
   const completedCoursesCount = enrolledCourses.filter(
     (c) => c.progress && (c.progress.percentage >= 100 || c.progress.isCompleted)
   ).length;
@@ -78,20 +78,36 @@ export default function StudentDashboard() {
     0
   );
 
+  const totalPossibleTopics = enrolledCourses.reduce(
+    (acc, c) => acc + (c.progress?.totalTopics || 0),
+    0
+  );
+
+  // Overall average course completion percentage
+  const overallCompletionPercentage =
+    totalEnrolled > 0
+      ? Math.round(
+          enrolledCourses.reduce((acc, c) => acc + (c.progress?.percentage || 0), 0) /
+            totalEnrolled
+        )
+      : 0;
+
   const stats = [
     {
       label: "Enrolled Courses",
-      value: enrolledCourses.length,
+      value: totalEnrolled,
       icon: "📚",
       color: "text-blue-400",
       bg: "bg-blue-950/40 border-blue-800/60",
+      subtitle: totalEnrolled === 0 ? "No active courses" : `${totalEnrolled} active courses`,
     },
     {
-      label: "Completed Topics",
-      value: totalCompletedTopics,
-      icon: "✅",
-      color: "text-emerald-400",
-      bg: "bg-emerald-950/40 border-emerald-800/60",
+      label: "Overall Completion",
+      value: `${overallCompletionPercentage}%`,
+      icon: "📊",
+      color: "text-rose-400",
+      bg: "bg-rose-950/40 border-rose-800/60",
+      subtitle: `${totalCompletedTopics} / ${totalPossibleTopics || 0} topics done`,
     },
     {
       label: "Coding Problems Solved",
@@ -99,6 +115,7 @@ export default function StudentDashboard() {
       icon: "🔥",
       color: "text-red-400",
       bg: "bg-red-950/40 border-red-800/60",
+      subtitle: "Across 13 SDE sheets",
     },
     {
       label: "Certificates Earned",
@@ -106,6 +123,7 @@ export default function StudentDashboard() {
       icon: "🏆",
       color: "text-amber-400",
       bg: "bg-amber-950/40 border-amber-800/60",
+      subtitle: `${completedCoursesCount} courses mastered`,
     },
   ];
 
@@ -125,13 +143,13 @@ export default function StudentDashboard() {
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-950/80 border border-red-800/60 text-red-400 text-xs font-bold">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-              Student Learning Command Center
+              Live Student Learning Command Center
             </div>
             <h1 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
               Welcome back, {user?.name || "Student"} 👋
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
-              Track your active course enrollments, real-time syllabus completion progress, and daily coding sheets in one place.
+              Real-time tracking of your course syllabus completion, topic milestones, and SDE problem solving.
             </p>
           </div>
 
@@ -140,13 +158,13 @@ export default function StudentDashboard() {
               to="/all-courses"
               className="px-5 py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-white font-bold text-xs rounded-xl transition-all shadow-md flex items-center gap-2"
             >
-              <span>📚 Browse Courses</span>
+              <span>📚 Course Catalog</span>
             </Link>
             <Link
               to="/sheets"
               className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-red-950/60 transition-all flex items-center gap-2"
             >
-              <span>🔥 Coding Sheets</span>
+              <span>🔥 Practice Sheets</span>
               <span>→</span>
             </Link>
           </div>
@@ -166,30 +184,33 @@ export default function StudentDashboard() {
                 {loading ? "..." : s.value}
               </span>
             </div>
-            <p className="text-xs font-bold text-slate-300">{s.label}</p>
+            <div>
+              <p className="text-xs font-bold text-slate-300">{s.label}</p>
+              <p className="text-[11px] text-slate-500 font-medium">{s.subtitle}</p>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* Real-Time Enrolled Courses Section */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Real-Time Course Progress Section */}
+      <div className="space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
           <div className="space-y-0.5">
             <h2 className="text-xl font-black text-white flex items-center gap-2">
               <span>📖</span>
-              <span>My Enrolled Courses</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
-                {enrolledCourses.length}
+              <span>Enrolled Courses & Live Progress</span>
+              <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-red-950 text-red-400 border border-red-800/60">
+                {totalEnrolled} Active
               </span>
             </h2>
             <p className="text-xs text-slate-400">
-              Live tracking of your learning progress across each registered course.
+              Granular breakdown of completed modules, topics, and next lessons to resume.
             </p>
           </div>
 
           <Link
             to="/all-courses"
-            className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors flex items-center gap-1"
+            className="text-xs font-bold text-red-400 hover:text-red-300 transition-colors flex items-center gap-1 self-start sm:self-auto"
           >
             <span>+ Enroll in More Courses</span>
           </Link>
@@ -198,7 +219,7 @@ export default function StudentDashboard() {
         {loading ? (
           <div className="p-12 text-center bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
             <div className="w-8 h-8 border-4 border-slate-800 border-t-red-500 rounded-full animate-spin mx-auto" />
-            <p className="text-xs text-slate-400">Loading your enrolled courses...</p>
+            <p className="text-xs text-slate-400">Fetching real-time course progress from database...</p>
           </div>
         ) : enrolledCourses.length === 0 ? (
           /* Empty State for Brand New User */
@@ -209,7 +230,7 @@ export default function StudentDashboard() {
             <div className="space-y-1 max-w-md mx-auto">
               <h3 className="text-lg font-bold text-white">No Enrolled Courses Yet</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
-                You haven't enrolled in any courses yet. Explore our curated course catalog in DSA, Full Stack Web Development, System Design, and AI to start learning!
+                You currently have 0 active courses. Choose a course from our catalog in DSA, Full Stack, System Design, or Machine Learning to start tracking your completion progress!
               </p>
             </div>
             <Link
@@ -221,99 +242,186 @@ export default function StudentDashboard() {
             </Link>
           </div>
         ) : (
-          /* Real Enrolled Courses Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          /* Real Enrolled Courses Detailed Cards */
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {enrolledCourses.map((course) => {
-              const progress = course.progress || { percentage: 0, completedTopicsCount: 0, totalTopics: 0 };
+              const progress = course.progress || {
+                percentage: 0,
+                completedTopicsCount: 0,
+                totalTopics: 0,
+                completedModulesCount: 0,
+                totalModules: 0,
+                nextTopic: null,
+              };
+
               const isDone = progress.percentage >= 100 || progress.isCompleted;
+              const isExpanded = expandedCourseId === course._id;
 
               return (
                 <div
                   key={course._id}
-                  className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl overflow-hidden shadow-xl flex flex-col justify-between transition-all group"
+                  className={`bg-slate-900 border rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all ${
+                    isDone
+                      ? "border-emerald-800/80 ring-1 ring-emerald-500/20"
+                      : "border-slate-800 hover:border-slate-700"
+                  }`}
                 >
-                  <div>
-                    {/* Course Thumbnail & Badges */}
-                    <div className="h-40 overflow-hidden relative">
+                  <div className="p-5 sm:p-6 space-y-5">
+                    {/* Top Row: Thumbnail + Title + Progress Pill */}
+                    <div className="flex items-start gap-4">
                       <img
                         src={
                           course.thumbnail ||
                           "https://images.unsplash.com/photo-1516116211227-bbc0656a811c?w=800"
                         }
                         alt={course.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border border-slate-800 shrink-0"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-transparent" />
-                      
-                      <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                        <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-950/90 text-red-400 border border-slate-800 backdrop-blur-sm">
-                          {course.category || "Course"}
+
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-slate-950 text-red-400 border border-slate-800">
+                            {course.category || "Course"}
+                          </span>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">
+                            {course.level || "Beginner"}
+                          </span>
+                          {isDone ? (
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800">
+                              ✓ 100% Completed
+                            </span>
+                          ) : (
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-800">
+                              {progress.percentage}% Completed
+                            </span>
+                          )}
+                        </div>
+
+                        <h3 className="font-extrabold text-base sm:text-lg text-white truncate">
+                          {course.title}
+                        </h3>
+
+                        <p className="text-xs text-slate-400 line-clamp-1">
+                          {course.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Progress Bar & Real-time Metrics */}
+                    <div className="p-4 bg-slate-950/90 border border-slate-800/90 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between text-xs font-bold">
+                        <span className="text-slate-300 flex items-center gap-1.5">
+                          <span>Syllabus Completion:</span>
                         </span>
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-950/90 text-slate-300 border border-slate-800 backdrop-blur-sm">
-                          {course.level || "Beginner"}
+                        <span className={isDone ? "text-emerald-400 font-extrabold" : "text-rose-400 font-extrabold"}>
+                          {progress.percentage}% ({progress.completedTopicsCount} / {progress.totalTopics || "All"} Topics)
                         </span>
                       </div>
 
-                      {isDone && (
-                        <span className="absolute top-3 right-3 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-950 text-emerald-400 border border-emerald-800 backdrop-blur-sm flex items-center gap-1">
-                          <span>✓</span>
-                          <span>Completed</span>
-                        </span>
-                      )}
-                    </div>
+                      {/* Animated Gradient Bar */}
+                      <div className="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                        <div
+                          className={`h-full rounded-full transition-all duration-700 ${
+                            isDone
+                              ? "bg-emerald-500"
+                              : "bg-gradient-to-r from-red-600 via-rose-500 to-amber-500"
+                          }`}
+                          style={{ width: `${Math.max(4, progress.percentage)}%` }}
+                        />
+                      </div>
 
-                    {/* Content */}
-                    <div className="p-5 space-y-3">
-                      <h3 className="font-bold text-base text-white group-hover:text-red-400 transition-colors line-clamp-1">
-                        {course.title}
-                      </h3>
-                      <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                        {course.description}
-                      </p>
-
-                      {/* Real-time Progress Bar */}
-                      <div className="pt-2 space-y-1.5">
-                        <div className="flex items-center justify-between text-xs font-bold">
-                          <span className="text-slate-400">Course Progress:</span>
-                          <span className={isDone ? "text-emerald-400" : "text-red-400"}>
-                            {progress.percentage}%
+                      {/* Sub-metrics */}
+                      <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-400 border-t border-slate-900">
+                        <div className="flex items-center gap-1.5">
+                          <span>📦 Modules:</span>
+                          <span className="text-white font-semibold">
+                            {progress.completedModulesCount || 0} of {progress.totalModules || (course.modules ? course.modules.length : 0)} Done
                           </span>
                         </div>
-
-                        <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-slate-800">
-                          <div
-                            className={`h-full rounded-full transition-all duration-500 ${
-                              isDone
-                                ? "bg-emerald-500"
-                                : "bg-gradient-to-r from-red-600 via-rose-500 to-amber-500"
-                            }`}
-                            style={{ width: `${Math.max(5, progress.percentage)}%` }}
-                          />
-                        </div>
-
-                        <div className="flex items-center justify-between text-[11px] text-slate-500">
-                          <span>
-                            {progress.completedTopicsCount} of {progress.totalTopics || "All"} topics completed
+                        <div className="flex items-center gap-1.5 justify-end">
+                          <span>⏱️ Course Duration:</span>
+                          <span className="text-white font-semibold">
+                            {course.duration ? `${course.duration} Hours` : "Self-paced"}
                           </span>
-                          <span>{course.duration ? `${course.duration} hrs` : "Self-paced"}</span>
                         </div>
                       </div>
                     </div>
+
+                    {/* Next Lesson / Topic to Resume */}
+                    {!isDone && progress.nextTopic && (
+                      <div className="p-3 bg-red-950/20 border border-red-900/40 rounded-xl text-xs flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2 truncate">
+                          <span className="text-red-400 font-bold shrink-0">📍 Up Next:</span>
+                          <span className="text-slate-200 font-semibold truncate">
+                            {progress.nextTopic.title}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 shrink-0 hidden sm:inline">
+                          {progress.nextTopic.moduleTitle}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Expandable Module Breakdown Checklist */}
+                    {course.modules && course.modules.length > 0 && (
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => setExpandedCourseId(isExpanded ? null : course._id)}
+                          className="text-[11px] font-bold text-slate-400 hover:text-slate-200 flex items-center gap-1.5"
+                        >
+                          <span>{isExpanded ? "▼ Hide Modules Breakdown" : "▶ View Modules Breakdown"}</span>
+                        </button>
+
+                        {isExpanded && (
+                          <div className="space-y-2 pt-2 animate-fadeIn">
+                            {course.modules.map((mod, mIdx) => (
+                              <div
+                                key={mIdx}
+                                className="p-3 rounded-xl bg-slate-950/60 border border-slate-800/80 text-xs space-y-1.5"
+                              >
+                                <div className="flex items-center justify-between font-bold text-slate-300">
+                                  <span>{mod.title}</span>
+                                  <span className="text-[10px] text-slate-500">{mod.duration}</span>
+                                </div>
+                                <div className="space-y-1 pl-2">
+                                  {mod.topics &&
+                                    mod.topics.map((t, tIdx) => (
+                                      <div key={tIdx} className="text-[11px] text-slate-400 flex items-center gap-2">
+                                        <span className="text-slate-600">•</span>
+                                        <span className="truncate">{t.title}</span>
+                                      </div>
+                                    ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Actions */}
-                  <div className="p-5 pt-0">
+                  {/* Card Action Footer */}
+                  <div className="p-5 pt-0 border-t border-slate-800/60 flex items-center gap-3">
                     <Link
                       to={`/course/${course._id}`}
-                      className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                      className={`flex-1 py-3 px-4 rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-2 shadow-lg ${
                         isDone
                           ? "bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40"
-                          : "bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-950/50"
+                          : "bg-red-600 hover:bg-red-500 text-white shadow-red-950/50 hover:scale-[1.02]"
                       }`}
                     >
-                      <span>{isDone ? "Review Course" : "Continue Learning"}</span>
+                      <span>{isDone ? "Review Course Curriculum" : "Resume Learning"}</span>
                       <span>→</span>
                     </Link>
+
+                    {isDone && (
+                      <Link
+                        to="/certificates"
+                        className="py-3 px-4 rounded-xl text-xs font-bold bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 transition-all flex items-center gap-1.5"
+                      >
+                        <span>🏆 Certificate</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
               );
@@ -324,7 +432,7 @@ export default function StudentDashboard() {
 
       {/* Recommended Courses to Explore & Enroll */}
       {recommendedCourses.length > 0 && (
-        <div className="space-y-4 pt-4 border-t border-slate-800/80">
+        <div className="space-y-4 pt-6 border-t border-slate-800/80">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
@@ -332,11 +440,11 @@ export default function StudentDashboard() {
                 <span>Recommended Courses for You</span>
               </h2>
               <p className="text-xs text-slate-400">
-                Level up your technical skills with our most popular curriculums.
+                Explore popular tech curriculums to expand your skillset.
               </p>
             </div>
             <Link to="/all-courses" className="text-xs text-red-400 hover:underline">
-              View All Catalog →
+              View Catalog →
             </Link>
           </div>
 
@@ -344,7 +452,7 @@ export default function StudentDashboard() {
             {recommendedCourses.map((course) => (
               <div
                 key={course._id}
-                className="p-4 bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl flex flex-col justify-between space-y-3 group"
+                className="p-5 bg-slate-900/80 border border-slate-800 hover:border-slate-700 rounded-2xl flex flex-col justify-between space-y-3 group"
               >
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-[10px]">
@@ -361,17 +469,17 @@ export default function StudentDashboard() {
                   </p>
                 </div>
 
-                <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
                   <button
                     onClick={() => handleQuickEnroll(course._id)}
                     disabled={enrollingId === course._id}
-                    className="flex-1 py-1.5 px-3 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/40 text-xs font-bold rounded-lg transition-all text-center"
+                    className="flex-1 py-2 px-3 bg-red-600/20 hover:bg-red-600 text-red-300 hover:text-white border border-red-500/40 text-xs font-bold rounded-xl transition-all text-center"
                   >
                     {enrollingId === course._id ? "Enrolling..." : "+ Quick Enroll"}
                   </button>
                   <Link
                     to={`/course/${course._id}`}
-                    className="py-1.5 px-3 bg-slate-950 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg border border-slate-800 transition-colors"
+                    className="py-2 px-3 bg-slate-950 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl border border-slate-800 transition-colors"
                   >
                     View
                   </Link>

@@ -97,6 +97,69 @@ const login = async (req, res) => {
   }
 };
 
+// Helper to find or create an OAuth user safely with duplicate index auto-recovery
+const findOrCreateOAuthUser = async ({ name, email, provider, avatar, providerId }) => {
+  const normalizedEmail = email.toLowerCase();
+  let user = await User.findOne({ email: normalizedEmail });
+
+  if (!user) {
+    try {
+      user = await User.create({
+        name: name || normalizedEmail.split("@")[0],
+        email: normalizedEmail,
+        provider: provider.toLowerCase(),
+        role: "student",
+        avatar: avatar || "",
+        googleId: provider.toLowerCase() === "google" ? providerId : undefined,
+        githubId: provider.toLowerCase() === "github" ? providerId : undefined,
+      });
+    } catch (createErr) {
+      if (createErr.code === 11000) {
+        // If duplicate key error on phone index, drop index and retry
+        if (createErr.message && createErr.message.includes("phone")) {
+          try {
+            await User.collection.dropIndex("phone_1");
+            console.log("✅ Auto-dropped legacy phone_1 index on retry");
+          } catch (e) {}
+          user = await User.create({
+            name: name || normalizedEmail.split("@")[0],
+            email: normalizedEmail,
+            provider: provider.toLowerCase(),
+            role: "student",
+            avatar: avatar || "",
+            googleId: provider.toLowerCase() === "google" ? providerId : undefined,
+            githubId: provider.toLowerCase() === "github" ? providerId : undefined,
+          });
+        } else {
+          // If user was created concurrently, fetch by email
+          user = await User.findOne({ email: normalizedEmail });
+        }
+      } else {
+        throw createErr;
+      }
+    }
+  } else {
+    let updated = false;
+    if (provider.toLowerCase() === "google" && !user.googleId && providerId) {
+      user.googleId = providerId;
+      updated = true;
+    }
+    if (provider.toLowerCase() === "github" && !user.githubId && providerId) {
+      user.githubId = providerId;
+      updated = true;
+    }
+    if (!user.avatar && avatar) {
+      user.avatar = avatar;
+      updated = true;
+    }
+    if (updated) {
+      await user.save();
+    }
+  }
+
+  return user;
+};
+
 // @desc OAuth Login via API direct payload (Google / GitHub)
 // @route POST /api/auth/oauth-login
 const oauthLogin = async (req, res) => {
@@ -115,37 +178,13 @@ const oauthLogin = async (req, res) => {
       return res.status(400).json({ message: "OAuth email is invalid" });
     }
 
-    const normalizedEmail = email.toLowerCase();
-    let user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      user = await User.create({
-        name: name || normalizedEmail.split("@")[0],
-        email: normalizedEmail,
-        provider: provider.toLowerCase(),
-        role: "student",
-        avatar: avatar || "",
-        googleId: provider.toLowerCase() === "google" ? providerId : undefined,
-        githubId: provider.toLowerCase() === "github" ? providerId : undefined,
-      });
-    } else {
-      let updated = false;
-      if (provider.toLowerCase() === "google" && !user.googleId && providerId) {
-        user.googleId = providerId;
-        updated = true;
-      }
-      if (provider.toLowerCase() === "github" && !user.githubId && providerId) {
-        user.githubId = providerId;
-        updated = true;
-      }
-      if (!user.avatar && avatar) {
-        user.avatar = avatar;
-        updated = true;
-      }
-      if (updated) {
-        await user.save();
-      }
-    }
+    const user = await findOrCreateOAuthUser({
+      name,
+      email,
+      provider,
+      avatar,
+      providerId,
+    });
 
     res.json({
       _id: user._id,
@@ -278,30 +317,13 @@ const googleCallback = async (req, res) => {
       );
     }
 
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = await User.create({
-        name,
-        email,
-        provider: "google",
-        role: "student",
-        avatar,
-        googleId,
-      });
-    } else {
-      let updated = false;
-      if (!user.googleId) {
-        user.googleId = googleId;
-        updated = true;
-      }
-      if (!user.avatar && avatar) {
-        user.avatar = avatar;
-        updated = true;
-      }
-      if (updated) {
-        await user.save();
-      }
-    }
+    const user = await findOrCreateOAuthUser({
+      name,
+      email,
+      provider: "google",
+      avatar,
+      providerId: googleId,
+    });
 
     const token = generateToken(user._id);
     const userPayload = {
@@ -475,30 +497,13 @@ const githubCallback = async (req, res) => {
       );
     }
 
-    let user = await User.findOne({ email: normalizedEmail });
-    if (!user) {
-      user = await User.create({
-        name,
-        email: normalizedEmail,
-        provider: "github",
-        role: "student",
-        avatar,
-        githubId,
-      });
-    } else {
-      let updated = false;
-      if (!user.githubId) {
-        user.githubId = githubId;
-        updated = true;
-      }
-      if (!user.avatar && avatar) {
-        user.avatar = avatar;
-        updated = true;
-      }
-      if (updated) {
-        await user.save();
-      }
-    }
+    const user = await findOrCreateOAuthUser({
+      name,
+      email: normalizedEmail,
+      provider: "github",
+      avatar,
+      providerId: githubId,
+    });
 
     const token = generateToken(user._id);
     const userPayload = {

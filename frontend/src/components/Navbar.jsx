@@ -1,227 +1,99 @@
-import { useContext, useState, useRef, useEffect } from "react";
-import { ThemeContext } from "../context/ThemeContext";
-import { AuthContext } from "../context/AuthContext";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 
-const Navbar = () => {
-  const { darkMode, setDarkMode } = useContext(ThemeContext);
-  const { user, logout } = useContext(AuthContext);
+export default function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
-  const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const dropdownRef = useRef(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowProfileMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleLogout = () => {
-    setShowProfileMenu(false);
-    logout();
-  };
-
-  const handleProfileClick = () => {
-    setShowProfileMenu(false);
-    navigate('/profile');
-  };
 
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-100 dark:border-gray-800">
-      <div className="px-4 sm:px-6 py-3 sm:py-4 flex justify-between items-center">
-        <Link to="/" className="text-xl sm:text-2xl font-bold text-primary hover:text-primary-dark transition">
-          SkillSync
+    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/80 backdrop-blur-md">
+      <div className="max-w-7xl mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md shadow-red-950/50">
+            S
+          </div>
+          <span className="text-xl font-extrabold tracking-tight text-white">
+            Skill<span className="text-red-500">Sync</span>
+          </span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex gap-4 items-center">
-          {/* Public navigation links for non-authenticated users */}
-          {!user && (
+        {/* Center Nav Links */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
+          <Link to="/all-courses" className="hover:text-red-400 transition-colors">
+            Courses
+          </Link>
+          <Link to="/sheets" className="text-red-400 font-semibold flex items-center gap-1">
+            <span>🔥</span>
+            <span>Coding Sheets</span>
+          </Link>
+          <Link to="/roadmaps" className="hover:text-red-400 transition-colors">
+            Roadmaps
+          </Link>
+          {isAuthenticated && (
             <>
-              <Link
-                to="/all-courses"
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
-              >
-                Courses
+              <Link to="/dashboard" className="hover:text-red-400 transition-colors">
+                Dashboard
               </Link>
-              <Link
-                to="/sheets"
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
-              >
-                Coding Sheets
+              <Link to="/practice" className="hover:text-red-400 transition-colors">
+                Code IDE
               </Link>
             </>
           )}
+        </nav>
 
-          {/* Theme Toggle - Icon Only */}
+        {/* Right Actions */}
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition text-xl"
-            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={toggleTheme}
+            className="p-2 rounded-lg text-slate-400 hover:text-slate-100 hover:bg-slate-900 transition-colors"
+            title="Toggle theme"
           >
-            {darkMode ? "☀️" : "🌙"}
+            {isDark ? "☀️" : "🌙"}
           </button>
 
-          {/* Show Login/Register when NOT logged in */}
-          {!user && (
-            <>
+          {isAuthenticated ? (
+            <div className="flex items-center gap-3">
+              <Link
+                to="/dashboard"
+                className="flex items-center gap-2 text-sm font-semibold text-white hover:text-red-400"
+              >
+                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-red-400">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </div>
+                <span className="hidden sm:inline">{user?.name || "Student"}</span>
+              </Link>
+              <button
+                onClick={() => {
+                  logout();
+                  navigate("/");
+                }}
+                className="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-900 text-xs font-semibold text-slate-300 hover:bg-slate-800 transition-colors"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary font-medium transition"
+                className="px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
               >
-                Login
+                Sign In
               </Link>
               <Link
                 to="/register"
-                className="px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
+                className="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-xs font-semibold text-white shadow-md shadow-red-950/40 transition-all"
               >
-                Sign Up
+                Get Started
               </Link>
-            </>
-          )}
-
-          {/* Profile Dropdown - Only when logged in */}
-          {user && (
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowProfileMenu(!showProfileMenu)}
-                className="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-full hover:bg-primary-dark transition font-semibold text-sm shadow-md"
-                aria-label="Profile menu"
-                title={user.name}
-              >
-                {user.name ? user.name.charAt(0).toUpperCase() : '👤'}
-              </button>
-
-              {/* Dropdown Menu */}
-              {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
-                      {user.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                      {user.email}
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleProfileClick}
-                    className="w-full text-left px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition flex items-center gap-3"
-                  >
-                    <span className="text-lg">👤</span>
-                    <span>Profile</span>
-                  </button>
-                  <hr className="my-1 border-gray-200 dark:border-gray-700" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-primary hover:bg-red-50 dark:hover:bg-red-900/20 transition flex items-center gap-3"
-                  >
-                    <span className="text-lg">🚪</span>
-                    <span>Logout</span>
-                  </button>
-                </div>
-              )}
             </div>
           )}
         </div>
-
-        {/* Mobile Menu Button & Theme Toggle */}
-        <div className="flex md:hidden items-center gap-2">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="w-9 h-9 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition text-lg"
-            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-          >
-            {darkMode ? "☀️" : "🌙"}
-          </button>
-          
-          <button
-            onClick={() => setShowMobileMenu(!showMobileMenu)}
-            className="w-9 h-9 flex items-center justify-center bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition"
-            aria-label="Toggle menu"
-          >
-            {showMobileMenu ? '✕' : '☰'}
-          </button>
-        </div>
       </div>
-
-      {/* Mobile Menu */}
-      {showMobileMenu && (
-        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 pb-4">
-          <div className="px-4 pt-2 space-y-1">
-            {!user && (
-              <>
-                <Link
-                  to="/all-courses"
-                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  📚 Courses
-                </Link>
-                <Link
-                  to="/sheets"
-                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  📋 Coding Sheets
-                </Link>
-                <hr className="my-2 border-gray-200 dark:border-gray-700" />
-                <Link
-                  to="/login"
-                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="block px-4 py-3 bg-primary text-white rounded-lg font-medium text-center"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  Sign Up
-                </Link>
-              </>
-            )}
-            
-            {user && (
-              <>
-                <div className="px-4 py-3 bg-gray-50 dark:bg-gray-800 rounded-lg mb-2">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    {user.name}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {user.email}
-                  </p>
-                </div>
-                <Link
-                  to="/profile"
-                  className="block px-4 py-3 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
-                  onClick={() => setShowMobileMenu(false)}
-                >
-                  👤 Profile
-                </Link>
-                <button
-                  onClick={() => {
-                    setShowMobileMenu(false);
-                    handleLogout();
-                  }}
-                  className="w-full text-left px-4 py-3 text-primary hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition"
-                >
-                  🚪 Logout
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-    </nav>
+    </header>
   );
-};
-
-export default Navbar;
+}

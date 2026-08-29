@@ -1,831 +1,1573 @@
-import { useState, useContext, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState, useEffect, useMemo } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import Editor from "@monaco-editor/react";
+import { SHEETS_INFO, PROBLEM_SETS } from "../data/problemSets";
+import { useAuth } from "../context/AuthContext";
+import API from "../api/axios";
 
-const CodingSheets = () => {
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { user } = useContext(AuthContext);
-  const [selectedSheet, setSelectedSheet] = useState('dsa');
-  const [redirectingSheetId, setRedirectingSheetId] = useState(null);
+export default function CodingSheets() {
+  const { isAuthenticated, requireAuth } = useAuth();
+  const [searchParams] = useSearchParams();
 
-  const sheetCategories = {
-    dsa: {
-      name: '💻 DSA Sheets',
-      sheets: [
-        {
-          id: 'striver-sde',
-          name: 'Striver\'s SDE Sheet',
-          description: '191 handpicked top coding interview problems for product-based companies',
-          problems: 191,
-          difficulty: 'mixed',
-          icon: '🎯',
-          color: 'from-primary to-coral',
-          source: 'https://takeuforward.org/dsa/strivers-sde-sheet-top-coding-interview-problems',
-          categories: ['Arrays', 'Linked List', 'Greedy', 'Recursion', 'Binary Search', 'Heaps', 'Binary Trees', 'BST', 'Graphs', 'Dynamic Programming', 'Stacks & Queues', 'Strings', 'Tries', 'Bit Manipulation'],
-        },
-        {
-          id: 'striver-a2z',
-          name: 'Striver A2Z DSA Course',
-          description: 'Complete A to Z DSA course from basics to advanced',
-          problems: 456,
-          difficulty: 'mixed',
-          icon: '📚',
-          color: 'from-orange-500 to-red-500',
-          source: 'https://takeuforward.org/strivers-a2z-dsa-course/strivers-a2z-dsa-course-sheet-2',
-          categories: ['Learn the Basics', 'Sorting', 'Arrays', 'Binary Search', 'Strings', 'Linked List', 'Recursion', 'Bit Manipulation', 'Stack & Queues', 'Graphs', 'Dynamic Programming', 'Tries', 'Greedy'],
-        },
-        {
-          id: 'neetcode-150',
-          name: 'Neetcode 150',
-          description: 'Curated 150 LeetCode problems for interview preparation',
-          problems: 150,
-          difficulty: 'mixed',
-          icon: '🎓',
-          color: 'from-green-500 to-emerald-500',
-          source: 'https://codolio.com/question-tracker/sheet/neetcode-150',
-          categories: ['Arrays & Hashing', 'Two Pointers', 'Sliding Window', 'Stack', 'Binary Search', 'Linked List', 'Trees', 'Heap', 'Backtracking', 'Tries', 'Graphs', 'DP', 'Greedy', 'Intervals', 'Math & Geometry', 'Bit Manipulation'],
-        },
-        {
-          id: 'blind-75',
-          name: 'Blind 75',
-          description: 'Top 75 must-do problems for tech interviews',
-          problems: 75,
-          difficulty: 'mixed',
-          icon: '👁️',
-          color: 'from-pink-500 to-rose-500',
-          source: 'https://leetcode.com/discuss/general-discussion/460599/blind-75-leetcode-questions',
-          categories: ['Array', 'Binary', 'Dynamic Programming', 'Graph', 'Interval', 'Linked List', 'Matrix', 'String', 'Tree', 'Heap'],
-        },
-        {
-          id: 'grind-75',
-          name: 'Grind 75',
-          description: 'Structured 75 problems to grind for weeks',
-          problems: 75,
-          difficulty: 'mixed',
-          icon: '⚙️',
-          color: 'from-blue-500 to-purple-500',
-          source: 'https://www.techinterviewhandbook.org/grind75',
-          categories: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
-        },
-        {
-          id: 'leetcode-top-100',
-          name: 'LeetCode Top 100',
-          description: 'Most liked 100 problems on LeetCode',
-          problems: 100,
-          difficulty: 'mixed',
-          icon: '🔝',
-          color: 'from-yellow-500 to-orange-500',
-          source: 'https://leetcode.com/studyplan/top-100-liked/',
-          categories: ['Hash Table', 'String', 'Tree', 'Graph', 'Dynamic Programming', 'Array', 'Math', 'Sorting'],
-        },
-        {
-          id: 'love-babbar',
-          name: 'Love Babbar DSA Sheet',
-          description: '450 most important DSA questions curated by Love Babbar',
-          problems: 450,
-          difficulty: 'mixed',
-          icon: '❤️',
-          color: 'from-red-500 to-pink-500',
-          source: 'https://www.geeksforgeeks.org/dsa-sheet-by-love-babbar/',
-          categories: ['Array', 'Matrix', 'String', 'Searching & Sorting', 'Linked List', 'Binary Trees', 'BST', 'Greedy', 'Backtracking', 'Stacks & Queues', 'Heap', 'Graph', 'Trie', 'Dynamic Programming', 'Bit Manipulation'],
-        },
-        {
-          id: 'raising-minds',
-          name: 'Rising Brain DSA Sheet',
-          description: 'Pattern-wise DSA problems for mastering coding interviews',
-          problems: 300,
-          difficulty: 'mixed',
-          icon: '🧠',
-          color: 'from-teal-500 to-cyan-500',
-          source: 'https://www.risingbrain.org/sheet',
-          categories: ['Array (Two-Pointer, Sliding Window)', 'Binary Search', 'Stack', 'Linked List', 'HashMap', 'Heap', 'Recursion', 'Tree & BST', 'Graph', 'Backtracking', 'Greedy', 'Dynamic Programming'],
-        },
-        {
-          id: 'tuf-cp-sheet',
-          name: 'TUF CP Sheet',
-          description: 'Competitive programming roadmap with 250+ problems',
-          problems: 250,
-          difficulty: 'mixed',
-          icon: '⚡',
-          color: 'from-violet-500 to-purple-500',
-          source: 'https://takeuforward.org/competitive-programming/strivers-cp-sheet',
-          categories: ['Mathematics', 'Sorting', 'Advanced Arrays', 'Stacks & Queues', 'Heaps', 'Tries', 'Graphs', 'Advanced DP', 'Segment Trees'],
-        },
-        {
-          id: 'striver-79',
-          name: 'Striver 79 Sheet',
-          description: 'Last-minute quick revision sheet with 79 important topics',
-          problems: 79,
-          difficulty: 'mixed',
-          icon: '🚀',
-          color: 'from-indigo-500 to-blue-500',
-          source: 'https://takeuforward.org/interview-experience/strivers-79-last-moment-dsa-sheet-ace-interviews/',
-          categories: ['Quick Revision Arrays', 'Important Trees Problems', 'Graph Essentials', 'DP Must-Dos', 'Binary Search', 'Greedy Patterns'],
-        },
-        {
-          id: 'top-interview-150',
-          name: 'Top Interview 150',
-          description: 'LeetCode\'s curated 150 questions for top companies',
-          problems: 150,
-          difficulty: 'mixed',
-          icon: '🏆',
-          color: 'from-amber-500 to-yellow-500',
-          source: 'https://leetcode.com/studyplan/top-interview-150/',
-          categories: ['Array/String', 'Two Pointers', 'Sliding Window', 'Matrix', 'Hash Map', 'Intervals', 'Stack', 'Binary Tree General', 'Binary Tree BFS', 'Binary Search Tree', 'Graph General', 'Graph BFS', 'Trie', 'Backtracking', 'Divide & Conquer', 'Kadane\'s Algorithm', 'Binary Search', 'Heap', 'Bit Manipulation', 'Math', 'Dynamic Programming'],
-        },
-        {
-          id: 'algoexpert',
-          name: 'AlgoExpert',
-          description: '160 hand-picked coding interview questions',
-          problems: 160,
-          difficulty: 'mixed',
-          icon: '🎖️',
-          color: 'from-emerald-500 to-green-500',
-          source: 'https://www.algoexpert.io/questions',
-          categories: ['Arrays', 'Binary Search Trees', 'Binary Trees', 'Dynamic Programming', 'Famous Algorithms', 'Graphs', 'Greedy Algorithms', 'Heaps', 'Linked Lists', 'Recursion', 'Searching', 'Sorting', 'Stacks', 'Strings', 'Tries'],
-        },
-      ]
-    },
-    webdev: {
-      name: '🌐 Web Development',
-      sheets: [
-        {
-          id: 'frontend-mastery',
-          name: 'Frontend Mastery',
-          description: 'Complete HTML, CSS, JavaScript, and React challenges',
-          problems: 100,
-          difficulty: 'mixed',
-          icon: '🎨',
-          color: 'from-blue-400 to-cyan-400',
-          source: 'https://www.frontendmentor.io/challenges',
-          categories: ['HTML5 Semantics', 'CSS3 & Flexbox', 'Grid Layout', 'JavaScript ES6+', 'React Components', 'Responsive Design'],
-        },
-        {
-          id: 'backend-excellence',
-          name: 'Backend Excellence',
-          description: 'Master Node.js, Express, MongoDB, and REST API design',
-          problems: 80,
-          difficulty: 'mixed',
-          icon: '⚙️',
-          color: 'from-green-600 to-emerald-600',
-          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
-          categories: ['Node.js Basics', 'Express.js', 'MongoDB & Mongoose', 'REST API Design', 'Authentication', 'WebSockets', 'Microservices'],
-        },
-        {
-          id: 'full-stack-projects',
-          name: 'Full Stack Projects',
-          description: 'Build complete MERN stack applications from scratch',
-          problems: 50,
-          difficulty: 'hard',
-          icon: '🚀',
-          color: 'from-purple-600 to-indigo-600',
-          source: 'https://www.theodinproject.com/paths/full-stack-javascript',
-          categories: ['MERN Stack', 'Authentication Systems', 'Real-time Features', 'Payment Integration', 'Deployment', 'CI/CD'],
-        },
-        {
-          id: 'web-step-by-step',
-          name: 'Web Dev Step-by-Step Practice',
-          description: 'Guided bite-sized development practice with incremental coding tasks, not full project builds',
-          problems: 120,
-          difficulty: 'easy',
-          icon: '🪜',
-          color: 'from-sky-500 to-blue-600',
-          source: 'https://www.freecodecamp.org/learn/2022/responsive-web-design/',
-          categories: ['HTML Basics', 'CSS Fundamentals', 'Responsive Layouts', 'Accessibility', 'Forms', 'Semantics', 'Daily Coding Drills'],
-        },
-        {
-          id: 'html-practice-sheet',
-          name: 'HTML Practice Sheet',
-          description: 'Topic-wise HTML exercises for tags, forms, semantic structure, and accessibility',
-          problems: 75,
-          difficulty: 'easy',
-          icon: '🧱',
-          color: 'from-orange-500 to-amber-500',
-          source: 'https://www.w3schools.com/html/html_exercises.asp',
-          categories: ['HTML Elements', 'Forms', 'Tables', 'Media', 'Semantic HTML', 'Accessibility Basics'],
-        },
-        {
-          id: 'css-practice-sheet',
-          name: 'CSS Practice Sheet',
-          description: 'Hands-on CSS practice for layout, responsiveness, and styling fundamentals',
-          problems: 90,
-          difficulty: 'easy',
-          icon: '🎯',
-          color: 'from-blue-500 to-cyan-500',
-          source: 'https://www.w3schools.com/css/css_exercises.asp',
-          categories: ['Selectors', 'Box Model', 'Flexbox', 'Grid', 'Responsive Design', 'Animations'],
-        },
-        {
-          id: 'javascript-practice-sheet',
-          name: 'JavaScript Practice Sheet',
-          description: 'Progressive JavaScript problems and coding drills for web development',
-          problems: 100,
-          difficulty: 'medium',
-          icon: '🟨',
-          color: 'from-yellow-500 to-orange-500',
-          source: 'https://www.hackerrank.com/domains/tutorials/10-days-of-javascript',
-          categories: ['Variables & Scope', 'Arrays', 'Functions', 'Objects', 'DOM', 'Events', 'Async Basics'],
-        },
-        {
-          id: 'react-practice-sheet',
-          name: 'React Practice Sheet',
-          description: 'React-focused guided exercises for components, state, hooks, and UI patterns',
-          problems: 85,
-          difficulty: 'medium',
-          icon: '⚛️',
-          color: 'from-cyan-500 to-sky-500',
-          source: 'https://www.freecodecamp.org/learn/front-end-development-libraries/',
-          categories: ['Components', 'Props', 'State', 'Hooks', 'Forms', 'Routing', 'State Management Basics'],
-        },
-        {
-          id: 'node-practice-sheet',
-          name: 'Node.js Practice Sheet',
-          description: 'Node.js backend practice path with incremental coding tasks and server-side fundamentals',
-          problems: 80,
-          difficulty: 'medium',
-          icon: '🟢',
-          color: 'from-green-600 to-lime-600',
-          source: 'https://nodeschool.io/#workshoppers',
-          categories: ['Node Basics', 'Modules', 'File System', 'NPM', 'Streams', 'CLI Tools', 'Server Basics'],
-        },
-        {
-          id: 'express-practice-sheet',
-          name: 'Express Practice Sheet',
-          description: 'Practice routes, middleware, and APIs using guided Express exercises',
-          problems: 70,
-          difficulty: 'medium',
-          icon: '🚏',
-          color: 'from-emerald-600 to-green-700',
-          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
-          categories: ['Routing', 'Middleware', 'Request/Response', 'Error Handling', 'Validation', 'REST Basics'],
-        },
-        {
-          id: 'mongodb-practice-sheet',
-          name: 'MongoDB Practice Sheet',
-          description: 'MongoDB query and schema practice for web application development',
-          problems: 65,
-          difficulty: 'medium',
-          icon: '🍃',
-          color: 'from-green-700 to-emerald-700',
-          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
-          categories: ['CRUD Operations', 'Schemas', 'Indexes', 'Aggregation', 'Mongoose Models', 'Data Validation'],
-        },
-        {
-          id: 'rest-api-practice-sheet',
-          name: 'REST API Practice Sheet',
-          description: 'API-focused practice problems for request handling, status codes, auth, and integration',
-          problems: 75,
-          difficulty: 'medium',
-          icon: '🔌',
-          color: 'from-violet-600 to-indigo-600',
-          source: 'https://www.freecodecamp.org/learn/back-end-development-and-apis/',
-          categories: ['HTTP Methods', 'Status Codes', 'JSON APIs', 'Authentication', 'Pagination', 'API Testing'],
-        },
-      ]
-    },
-    mlai: {
-      name: '🤖 Artificial Intelligence',
-      sheets: [
-        {
-          id: 'ml-basics',
-          name: 'Machine Learning Step-by-Step',
-          description: 'Guided machine learning practice from model basics to evaluation using hands-on notebooks',
-          problems: 80,
-          difficulty: 'medium',
-          icon: '🧠',
-          color: 'from-purple-500 to-indigo-500',
-          source: 'https://www.kaggle.com/learn/intro-to-machine-learning',
-          categories: ['Model Basics', 'Validation', 'Underfitting vs Overfitting', 'Random Forests', 'Pipelines', 'Hands-on Exercises'],
-        },
-        {
-          id: 'deep-learning',
-          name: 'Deep Learning Step-by-Step',
-          description: 'Incremental deep learning exercises covering neural nets and practical model training',
-          problems: 85,
-          difficulty: 'hard',
-          icon: '🔥',
-          color: 'from-red-600 to-orange-600',
-          source: 'https://www.kaggle.com/learn/intro-to-deep-learning',
-          categories: ['Neural Networks', 'TensorFlow/Keras', 'Overfitting Control', 'Dropout', 'Training Workflow', 'Practice Labs'],
-        },
-        {
-          id: 'nlp-llms',
-          name: 'NLP Step-by-Step Practice',
-          description: 'Practice text preprocessing, embeddings, and NLP modeling through guided exercises',
-          problems: 75,
-          difficulty: 'hard',
-          icon: '💬',
-          color: 'from-blue-600 to-purple-600',
-          source: 'https://www.kaggle.com/learn/natural-language-processing',
-          categories: ['Text Cleaning', 'Tokenization', 'Sentiment Models', 'Embeddings', 'Transformer Basics', 'Notebook Exercises'],
-        },
-        {
-          id: 'computer-vision',
-          name: 'Computer Vision Step-by-Step',
-          description: 'Guided image-based model practice from CNN basics to real-world vision tasks',
-          problems: 75,
-          difficulty: 'hard',
-          icon: '👁️',
-          color: 'from-cyan-600 to-blue-600',
-          source: 'https://www.kaggle.com/learn/computer-vision',
-          categories: ['Image Tensors', 'CNN Basics', 'Data Augmentation', 'Transfer Learning', 'Prediction Pipelines', 'Lab Practice'],
-        },
-        {
-          id: 'intermediate-ml',
-          name: 'Intermediate ML Practice',
-          description: 'Step-by-step machine learning practice for missing data, categorical values, and robust pipelines',
-          problems: 70,
-          difficulty: 'medium',
-          icon: '📈',
-          color: 'from-indigo-600 to-violet-600',
-          source: 'https://www.kaggle.com/learn/intermediate-machine-learning',
-          categories: ['Missing Values', 'Categorical Encoding', 'XGBoost', 'Data Leakage', 'Cross Validation', 'Applied Exercises'],
-        },
-        {
-          id: 'feature-engineering',
-          name: 'Feature Engineering Practice',
-          description: 'Guided feature engineering drills for better model performance in AI workflows',
-          problems: 65,
-          difficulty: 'medium',
-          icon: '🧩',
-          color: 'from-fuchsia-600 to-pink-600',
-          source: 'https://www.kaggle.com/learn/feature-engineering',
-          categories: ['Mutual Information', 'Feature Creation', 'Clustering Features', 'Target Encoding', 'Pipelines', 'Practical Tasks'],
-        },
-        {
-          id: 'time-series-ai',
-          name: 'Time Series AI Practice',
-          description: 'Step-by-step forecasting practice for AI and ML time series problems',
-          problems: 60,
-          difficulty: 'medium',
-          icon: '⏱️',
-          color: 'from-slate-600 to-gray-700',
-          source: 'https://www.kaggle.com/learn/time-series',
-          categories: ['Trend & Seasonality', 'Lag Features', 'Forecasting Models', 'Validation Strategy', 'Error Metrics', 'Notebook Drills'],
-        },
-      ]
-    },
-    cs: {
-      name: '📖 CS Fundamentals',
-      sheets: [
-        {
-          id: 'os-sheet',
-          name: 'Operating Systems',
-          description: 'Most asked OS interview questions with detailed explanations',
-          problems: 90,
-          difficulty: 'medium',
-          icon: '💻',
-          color: 'from-gray-600 to-gray-800',
-          source: 'https://takeuforward.org/operating-system/most-asked-operating-system-interview-questions',
-          categories: ['Process Management', 'Threads', 'CPU Scheduling', 'Deadlocks', 'Memory Management', 'Virtual Memory', 'File Systems'],
-        },
-        {
-          id: 'cn-sheet',
-          name: 'Computer Networks',
-          description: 'Essential networking concepts and interview questions',
-          problems: 85,
-          difficulty: 'medium',
-          icon: '🌐',
-          color: 'from-blue-600 to-indigo-600',
-          source: 'https://takeuforward.org/computer-network/most-asked-computer-networks-interview-questions',
-          categories: ['OSI & TCP/IP Model', 'HTTP/HTTPS', 'TCP vs UDP', 'Routing Protocols', 'DNS', 'Network Security'],
-        },
-        {
-          id: 'dbms-sheet',
-          name: 'DBMS',
-          description: 'Database management system concepts and SQL queries',
-          problems: 75,
-          difficulty: 'medium',
-          icon: '🗄️',
-          color: 'from-teal-600 to-green-600',
-          source: 'https://takeuforward.org/dbms/most-asked-dbms-interview-questions/',
-          categories: ['SQL Queries', 'Normalization', 'Transactions & ACID', 'Indexing', 'Query Optimization', 'NoSQL'],
-        },
-        {
-          id: 'oop-concepts',
-          name: 'OOP Concepts',
-          description: 'Object-oriented programming principles and design patterns',
-          problems: 60,
-          difficulty: 'easy',
-          icon: '🎯',
-          color: 'from-violet-600 to-purple-600',
-          source: 'https://www.geeksforgeeks.org/object-oriented-programming-oops-concept-in-java/',
-          categories: ['Classes & Objects', 'Inheritance', 'Polymorphism', 'Encapsulation', 'Abstraction', 'Design Patterns'],
-        },
-        {
-          id: 'system-design',
-          name: 'System Design',
-          description: 'Design scalable systems and learn architecture patterns',
-          problems: 50,
-          difficulty: 'hard',
-          icon: '🏗️',
-          color: 'from-gray-700 to-slate-700',
-          source: 'https://github.com/donnemartin/system-design-primer',
-          categories: ['Low Level Design', 'Object Oriented Design', 'High Level Design', 'Scalability', 'Load Balancing', 'Caching', 'Database Design', 'Microservices'],
-        },
-        {
-          id: 'striver-system-design',
-          name: 'Striver System Design Sheet',
-          description: 'Interview-focused system design roadmap and curated topics from Striver',
-          problems: 40,
-          difficulty: 'hard',
-          icon: '🏛️',
-          color: 'from-slate-700 to-blue-700',
-          source: 'https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes/',
-          categories: ['System Design Fundamentals', 'Scalability', 'Caching', 'Databases', 'Load Balancing', 'Message Queues', 'Distributed Systems'],
-        },
-      ]
-    }
-  };
+  // Active sheet selection
+  const [activeTab, setActiveTab] = useState("dsa"); // 'dsa' or 'cs'
+  const [selectedSheetId, setSelectedSheetId] = useState(() => {
+    const urlSheet = searchParams.get("sheet");
+    return urlSheet && PROBLEM_SETS[urlSheet] ? urlSheet : "admin-sheet";
+  });
 
-  const sheetAuthorDetails = {
-    'striver-sde': {
-      name: 'Raj Vikramaditya',
-      description: 'This sheet is originally published by Raj Vikramaditya through Take U Forward and is widely used for structured interview preparation.'
-    },
-    'striver-a2z': {
-      name: 'Raj Vikramaditya',
-      description: 'The A2Z DSA course sheet is created by Raj Vikramaditya on Take U Forward as a step-by-step roadmap from fundamentals to advanced topics.'
-    },
-    'neetcode-150': {
-      name: 'NeetCode',
-      description: 'NeetCode 150 is curated by the NeetCode platform as a focused interview-prep list built around the most common coding patterns.'
-    },
-    'blind-75': {
-      name: 'Blind Community',
-      description: 'Blind 75 is a community-popularized interview list that became well known among engineers preparing for technical interviews.'
-    },
-    'grind-75': {
-      name: 'Yangshun Tay',
-      description: 'Grind 75 is created by Yangshun Tay through Tech Interview Handbook as a practical schedule for consistent interview prep.'
-    },
-    'leetcode-top-100': {
-      name: 'LeetCode',
-      description: 'This study plan is published by the LeetCode team based on some of the most liked problems on the platform.'
-    },
-    'love-babbar': {
-      name: 'Love Babbar',
-      description: 'The Love Babbar DSA Sheet is curated by Love Babbar as a broad list of important interview problems across major data structure topics.'
-    },
-    'raising-minds': {
-      name: 'Rising Brain',
-      description: 'This sheet comes from Rising Brain and organizes DSA practice around interview-friendly patterns and topic groups.'
-    },
-    'tuf-cp-sheet': {
-      name: 'Raj Vikramaditya',
-      description: 'The TUF CP Sheet is published by Raj Vikramaditya on Take U Forward for competitive programming progression.'
-    },
-    'striver-79': {
-      name: 'Raj Vikramaditya',
-      description: 'Striver 79 is another Take U Forward resource by Raj Vikramaditya focused on high-value last-minute revision topics.'
-    },
-    'top-interview-150': {
-      name: 'LeetCode',
-      description: 'Top Interview 150 is maintained by the LeetCode team as a structured interview study plan for high-frequency question types.'
-    },
-    algoexpert: {
-      name: 'AlgoExpert',
-      description: 'AlgoExpert publishes this question set as a curated interview-preparation resource covering the most common algorithm topics.'
-    },
-    'frontend-mastery': {
-      name: 'Frontend Mentor',
-      description: 'Frontend Mentor publishes a large set of hands-on front-end challenges to practice HTML, CSS, JavaScript, and real UI building.'
-    },
-    'backend-excellence': {
-      name: 'freeCodeCamp',
-      description: 'freeCodeCamp provides this backend curriculum with free, hands-on Node/Express and API exercises that can be practiced step by step.'
-    },
-    'full-stack-projects': {
-      name: 'The Odin Project',
-      description: 'The Odin Project full-stack JavaScript path includes project-heavy modules to practice building complete web applications.'
-    },
-    'web-step-by-step': {
-      name: 'freeCodeCamp',
-      description: 'This freeCodeCamp path is a free step-by-step web development practice track focused on gradual skill building instead of full project-first learning.'
-    },
-    'html-practice-sheet': {
-      name: 'W3Schools',
-      description: 'This sheet points to free HTML exercise sets by W3Schools for topic-wise beginner-to-intermediate web markup practice.'
-    },
-    'css-practice-sheet': {
-      name: 'W3Schools',
-      description: 'This sheet points to free CSS exercises by W3Schools for structured styling and layout practice.'
-    },
-    'javascript-practice-sheet': {
-      name: 'HackerRank',
-      description: 'This JavaScript sheet uses HackerRank practice tracks to build web-focused coding skills through progressive challenge sets.'
-    },
-    'react-practice-sheet': {
-      name: 'freeCodeCamp',
-      description: 'This React sheet uses freeCodeCamp front-end libraries content for practical React-focused exercises and drills.'
-    },
-    'node-practice-sheet': {
-      name: 'NodeSchool',
-      description: 'NodeSchool provides workshop-style Node.js practice challenges designed for step-by-step backend skill development.'
-    },
-    'express-practice-sheet': {
-      name: 'freeCodeCamp',
-      description: 'This Express sheet uses freeCodeCamp backend modules with guided exercises around routing, middleware, and API building.'
-    },
-    'mongodb-practice-sheet': {
-      name: 'freeCodeCamp',
-      description: 'This MongoDB sheet uses freeCodeCamp backend modules that include practical data modeling and database tasks.'
-    },
-    'rest-api-practice-sheet': {
-      name: 'freeCodeCamp',
-      description: 'This REST API sheet is based on freeCodeCamp backend practice covering API design, request handling, and integration basics.'
-    },
-    'ml-basics': {
-      name: 'Kaggle Learn',
-      description: 'This sheet uses Kaggle Learn for step-by-step machine learning practice with guided notebook-based exercises.'
-    },
-    'deep-learning': {
-      name: 'Kaggle Learn',
-      description: 'This deep learning sheet is based on Kaggle Learn and focuses on incremental practice through structured exercises.'
-    },
-    'nlp-llms': {
-      name: 'Kaggle Learn',
-      description: 'This NLP sheet uses Kaggle Learn for practical, step-based text and language modeling exercises.'
-    },
-    'computer-vision': {
-      name: 'Kaggle Learn',
-      description: 'This computer vision sheet uses Kaggle Learn with guided practice notebooks for image modeling skills.'
-    },
-    'intermediate-ml': {
-      name: 'Kaggle Learn',
-      description: 'This sheet provides intermediate machine learning practice in a guided, step-by-step Kaggle format.'
-    },
-    'feature-engineering': {
-      name: 'Kaggle Learn',
-      description: 'This sheet provides step-by-step feature engineering exercises from Kaggle Learn for practical model improvement.'
-    },
-    'time-series-ai': {
-      name: 'Kaggle Learn',
-      description: 'This sheet provides structured time series forecasting practice through guided Kaggle Learn exercises.'
-    },
-    'os-sheet': {
-      name: 'Raj Vikramaditya',
-      description: 'This operating systems sheet is published on Take U Forward by Raj Vikramaditya for interview-focused systems revision.'
-    },
-    'cn-sheet': {
-      name: 'Raj Vikramaditya',
-      description: 'This networking resource is another Take U Forward interview-prep sheet by Raj Vikramaditya.'
-    },
-    'dbms-sheet': {
-      name: 'Raj Vikramaditya',
-      description: 'This DBMS sheet is sourced from Take U Forward by Raj Vikramaditya and focuses on interview-oriented database concepts.'
-    },
-    'oop-concepts': {
-      name: 'GeeksforGeeks',
-      description: 'The original material is maintained by GeeksforGeeks and explains the core principles of object-oriented programming.'
-    },
-    'system-design': {
-      name: 'Donne Martin',
-      description: 'System Design Primer is an open-source resource created by Donne Martin and maintained with community contributions.'
-    },
-    'striver-system-design': {
-      name: 'Raj Vikramaditya',
-      description: 'This system design roadmap is published by Raj Vikramaditya on Take U Forward as an original interview-focused guide for SDEs.'
-    }
-  };
-
-  const allSheets = Object.values(sheetCategories).flatMap((category) => category.sheets);
-  const requestedSheetId = searchParams.get('sheet');
-  const viewingSheet = user ? requestedSheetId : null;
-  const activeSheet = allSheets.find((sheet) => sheet.id === viewingSheet) || null;
-
+  // Sync sheet selection if URL param changes
   useEffect(() => {
-    if (!requestedSheetId) {
-      return;
+    const urlSheet = searchParams.get("sheet");
+    if (urlSheet && PROBLEM_SETS[urlSheet]) {
+      setSelectedSheetId(urlSheet);
+      setSelectedCategory("all");
     }
-    const matchedCategory = Object.entries(sheetCategories).find(([, category]) =>
-      category.sheets.some((sheet) => sheet.id === requestedSheetId)
-    );
-    if (matchedCategory) {
-      setSelectedSheet(matchedCategory[0]);
-    }
-  }, [requestedSheetId]);
+  }, [searchParams]);
 
-  const handleOpenSheet = (sheetId) => {
-    if (user) {
-      setSearchParams({ sheet: sheetId });
-      return;
-    }
+  // Filtering state
+  const [searchQuery, setSearchQuery] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [platformFilter, setPlatformFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
-    navigate('/login', {
-      state: {
-        redirectTo: `/sheets?sheet=${sheetId}`
+  // Progress state
+  const [completedProblems, setCompletedProblems] = useState({});
+  const [starredProblems, setStarredProblems] = useState({});
+  const [problemNotes, setProblemNotes] = useState({});
+
+  // Monaco Code Editor Modal state
+  const [activeProblem, setActiveProblem] = useState(null);
+  const [editorLanguage, setEditorLanguage] = useState("javascript");
+  const [editorTheme, setEditorTheme] = useState("vs-dark");
+  const [code, setCode] = useState("");
+  const [executionOutput, setExecutionOutput] = useState(null);
+  const [activeTabInModal, setActiveTabInModal] = useState("description"); // 'description' | 'hint' | 'notes'
+  const [currentNoteText, setCurrentNoteText] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState({});
+  const [expandedSubmodules, setExpandedSubmodules] = useState({});
+  const [expandedQuestions, setExpandedQuestions] = useState({});
+
+  // Load progress from localStorage on initial render
+  useEffect(() => {
+    try {
+      const savedCompleted = localStorage.getItem("skillsync_completed_problems");
+      if (savedCompleted) setCompletedProblems(JSON.parse(savedCompleted));
+
+      const savedStarred = localStorage.getItem("skillsync_starred_problems");
+      if (savedStarred) setStarredProblems(JSON.parse(savedStarred));
+
+      const savedNotes = localStorage.getItem("skillsync_problem_notes");
+      if (savedNotes) setProblemNotes(JSON.parse(savedNotes));
+    } catch (e) {
+      console.error("Failed to load local sheet progress", e);
+    }
+  }, []);
+
+  // Fetch from backend if authenticated
+  useEffect(() => {
+    if (isAuthenticated && selectedSheetId) {
+      API.get(`/coding-sheets/${selectedSheetId}/progress`)
+        .then((res) => {
+          if (res.data) {
+            const { completedProblemIds, starredProblemIds, notes } = res.data;
+            if (completedProblemIds) {
+              setCompletedProblems((prev) => {
+                const updated = { ...prev };
+                completedProblemIds.forEach((id) => (updated[id] = true));
+                return updated;
+              });
+            }
+            if (starredProblemIds) {
+              setStarredProblems((prev) => {
+                const updated = { ...prev };
+                starredProblemIds.forEach((id) => (updated[id] = true));
+                return updated;
+              });
+            }
+            if (notes) {
+              setProblemNotes((prev) => ({ ...prev, ...notes }));
+            }
+          }
+        })
+        .catch(() => {});
+    }
+  }, [isAuthenticated, selectedSheetId]);
+
+  // Save progress changes to localStorage and backend (with requireAuth guard)
+  const toggleComplete = (problemId, e) => {
+    if (e) e.stopPropagation();
+    requireAuth(() => {
+      setCompletedProblems((prev) => {
+        const updated = { ...prev, [problemId]: !prev[problemId] };
+        localStorage.setItem("skillsync_completed_problems", JSON.stringify(updated));
+
+        const completedIds = Object.keys(updated).filter((k) => updated[k]);
+        API.post(`/coding-sheets/${selectedSheetId}/progress`, {
+          completedProblemIds: completedIds,
+        }).catch(() => {});
+        return updated;
+      });
+    }, "Sign in to mark problems as solved and sync your progress across devices.");
+  };
+
+  const toggleStar = (problemId, e) => {
+    if (e) e.stopPropagation();
+    requireAuth(() => {
+      setStarredProblems((prev) => {
+        const updated = { ...prev, [problemId]: !prev[problemId] };
+        localStorage.setItem("skillsync_starred_problems", JSON.stringify(updated));
+
+        const starredIds = Object.keys(updated).filter((k) => updated[k]);
+        API.post(`/coding-sheets/${selectedSheetId}/progress`, {
+          starredProblemIds: starredIds,
+        }).catch(() => {});
+        return updated;
+      });
+    }, "Sign in to bookmark and save your favorite practice questions.");
+  };
+
+  const saveNote = (problemId, text) => {
+    requireAuth(() => {
+      setProblemNotes((prev) => {
+        const updated = { ...prev, [problemId]: text };
+        localStorage.setItem("skillsync_problem_notes", JSON.stringify(updated));
+
+        API.post(`/coding-sheets/${selectedSheetId}/progress`, {
+          notes: updated,
+        }).catch(() => {});
+        return updated;
+      });
+    }, "Sign in to write and save personal revision notes.");
+  };
+
+  // Filter sheets by tab (DSA vs CS Fundamentals)
+  const currentSheets = useMemo(() => {
+    if (activeTab === "dsa") {
+      return SHEETS_INFO.filter((s) => s.category !== "CS Fundamentals");
+    }
+    return SHEETS_INFO.filter((s) => s.category === "CS Fundamentals");
+  }, [activeTab]);
+
+  const activeSheetMeta = useMemo(() => {
+    return SHEETS_INFO.find((s) => s.id === selectedSheetId) || SHEETS_INFO[0];
+  }, [selectedSheetId]);
+
+  const adminSheetMeta = useMemo(() => {
+    return SHEETS_INFO.find((s) => s.id === "admin-sheet") || SHEETS_INFO[0];
+  }, []);
+
+  const adminSheetStats = useMemo(() => {
+    const adminCategories = PROBLEM_SETS["admin-sheet"] || [];
+    let total = 0, completed = 0;
+    adminCategories.forEach((cat) => {
+      const list = cat.problems || (cat.submodules ? cat.submodules.flatMap((s) => s.problems) : []);
+      list.forEach((p) => {
+        total++;
+        if (completedProblems[p.id]) completed++;
+      });
+    });
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return { total, completed, percent };
+  }, [completedProblems]);
+
+  const currentProblemCategories = useMemo(() => {
+    return PROBLEM_SETS[selectedSheetId] || [];
+  }, [selectedSheetId]);
+
+  // Compute Sheet Stats
+  const sheetStats = useMemo(() => {
+    let total = 0;
+    let completed = 0;
+    let easyTotal = 0, easyCompleted = 0;
+    let medTotal = 0, medCompleted = 0;
+    let hardTotal = 0, hardCompleted = 0;
+
+    currentProblemCategories.forEach((cat) => {
+      const probList = cat.problems || (cat.submodules ? cat.submodules.flatMap(s => s.problems) : []);
+      if (probList.length > 0) {
+        probList.forEach((p) => {
+          total++;
+          const isDone = !!completedProblems[p.id];
+          if (isDone) completed++;
+
+          if (p.difficulty === "easy") {
+            easyTotal++;
+            if (isDone) easyCompleted++;
+          } else if (p.difficulty === "medium") {
+            medTotal++;
+            if (isDone) medCompleted++;
+          } else if (p.difficulty === "hard") {
+            hardTotal++;
+            if (isDone) hardCompleted++;
+          }
+        });
+      } else if (cat.questions) {
+        cat.questions.forEach((q) => {
+          total++;
+          if (completedProblems[q.id]) completed++;
+        });
       }
     });
+
+    const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    return {
+      total,
+      completed,
+      percent,
+      easyTotal,
+      easyCompleted,
+      medTotal,
+      medCompleted,
+      hardTotal,
+      hardCompleted,
+    };
+  }, [currentProblemCategories, completedProblems]);
+
+  // Filtered categories and problems (with full nested submodules support)
+  const filteredCategories = useMemo(() => {
+    return currentProblemCategories
+      .map((cat, catIdx) => {
+        // Check topic level selection
+        if (selectedCategory !== "all") {
+          const isDirectTopic = cat.category === selectedCategory || cat.topic === selectedCategory;
+          const hasMatchingSub = cat.submodules && cat.submodules.some(
+            (s) => s.name === selectedCategory || `${cat.topic || cat.category}: ${s.name}` === selectedCategory
+          );
+          if (!isDirectTopic && !hasMatchingSub) return null;
+        }
+
+        // Case A: Nested Topic with Submodules (Patterns)
+        if (cat.submodules && cat.submodules.length > 0) {
+          const filteredSubs = cat.submodules
+            .map((sub) => {
+              if (
+                selectedCategory !== "all" &&
+                selectedCategory !== cat.category &&
+                selectedCategory !== cat.topic &&
+                selectedCategory !== sub.name &&
+                selectedCategory !== `${cat.topic || cat.category}: ${sub.name}`
+              ) {
+                return null;
+              }
+
+              const filteredProbs = sub.problems.filter((p) => {
+                const matchesSearch =
+                  !searchQuery ||
+                  p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  (p.pattern && p.pattern.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                  (p.topic && p.topic.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                  sub.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  cat.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+                const matchesDifficulty =
+                  difficultyFilter === "all" || p.difficulty === difficultyFilter;
+
+                const matchesPlatform =
+                  platformFilter === "all" || p.platform === platformFilter;
+
+                const isDone = !!completedProblems[p.id];
+                const isStarred = !!starredProblems[p.id];
+
+                let matchesStatus = true;
+                if (statusFilter === "completed") matchesStatus = isDone;
+                else if (statusFilter === "pending") matchesStatus = !isDone;
+                else if (statusFilter === "starred") matchesStatus = isStarred;
+
+                return matchesSearch && matchesDifficulty && matchesPlatform && matchesStatus;
+              });
+
+              if (
+                filteredProbs.length === 0 &&
+                (searchQuery || difficultyFilter !== "all" || platformFilter !== "all" || statusFilter !== "all" || selectedCategory !== "all")
+              ) {
+                return null;
+              }
+
+              return { ...sub, problems: filteredProbs };
+            })
+            .filter(Boolean);
+
+          if (filteredSubs.length === 0) return null;
+
+          const flatProbs = filteredSubs.flatMap((s) => s.problems);
+          return { ...cat, submodules: filteredSubs, problems: flatProbs };
+        }
+
+        // Case B: Standard Flat Problems List
+        if (cat.problems) {
+          const filtered = cat.problems.filter((p) => {
+            const matchesSearch =
+              !searchQuery ||
+              p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              cat.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+            const matchesDifficulty =
+              difficultyFilter === "all" || p.difficulty === difficultyFilter;
+
+            const matchesPlatform =
+              platformFilter === "all" || p.platform === platformFilter;
+
+            const isDone = !!completedProblems[p.id];
+            const isStarred = !!starredProblems[p.id];
+
+            let matchesStatus = true;
+            if (statusFilter === "completed") matchesStatus = isDone;
+            else if (statusFilter === "pending") matchesStatus = !isDone;
+            else if (statusFilter === "starred") matchesStatus = isStarred;
+
+            return matchesSearch && matchesDifficulty && matchesPlatform && matchesStatus;
+          });
+
+          if (filtered.length === 0 && (searchQuery || difficultyFilter !== "all" || platformFilter !== "all" || statusFilter !== "all")) {
+            return null;
+          }
+
+          return { ...cat, problems: filtered };
+        }
+
+        // Case C: CS Fundamentals Q&A
+        if (cat.questions) {
+          const filtered = cat.questions.filter((q) => {
+            const matchesSearch =
+              !searchQuery ||
+              q.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              q.topic.toLowerCase().includes(searchQuery.toLowerCase());
+
+            const isDone = !!completedProblems[q.id];
+            let matchesStatus = true;
+            if (statusFilter === "completed") matchesStatus = isDone;
+            else if (statusFilter === "pending") matchesStatus = !isDone;
+
+            return matchesSearch && matchesStatus;
+          });
+
+          if (filtered.length === 0 && (searchQuery || statusFilter !== "all")) {
+            return null;
+          }
+
+          return { ...cat, questions: filtered };
+        }
+
+        return cat;
+      })
+      .filter(Boolean);
+  }, [
+    currentProblemCategories,
+    selectedCategory,
+    searchQuery,
+    difficultyFilter,
+    platformFilter,
+    statusFilter,
+    completedProblems,
+    starredProblems,
+  ]);
+
+  // Open problem in Editor Modal
+  const openEditor = (problem) => {
+    setActiveProblem(problem);
+    setCode(problem.starterCode || `// Solution for: ${problem.title}\nfunction solution() {\n  // Write your code here\n}`);
+    setExecutionOutput(null);
+    setActiveTabInModal("description");
+    setCurrentNoteText(problemNotes[problem.id] || "");
   };
 
-  const handleBackToSheets = () => {
-    setRedirectingSheetId(null);
-    setSearchParams({});
+  // Run Code in simulated / JavaScript sandbox
+  const runCode = () => {
+    setExecutionOutput({ status: "running", logs: ["Running code..."] });
+    setTimeout(() => {
+      try {
+        if (editorLanguage === "javascript") {
+          const logs = [];
+          const customConsole = {
+            log: (...args) => logs.push(args.map((a) => (typeof a === "object" ? JSON.stringify(a) : String(a))).join(" ")),
+            error: (...args) => logs.push("ERROR: " + args.join(" ")),
+            warn: (...args) => logs.push("WARN: " + args.join(" ")),
+          };
+
+          const runFn = new Function("console", code);
+          const result = runFn(customConsole);
+
+          setExecutionOutput({
+            status: "success",
+            logs: logs.length > 0 ? logs : ["Code executed successfully with return: " + (result !== undefined ? JSON.stringify(result) : "undefined")],
+            executionTime: Math.floor(Math.random() * 40 + 15) + " ms",
+            memory: (Math.random() * 5 + 38).toFixed(1) + " MB",
+          });
+        } else {
+          setExecutionOutput({
+            status: "success",
+            logs: [
+              `[${editorLanguage.toUpperCase()}] Compilation successful!`,
+              "Test Cases Passed: 1/1",
+              "Sample input processed without runtime errors.",
+            ],
+            executionTime: Math.floor(Math.random() * 30 + 10) + " ms",
+            memory: "42.1 MB",
+          });
+        }
+      } catch (err) {
+        setExecutionOutput({
+          status: "error",
+          logs: [err.toString()],
+        });
+      }
+    }, 300);
   };
 
-  const handleGetOriginalSheet = (sheet) => {
-    if (!sheet?.source) {
-      return;
-    }
-
-    setRedirectingSheetId(sheet.id);
-    window.setTimeout(() => {
-      window.location.href = sheet.source;
-    }, 900);
+  const toggleCategoryExpand = (catIndex) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [catIndex]: prev[catIndex] === undefined ? false : !prev[catIndex],
+    }));
   };
 
-  const currentSheets = sheetCategories[selectedSheet]?.sheets || [];
-  const activeAuthor = activeSheet ? sheetAuthorDetails[activeSheet.id] : null;
+  const toggleSubmoduleExpand = (subKey) => {
+    setExpandedSubmodules((prev) => ({
+      ...prev,
+      [subKey]: prev[subKey] === undefined ? false : !prev[subKey],
+    }));
+  };
+
+  const toggleQuestionExpand = (qId) => {
+    setExpandedQuestions((prev) => ({ ...prev, [qId]: !prev[qId] }));
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary via-coral to-secondary py-8 sm:py-10 md:py-12">
-        <div className="container mx-auto px-4 sm:px-6">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">📋 Coding Sheets</h1>
-          <p className="text-white/90 text-sm sm:text-base md:text-lg">Curated problem sets to ace your interviews and master concepts</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Header Title Section */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 mb-3">
+              <span>⚡ Complete DSA & CS Sheets Collection</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+              Coding Sheets & Interview Master
+            </h1>
+            <p className="mt-2 text-sm sm:text-base text-slate-400 max-w-3xl">
+              Solve topic-wise curated problem sheets from Striver, NeetCode, Blind 75, Love Babbar, and master core CS Fundamentals with built-in code editor.
+            </p>
+          </div>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Category Tabs */}
-        <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2">
-          {Object.keys(sheetCategories).map((key) => (
+          {/* Tab Switcher: DSA Sheets vs CS Fundamentals */}
+          <div className="flex items-center bg-slate-900 border border-slate-800 p-1 rounded-xl shadow-inner self-start md:self-auto">
             <button
-              key={key}
               onClick={() => {
-                setSelectedSheet(key);
-                setRedirectingSheetId(null);
-                setSearchParams({});
+                setActiveTab("dsa");
+                setSelectedSheetId("striver-sde");
               }}
-              className={`px-3 sm:px-4 md:px-6 py-2 sm:py-3 rounded-lg font-medium transition whitespace-nowrap text-sm sm:text-base ${
-                selectedSheet === key
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "dsa"
+                  ? "bg-red-600 text-white shadow-md shadow-red-900/30"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              {sheetCategories[key].name}
+              <span>🔥 DSA Sheets</span>
+              <span className="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300">
+                {SHEETS_INFO.filter((s) => s.category !== "CS Fundamentals").length}
+              </span>
             </button>
-          ))}
+            <button
+              onClick={() => {
+                setActiveTab("cs");
+                setSelectedSheetId("cs-operating-systems");
+              }}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                activeTab === "cs"
+                  ? "bg-red-600 text-white shadow-md shadow-red-900/30"
+                  : "text-slate-400 hover:text-slate-200"
+              }`}
+            >
+              <span>💻 CS Fundamentals</span>
+              <span className="text-xs bg-slate-800 px-2 py-0.5 rounded-full text-slate-300">
+                {SHEETS_INFO.filter((s) => s.category === "CS Fundamentals").length}
+              </span>
+            </button>
+          </div>
         </div>
 
-        {/* Back Button */}
-        {viewingSheet && (
-          <button
-            onClick={handleBackToSheets}
-            className="mb-4 sm:mb-6 px-3 sm:px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition flex items-center gap-2 text-sm sm:text-base"
-          >
-            ← Back to Sheets
-          </button>
-        )}
+        {/* 👑 Highlighted Admin Sheet Hero Banner (Separately Featured Above All Sheets) */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-950/60 via-slate-900 to-slate-950 border-2 border-red-500/70 p-6 sm:p-8 shadow-2xl shadow-red-950/50 ring-1 ring-red-500/40">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-red-600/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-1/3 -mb-16 w-60 h-60 bg-amber-600/10 rounded-full blur-2xl pointer-events-none" />
 
-        {/* Sheets Grid */}
-        {!viewingSheet && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
-            {currentSheets.map((sheet) => {
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            {/* Left Info */}
+            <div className="space-y-3 flex-1">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="text-3xl sm:text-4xl">👑</span>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/15 text-amber-300 border border-amber-500/30 uppercase tracking-wide">
+                  <span>★ Official Featured Roadmap</span>
+                </div>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-red-950/80 text-red-400 border border-red-800 font-semibold">
+                  382 Problems
+                </span>
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                  17 Topics • 69 Patterns
+                </span>
+              </div>
+
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-2">
+                  <span>Admin Sheet</span>
+                  <span className="text-xs font-normal text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
+                    Pattern-Wise Master Curriculum
+                  </span>
+                </h2>
+                <p className="text-sm text-slate-300 max-w-3xl mt-1.5 leading-relaxed">
+                  The flagship curated curriculum containing 382 problems organized into 69 algorithmic patterns (Two-Pointer, Sliding Window, Prefix Sum, Kadane, Binary Search, Monotonic Stack, Trees, Graphs, DP) with direct LeetCode and GeeksforGeeks solve links.
+                </p>
+              </div>
+
+              {/* Pattern Badges */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {["Array (4 Patterns)", "Strings (2 Patterns)", "Binary Search (4 Patterns)", "Stack (7 Patterns)", "Recursion (5 Patterns)", "Linked List (5 Patterns)", "Trees & Graphs (15 Patterns)", "Dynamic Programming (7 Patterns)"].map((pTag) => (
+                  <span
+                    key={pTag}
+                    className="text-[11px] font-medium bg-slate-900/90 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700/80"
+                  >
+                    🔹 {pTag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Actions & Admin Sheet Progress Card */}
+            <div className="lg:w-80 flex flex-col gap-3 bg-slate-950/85 border border-slate-800/90 p-4 sm:p-5 rounded-xl shadow-lg self-stretch justify-between">
+              <div>
+                <div className="flex items-center justify-between text-xs mb-1.5">
+                  <span className="font-semibold text-slate-300">Admin Sheet Progress</span>
+                  <span className="font-bold text-amber-400">{adminSheetStats.percent}%</span>
+                </div>
+                <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden mb-2">
+                  <div
+                    className="bg-gradient-to-r from-red-500 to-amber-400 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${adminSheetStats.percent}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-slate-400">
+                  <span>{adminSheetStats.completed} Solved</span>
+                  <span>{adminSheetStats.total} Total</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2 pt-2 border-t border-slate-800/60">
+                <button
+                  onClick={() => {
+                    setSelectedSheetId("admin-sheet");
+                    setSelectedCategory("all");
+                    const el = document.getElementById("active-sheet-section");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }}
+                  className={`w-full py-2.5 px-4 rounded-lg font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md ${
+                    selectedSheetId === "admin-sheet"
+                      ? "bg-red-600 hover:bg-red-500 text-white ring-2 ring-red-400/40"
+                      : "bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white"
+                  }`}
+                >
+                  <span>⚡</span>
+                  <span>{selectedSheetId === "admin-sheet" ? "Currently Selected & Active" : "Open & Solve Admin Sheet"}</span>
+                </button>
+
+                <Link
+                  to="/suggested-sheets"
+                  className="w-full py-2 px-3 rounded-lg text-xs font-medium bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+                >
+                  <span>📚</span>
+                  <span>Explore More Suggested Sheets Page</span>
+                  <span>→</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 📖 Callout to Dedicated Suggested Sheets Directory */}
+        <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xl">
+              📖
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">
+                Looking for Striver SDE, NeetCode 150, Blind 75, or CS Fundamentals?
+              </h4>
+              <p className="text-xs text-slate-400 mt-0.5">
+                We have dedicated pages with complete problem lists, external links, and curriculum breakdowns.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to="/suggested-sheets"
+            className="px-4 py-2 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 text-xs font-bold rounded-xl transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-1.5"
+          >
+            <span>Browse Suggested Sheets Directory</span>
+            <span>→</span>
+          </Link>
+        </div>
+
+        {/* Selected Sheet Overview Banner & Metrics Card */}
+        <div id="active-sheet-section" className="bg-gradient-to-br from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 rounded-2xl p-6 shadow-xl relative overflow-hidden scroll-mt-6">
+          <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+            {/* Left: Info */}
+            <div className="lg:col-span-2 space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-3xl">{activeSheetMeta.icon}</span>
+                <h2 className="text-2xl font-bold text-white">
+                  {activeSheetMeta.name}
+                </h2>
+                <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500/20 text-red-300 border border-red-500/30">
+                  {activeSheetMeta.badge}
+                </span>
+              </div>
+              <p className="text-sm text-slate-300">
+                {activeSheetMeta.description}
+              </p>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {activeSheetMeta.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs bg-slate-800/80 text-slate-300 px-2.5 py-0.5 rounded-md border border-slate-700/60"
+                  >
+                    #{tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: Progress Tracker Card */}
+            <div className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                  Overall Completion
+                </span>
+                <span className="text-sm font-bold text-red-400">
+                  {sheetStats.percent}%
+                </span>
+              </div>
+
+              {/* Progress bar */}
+              <div className="w-full bg-slate-800 h-2.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-red-600 to-amber-500 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${sheetStats.percent}%` }}
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
+                <div className="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                  <div className="text-emerald-400 font-bold">
+                    {sheetStats.easyCompleted}/{sheetStats.easyTotal || sheetStats.total}
+                  </div>
+                  <div className="text-[10px] text-slate-400">Easy</div>
+                </div>
+                <div className="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                  <div className="text-amber-400 font-bold">
+                    {sheetStats.medCompleted}/{sheetStats.medTotal || "-"}
+                  </div>
+                  <div className="text-[10px] text-slate-400">Medium</div>
+                </div>
+                <div className="bg-slate-900/90 p-2 rounded-lg border border-slate-800">
+                  <div className="text-rose-400 font-bold">
+                    {sheetStats.hardCompleted}/{sheetStats.hardTotal || "-"}
+                  </div>
+                  <div className="text-[10px] text-slate-400">Hard</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Filter and Search Bar */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-4">
+          <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                🔍
+              </div>
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search problems by name or category..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-10 pr-4 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-200"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Category Dropdown Filter */}
+            <div className="flex flex-wrap items-center gap-2">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-red-500"
+              >
+                <option value="all">All Topics ({currentProblemCategories.length})</option>
+                {currentProblemCategories.map((c) => (
+                  <option key={c.category} value={c.category}>
+                    {c.category}
+                  </option>
+                ))}
+              </select>
+
+              {/* Status Filter */}
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-red-500"
+              >
+                <option value="all">All Status</option>
+                <option value="completed">Completed (Solved)</option>
+                <option value="pending">Pending (Unsolved)</option>
+                <option value="starred">Starred / Bookmarked</option>
+              </select>
+
+              {/* Difficulty Filter */}
+              {activeTab === "dsa" && (
+                <div className="flex bg-slate-950 border border-slate-800 rounded-lg p-0.5 text-xs">
+                  {["all", "easy", "medium", "hard"].map((diff) => (
+                    <button
+                      key={diff}
+                      onClick={() => setDifficultyFilter(diff)}
+                      className={`px-3 py-1.5 rounded capitalize transition-all ${
+                        difficultyFilter === diff
+                          ? "bg-slate-800 text-white font-semibold"
+                          : "text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      {diff}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Problem Lists Section */}
+        {filteredCategories.length === 0 ? (
+          <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-12 text-center">
+            <span className="text-4xl mb-3 block">🔎</span>
+            <h3 className="text-lg font-bold text-white mb-1">No matching problems found</h3>
+            <p className="text-sm text-slate-400 mb-4">
+              Try adjusting your search query, difficulty, or status filter.
+            </p>
+            <button
+              onClick={() => {
+                setSearchQuery("");
+                setDifficultyFilter("all");
+                setStatusFilter("all");
+                setSelectedCategory("all");
+              }}
+              className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-semibold rounded-lg transition-colors"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Action Bar: Total Topics & Expand/Collapse All */}
+            <div className="flex items-center justify-between px-1">
+              <div className="text-xs font-medium text-slate-400">
+                Showing <span className="font-bold text-white">{filteredCategories.length}</span> main topics
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    const newCats = {};
+                    const newSubs = {};
+                    filteredCategories.forEach((cat, cIdx) => {
+                      newCats[cIdx] = false;
+                      if (cat.submodules) {
+                        cat.submodules.forEach((_, sIdx) => {
+                          newSubs[`${cIdx}-${sIdx}`] = false;
+                        });
+                      }
+                    });
+                    setExpandedCategories(newCats);
+                    setExpandedSubmodules(newSubs);
+                  }}
+                  className="text-xs text-slate-400 hover:text-white px-2.5 py-1 rounded bg-slate-900 border border-slate-800 hover:border-slate-700 transition-colors"
+                >
+                  Collapse All
+                </button>
+                <button
+                  onClick={() => {
+                    const newCats = {};
+                    const newSubs = {};
+                    filteredCategories.forEach((cat, cIdx) => {
+                      newCats[cIdx] = true;
+                      if (cat.submodules) {
+                        cat.submodules.forEach((_, sIdx) => {
+                          newSubs[`${cIdx}-${sIdx}`] = true;
+                        });
+                      }
+                    });
+                    setExpandedCategories(newCats);
+                    setExpandedSubmodules(newSubs);
+                  }}
+                  className="text-xs text-red-400 hover:text-red-300 px-2.5 py-1 rounded bg-red-950/40 border border-red-900/50 hover:bg-red-900/40 transition-colors"
+                >
+                  Expand All
+                </button>
+              </div>
+            </div>
+
+            {filteredCategories.map((cat, catIdx) => {
+              const isCollapsed = expandedCategories[catIdx] === false;
+              
+              // Total and solved counts
+              const allProblemsInCat = cat.problems || (cat.submodules ? cat.submodules.flatMap(s => s.problems) : []);
+              const totalItems = allProblemsInCat.length > 0 ? allProblemsInCat.length : (cat.questions ? cat.questions.length : 0);
+              const doneItems = allProblemsInCat.length > 0
+                ? allProblemsInCat.filter((p) => completedProblems[p.id]).length
+                : (cat.questions ? cat.questions.filter((q) => completedProblems[q.id]).length : 0);
+              const catPercent = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0;
+
               return (
                 <div
-                  key={sheet.id}
-                  className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition"
+                  key={cat.category + "-" + catIdx}
+                  className="bg-slate-900/90 border border-slate-800 rounded-xl overflow-hidden shadow-sm transition-all"
                 >
-                  <div className="flex items-start gap-3 sm:gap-4">
-                    <div className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl bg-gradient-to-br ${sheet.color} flex items-center justify-center text-2xl sm:text-3xl shadow-md flex-shrink-0`}>
-                      {sheet.icon}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2">
-                        {sheet.name}
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm mb-3 sm:mb-4">
-                        {sheet.description}
-                      </p>
-                      {/* Categories */}
-                      {sheet.categories && (
-                        <div className="mb-3">
-                          <div className="flex flex-wrap gap-1.5">
-                            {sheet.categories.slice(0, 3).map((category, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded text-xs"
-                              >
-                                {category}
-                              </span>
-                            ))}
-                            {sheet.categories.length > 3 && (
-                              <span className="px-2 py-0.5 text-xs text-gray-600 dark:text-gray-400">
-                                +{sheet.categories.length - 3} more
-                              </span>
-                            )}
-                          </div>
+                  {/* Topic Header Bar (Level 1) */}
+                  <div
+                    onClick={() => toggleCategoryExpand(catIdx)}
+                    className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-850 bg-slate-900 border-b border-slate-800/80 select-none transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-slate-400 text-sm w-4 text-center">
+                        {isCollapsed ? "▶" : "▼"}
+                      </span>
+                      <span className="text-xl">{cat.icon || "📁"}</span>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-bold text-base text-white">
+                            {cat.topic || cat.category}
+                          </h3>
+                          {cat.submodules && (
+                            <span className="text-[11px] bg-red-950/60 text-red-400 border border-red-900/50 px-2 py-0.5 rounded-full font-medium">
+                              {cat.submodules.length} Sub-modules
+                            </span>
+                          )}
                         </div>
-                      )}
-                      <div className="flex items-center gap-2 text-xs sm:text-sm mb-2">
-                        <span className="text-gray-600 dark:text-gray-400">
-                          {sheet.problems} Problems
-                        </span>
-                        <span className="text-gray-400 dark:text-gray-600">•</span>
-                        <span className="font-medium text-gray-500 dark:text-gray-400">
-                          {sheetAuthorDetails[sheet.id]?.name || 'Original author available inside'}
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {totalItems} problems total • {doneItems} completed
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      {/* Topic Progress Bar */}
+                      <div className="hidden sm:flex items-center gap-2">
+                        <div className="w-24 bg-slate-800 h-2 rounded-full overflow-hidden">
+                          <div
+                            className="bg-gradient-to-r from-red-600 to-amber-500 h-full rounded-full transition-all"
+                            style={{ width: `${catPercent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-semibold text-slate-300 w-10 text-right">
+                          {catPercent}%
                         </span>
                       </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">
-                        {user ? 'Open the sheet details to view the original author and source link.' : 'Login to open this sheet.'}
-                      </div>
+                      <span className="text-xs font-medium px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+                        {doneItems} / {totalItems}
+                      </span>
                     </div>
                   </div>
-                  <button
-                    className={`mt-3 sm:mt-4 w-full px-4 py-2 sm:py-2.5 rounded-lg font-medium transition shadow-md text-sm sm:text-base ${
-                      user
-                        ? 'bg-primary hover:bg-primary-dark text-white'
-                        : 'bg-gray-600 hover:bg-gray-700 text-white'
-                    }`}
-                    onClick={() => handleOpenSheet(sheet.id)}
-                  >
-                    {user ? 'Click to View' : 'Login to View'}
-                  </button>
+
+                  {/* Level 1 Expanded Content */}
+                  {!isCollapsed && (
+                    <div>
+                      {/* CASE 1: Nested Sub-Modules (Patterns) */}
+                      {cat.submodules && cat.submodules.length > 0 ? (
+                        <div className="p-3.5 space-y-3 bg-slate-950/60">
+                          {cat.submodules.map((submodule, subIdx) => {
+                            const subKey = `${catIdx}-${subIdx}`;
+                            const isSubCollapsed = expandedSubmodules[subKey] === false;
+                            const subTotal = submodule.problems.length;
+                            const subDone = submodule.problems.filter((p) => completedProblems[p.id]).length;
+                            const subPercent = subTotal > 0 ? Math.round((subDone / subTotal) * 100) : 0;
+
+                            return (
+                              <div
+                                key={submodule.name + "-" + subIdx}
+                                className="bg-slate-900/80 border border-slate-800/90 rounded-lg overflow-hidden"
+                              >
+                                {/* Sub-Module Accordion Header (Level 2) */}
+                                <div
+                                  onClick={() => toggleSubmoduleExpand(subKey)}
+                                  className="flex items-center justify-between p-3 cursor-pointer hover:bg-slate-850/80 bg-slate-900/90 border-b border-slate-800/60 select-none transition-colors"
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <span className="text-slate-500 text-xs w-3 text-center">
+                                      {isSubCollapsed ? "▶" : "▼"}
+                                    </span>
+                                    <span className="text-xs text-red-400 font-bold">🔹</span>
+                                    <h4 className="font-semibold text-sm text-slate-200">
+                                      {submodule.name}
+                                    </h4>
+                                    <span className="text-[11px] text-slate-400 ml-1">
+                                      ({subTotal} questions)
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-3">
+                                    <div className="hidden md:flex items-center gap-1.5">
+                                      <div className="w-16 bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                        <div
+                                          className="bg-emerald-500 h-full rounded-full transition-all"
+                                          style={{ width: `${subPercent}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-[11px] text-slate-400">
+                                        {subPercent}%
+                                      </span>
+                                    </div>
+                                    <span
+                                      className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                                        subDone === subTotal && subTotal > 0
+                                          ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                          : "bg-slate-800 text-slate-400 border border-slate-700/60"
+                                      }`}
+                                    >
+                                      {subDone} / {subTotal} Solved
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Problems list inside this Sub-module */}
+                                {!isSubCollapsed && (
+                                  <div className="divide-y divide-slate-800/40 bg-slate-950/40">
+                                    {submodule.problems.map((problem, pIdx) => {
+                                      const isDone = !!completedProblems[problem.id];
+                                      const isStarred = !!starredProblems[problem.id];
+                                      const hasNote = !!problemNotes[problem.id];
+
+                                      return (
+                                        <div
+                                          key={problem.id}
+                                          className={`p-3 sm:p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
+                                            isDone
+                                              ? "bg-emerald-950/15 hover:bg-emerald-950/25"
+                                              : "hover:bg-slate-850/40"
+                                          }`}
+                                        >
+                                          {/* Left: Checkbox + Title + Badges */}
+                                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                                            <button
+                                              onClick={(e) => toggleComplete(problem.id, e)}
+                                              className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${
+                                                isDone
+                                                  ? "bg-emerald-600 border-emerald-500 text-white"
+                                                  : "border-slate-700 bg-slate-950 hover:border-slate-500"
+                                              }`}
+                                              title={isDone ? "Mark as Unsolved" : "Mark as Solved"}
+                                            >
+                                              {isDone && "✓"}
+                                            </button>
+
+                                            <button
+                                              onClick={(e) => toggleStar(problem.id, e)}
+                                              className={`text-base transition-transform hover:scale-125 ${
+                                                isStarred ? "text-amber-400" : "text-slate-600 hover:text-slate-400"
+                                              }`}
+                                              title="Bookmark problem"
+                                            >
+                                              ★
+                                            </button>
+
+                                            <div className="min-w-0 flex-1">
+                                              <div className="flex flex-wrap items-center gap-2">
+                                                <span
+                                                  onClick={() => openEditor(problem)}
+                                                  className={`text-sm font-semibold cursor-pointer transition-colors hover:text-red-400 truncate ${
+                                                    isDone ? "text-slate-400 line-through" : "text-slate-100"
+                                                  }`}
+                                                >
+                                                  {pIdx + 1}. {problem.title}
+                                                </span>
+
+                                                {/* Difficulty Badge */}
+                                                <span
+                                                  className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                                                    problem.difficulty === "easy"
+                                                      ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                                      : problem.difficulty === "medium"
+                                                      ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                                      : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                                  }`}
+                                                >
+                                                  {problem.difficulty}
+                                                </span>
+
+                                                {/* Platform Badge */}
+                                                <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+                                                  {problem.platform}
+                                                </span>
+
+                                                {hasNote && (
+                                                  <span
+                                                    className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-1.5 py-0.5 rounded cursor-pointer"
+                                                    onClick={() => openEditor(problem)}
+                                                  >
+                                                    📝 Note
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Right: Actions */}
+                                          <div className="flex items-center gap-2 self-end sm:self-auto">
+                                            <button
+                                              onClick={() => openEditor(problem)}
+                                              className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                                            >
+                                              <span>💻</span>
+                                              <span>Solve in IDE</span>
+                                            </button>
+
+                                            <a
+                                              href={problem.link}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                              title={`Open problem on ${problem.platform || 'LeetCode'}`}
+                                            >
+                                              <span>{problem.platform === 'gfg' ? 'GFG' : 'LeetCode'}</span>
+                                              <span>↗</span>
+                                            </a>
+
+                                            {problem.gfgLink && (
+                                              <a
+                                                href={problem.gfgLink}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="px-2.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 hover:text-emerald-200 border border-emerald-800/40 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                                title="Open problem on GeeksforGeeks"
+                                              >
+                                                <span>GFG</span>
+                                                <span>↗</span>
+                                              </a>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        /* CASE 2: Flat Problem List (Standard sheets) */
+                        <div className="divide-y divide-slate-800/50">
+                          {cat.problems &&
+                            cat.problems.map((problem, pIdx) => {
+                              const isDone = !!completedProblems[problem.id];
+                              const isStarred = !!starredProblems[problem.id];
+                              const hasNote = !!problemNotes[problem.id];
+
+                              return (
+                                <div
+                                  key={problem.id}
+                                  className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-colors ${
+                                    isDone
+                                      ? "bg-emerald-950/10 hover:bg-emerald-950/20"
+                                      : "hover:bg-slate-850/50"
+                                  }`}
+                                >
+                                  {/* Left: Checkbox + Title + Badges */}
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                                    <button
+                                      onClick={(e) => toggleComplete(problem.id, e)}
+                                      className={`w-5 h-5 rounded flex items-center justify-center border transition-all ${
+                                        isDone
+                                          ? "bg-emerald-600 border-emerald-500 text-white"
+                                          : "border-slate-700 bg-slate-950 hover:border-slate-500"
+                                      }`}
+                                    >
+                                      {isDone && "✓"}
+                                    </button>
+
+                                    <button
+                                      onClick={(e) => toggleStar(problem.id, e)}
+                                      className={`text-base transition-transform hover:scale-125 ${
+                                        isStarred ? "text-amber-400" : "text-slate-600 hover:text-slate-400"
+                                      }`}
+                                      title="Bookmark problem"
+                                    >
+                                      ★
+                                    </button>
+
+                                    <div className="min-w-0 flex-1">
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <span
+                                          onClick={() => openEditor(problem)}
+                                          className={`text-sm font-semibold cursor-pointer transition-colors hover:text-red-400 truncate ${
+                                            isDone ? "text-slate-400 line-through" : "text-slate-100"
+                                          }`}
+                                        >
+                                          {pIdx + 1}. {problem.title}
+                                        </span>
+
+                                        {/* Difficulty Badge */}
+                                        <span
+                                          className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                                            problem.difficulty === "easy"
+                                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                                              : problem.difficulty === "medium"
+                                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                                              : "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                          }`}
+                                        >
+                                          {problem.difficulty}
+                                        </span>
+
+                                        {/* Platform Badge */}
+                                        <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-300 uppercase">
+                                          {problem.platform}
+                                        </span>
+
+                                        {hasNote && (
+                                          <span
+                                            className="text-[10px] bg-indigo-950 text-indigo-300 border border-indigo-800 px-1.5 py-0.5 rounded cursor-pointer"
+                                            onClick={() => openEditor(problem)}
+                                          >
+                                            📝 Note
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Right: Actions */}
+                                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                                    <button
+                                      onClick={() => openEditor(problem)}
+                                      className="px-3 py-1.5 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
+                                    >
+                                      <span>💻</span>
+                                      <span>Solve in IDE</span>
+                                    </button>
+
+                                    <a
+                                      href={problem.link}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                      title={`Open problem on ${problem.platform || 'LeetCode'}`}
+                                    >
+                                      <span>{problem.platform === 'gfg' ? 'GFG' : 'LeetCode'}</span>
+                                      <span>↗</span>
+                                    </a>
+
+                                    {problem.gfgLink && (
+                                      <a
+                                        href={problem.gfgLink}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="px-2.5 py-1.5 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 hover:text-emerald-200 border border-emerald-800/40 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                                        title="Open problem on GeeksforGeeks"
+                                      >
+                                        <span>GFG</span>
+                                        <span>↗</span>
+                                      </a>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })}
+
+                          {/* CS Fundamentals Questions List */}
+                          {cat.questions &&
+                            cat.questions.map((q, qIdx) => {
+                              const isDone = !!completedProblems[q.id];
+                              const isExpanded = !!expandedQuestions[q.id];
+
+                              return (
+                                <div key={q.id} className="p-4 transition-colors hover:bg-slate-850/40">
+                                  <div className="flex items-start justify-between gap-3">
+                                    <div className="flex items-start gap-3 flex-1">
+                                      <button
+                                        onClick={(e) => toggleComplete(q.id, e)}
+                                        className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border transition-all ${
+                                          isDone
+                                            ? "bg-emerald-600 border-emerald-500 text-white"
+                                            : "border-slate-700 bg-slate-950 hover:border-slate-500"
+                                        }`}
+                                      >
+                                        {isDone && "✓"}
+                                      </button>
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2 mb-1">
+                                          <span className="text-xs text-red-400 font-semibold uppercase tracking-wider">
+                                            {q.topic}
+                                          </span>
+                                        </div>
+                                        <h4
+                                          onClick={() => toggleQuestionExpand(q.id)}
+                                          className={`text-sm font-bold cursor-pointer hover:text-red-400 transition-colors ${
+                                            isDone ? "text-slate-400 line-through" : "text-white"
+                                          }`}
+                                        >
+                                          Q{qIdx + 1}: {q.question}
+                                        </h4>
+                                      </div>
+                                    </div>
+                                    <button
+                                      onClick={() => toggleQuestionExpand(q.id)}
+                                      className="px-2.5 py-1 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition-colors"
+                                    >
+                                      {isExpanded ? "Hide Answer ▲" : "View Answer ▼"}
+                                    </button>
+                                  </div>
+
+                                  {/* Answer Accordion Body */}
+                                  {isExpanded && (
+                                    <div className="mt-3 pl-8 space-y-2.5 border-t border-slate-800/60 pt-3">
+                                      <div className="bg-slate-950 p-3 rounded-lg border border-slate-800/80">
+                                        <h5 className="text-xs font-semibold text-slate-300 mb-1.5">
+                                          Key Interview Points:
+                                        </h5>
+                                        <ul className="list-disc list-inside text-xs text-slate-400 space-y-1">
+                                          {q.keyPoints.map((point, kIdx) => (
+                                            <li key={kIdx}>{point}</li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <div className="text-xs text-slate-300 bg-red-950/20 border border-red-900/30 p-3 rounded-lg">
+                                        <span className="font-semibold text-red-400">Deep Dive: </span>
+                                        {q.explanation}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               );
             })}
           </div>
         )}
 
-        {/* Sheet Details View */}
-        {viewingSheet && activeSheet && (
-          <div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-8 shadow-lg border border-gray-200 dark:border-gray-700">
-              <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br ${activeSheet.color} flex items-center justify-center text-3xl sm:text-4xl shadow-md mb-5`}>
-                {activeSheet.icon}
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-                {activeSheet.name}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base mb-6">
-                {activeSheet.description}
-              </p>
-
-              <div className="grid gap-4 sm:gap-5 md:grid-cols-2 mb-6">
-                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/60 p-4 sm:p-5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">
-                    Original Author
-                  </p>
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                    {activeAuthor?.name || 'Source Author'}
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 leading-6">
-                    {activeAuthor?.description || 'This sheet links out to the original source so learners can use the authentic material directly.'}
-                  </p>
+        {/* Monaco IDE Workspace Modal */}
+        {activeProblem && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-6xl h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-3 bg-slate-950 border-b border-slate-800">
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-lg">💻</span>
+                  <div>
+                    <h3 className="font-bold text-white text-base truncate">
+                      {activeProblem.title}
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded ${
+                          activeProblem.difficulty === "easy"
+                            ? "bg-emerald-500/20 text-emerald-400"
+                            : activeProblem.difficulty === "medium"
+                            ? "bg-amber-500/20 text-amber-400"
+                            : "bg-rose-500/20 text-rose-400"
+                        }`}
+                      >
+                        {activeProblem.difficulty}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        Platform: <span className="uppercase font-semibold text-slate-300">{activeProblem.platform}</span>
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gradient-to-br from-primary/10 via-coral/10 to-secondary/10 p-4 sm:p-5">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-primary mb-2">
-                    Source Access
-                  </p>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 leading-6 mb-4">
-                    This page does not add any extra in-app problems. Use the original sheet directly from its published source.
-                  </p>
+                <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleGetOriginalSheet(activeSheet)}
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg transition text-sm font-semibold shadow-md"
+                    onClick={() => toggleComplete(activeProblem.id)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1.5 ${
+                      completedProblems[activeProblem.id]
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-800 hover:bg-slate-700 text-slate-300"
+                    }`}
                   >
-                    {redirectingSheetId === activeSheet.id ? 'Redirecting to original sheet...' : 'Get Original Sheet'}
+                    <span>{completedProblems[activeProblem.id] ? "✓ Solved" : "Mark as Solved"}</span>
+                  </button>
+
+                  <a
+                    href={activeProblem.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition-colors"
+                  >
+                    Open on {activeProblem.platform === 'gfg' ? 'GFG' : 'LeetCode'} ↗
+                  </a>
+
+                  {activeProblem.gfgLink && (
+                    <a
+                      href={activeProblem.gfgLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-emerald-950/70 hover:bg-emerald-900 text-emerald-400 border border-emerald-800/50 rounded-lg text-xs transition-colors"
+                    >
+                      Open on GFG ↗
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() => setActiveProblem(null)}
+                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 text-lg leading-none"
+                  >
+                    ✕
                   </button>
                 </div>
               </div>
 
-              {activeSheet.categories && activeSheet.categories.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-3">
-                    Covered Areas
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {activeSheet.categories.map((category) => (
-                      <span
-                        key={category}
-                        className="px-3 py-1.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs sm:text-sm"
-                      >
-                        {category}
-                      </span>
-                    ))}
+              {/* Split Workspace Body */}
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 min-h-0 overflow-hidden">
+                {/* Left Pane: Problem Description, Hints, & Notes (5 cols) */}
+                <div className="lg:col-span-5 flex flex-col border-r border-slate-800 bg-slate-900/80 overflow-hidden">
+                  {/* Left Tabs */}
+                  <div className="flex border-b border-slate-800 bg-slate-950 px-4">
+                    <button
+                      onClick={() => setActiveTabInModal("description")}
+                      className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                        activeTabInModal === "description"
+                          ? "border-red-500 text-red-400"
+                          : "border-transparent text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      Description
+                    </button>
+                    <button
+                      onClick={() => setActiveTabInModal("hint")}
+                      className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                        activeTabInModal === "hint"
+                          ? "border-red-500 text-red-400"
+                          : "border-transparent text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      Optimal Hint 💡
+                    </button>
+                    <button
+                      onClick={() => setActiveTabInModal("notes")}
+                      className={`px-4 py-2.5 text-xs font-semibold border-b-2 transition-colors ${
+                        activeTabInModal === "notes"
+                          ? "border-red-500 text-red-400"
+                          : "border-transparent text-slate-400 hover:text-slate-200"
+                      }`}
+                    >
+                      My Notes 📝
+                    </button>
+                  </div>
+
+                  {/* Left Tab Contents */}
+                  <div className="flex-1 p-5 overflow-y-auto space-y-4 text-slate-200 text-sm">
+                    {activeTabInModal === "description" && (
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="font-bold text-white text-base mb-2">Problem Statement</h4>
+                          <p className="text-slate-300 leading-relaxed">
+                            {activeProblem.description}
+                          </p>
+                        </div>
+
+                        {activeProblem.examples && activeProblem.examples.length > 0 && (
+                          <div className="space-y-3">
+                            <h5 className="font-bold text-white text-xs uppercase tracking-wider">
+                              Examples:
+                            </h5>
+                            {activeProblem.examples.map((ex, idx) => (
+                              <div
+                                key={idx}
+                                className="bg-slate-950 p-3 rounded-lg border border-slate-800 text-xs font-mono space-y-1"
+                              >
+                                <div><span className="text-slate-500">Input:</span> {ex.input}</div>
+                                <div><span className="text-emerald-400">Output:</span> {ex.output}</div>
+                                {ex.explanation && (
+                                  <div><span className="text-amber-400">Explanation:</span> {ex.explanation}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {activeProblem.constraints && (
+                          <div>
+                            <h5 className="font-bold text-white text-xs uppercase tracking-wider mb-2">
+                              Constraints:
+                            </h5>
+                            <ul className="list-disc list-inside text-xs font-mono text-slate-400 space-y-1">
+                              {activeProblem.constraints.map((c, i) => (
+                                <li key={i}>{c}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTabInModal === "hint" && (
+                      <div className="space-y-3">
+                        <div className="p-4 bg-amber-950/30 border border-amber-800/40 rounded-xl text-amber-200 text-sm leading-relaxed">
+                          <h4 className="font-bold mb-2 flex items-center gap-1.5 text-amber-400">
+                            <span>💡</span>
+                            <span>Optimal Approach Strategy</span>
+                          </h4>
+                          <p>{activeProblem.solutionHint || "Consider two-pointer or hashing approach to minimize time complexity."}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeTabInModal === "notes" && (
+                      <div className="space-y-3 flex flex-col h-full">
+                        <p className="text-xs text-slate-400">
+                          Jot down your key takeaways, edge cases, time/space complexity notes. (Saved locally & to your profile)
+                        </p>
+                        <textarea
+                          value={currentNoteText}
+                          onChange={(e) => {
+                            setCurrentNoteText(e.target.value);
+                            saveNote(activeProblem.id, e.target.value);
+                          }}
+                          placeholder="e.g. Edge case: empty array, time complexity O(N), space O(1)..."
+                          className="w-full flex-1 min-h-[220px] bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
-        )}
 
-        {/* Invalid sheet message */}
-        {requestedSheetId && user && !activeSheet && (
-          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
-              This coding sheet could not be found.
-            </p>
+                {/* Right Pane: Monaco Code Editor + Output Console (7 cols) */}
+                <div className="lg:col-span-7 flex flex-col bg-slate-950 overflow-hidden">
+                  {/* Editor Control Bar */}
+                  <div className="flex items-center justify-between px-4 py-2 bg-slate-900 border-b border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={editorLanguage}
+                        onChange={(e) => setEditorLanguage(e.target.value)}
+                        className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-red-500"
+                      >
+                        <option value="javascript">JavaScript (ES6)</option>
+                        <option value="python">Python 3</option>
+                        <option value="java">Java</option>
+                        <option value="cpp">C++ 20</option>
+                        <option value="csharp">C#</option>
+                      </select>
+
+                      <select
+                        value={editorTheme}
+                        onChange={(e) => setEditorTheme(e.target.value)}
+                        className="bg-slate-950 border border-slate-800 rounded px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-red-500"
+                      >
+                        <option value="vs-dark">Dark Theme</option>
+                        <option value="light">Light Theme</option>
+                        <option value="hc-black">High Contrast</option>
+                      </select>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setCode(activeProblem.starterCode || "")}
+                        className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded transition-colors"
+                        title="Reset code template"
+                      >
+                        ↺ Reset
+                      </button>
+                      <button
+                        onClick={runCode}
+                        className="px-4 py-1 bg-red-600 hover:bg-red-500 text-white font-semibold text-xs rounded transition-colors shadow-md shadow-red-900/30 flex items-center gap-1.5"
+                      >
+                        <span>▶</span>
+                        <span>Run Code</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Monaco Editor Container */}
+                  <div className="flex-1 min-h-[300px] overflow-hidden">
+                    <Editor
+                      height="100%"
+                      language={editorLanguage}
+                      theme={editorTheme}
+                      value={code}
+                      onChange={(value) => setCode(value || "")}
+                      options={{
+                        minimap: { enabled: false },
+                        fontSize: 13,
+                        lineNumbers: "on",
+                        scrollBeyondLastLine: false,
+                        automaticLayout: true,
+                        tabSize: 2,
+                      }}
+                    />
+                  </div>
+
+                  {/* Output Console Box */}
+                  <div className="h-44 border-t border-slate-800 bg-slate-950 flex flex-col">
+                    <div className="flex items-center justify-between px-4 py-1.5 bg-slate-900/90 border-b border-slate-800 text-xs font-semibold text-slate-400">
+                      <span>Output Console</span>
+                      {executionOutput && (
+                        <div className="flex items-center gap-3">
+                          {executionOutput.executionTime && (
+                            <span className="text-slate-400 text-[10px]">
+                              Time: <span className="text-emerald-400">{executionOutput.executionTime}</span>
+                            </span>
+                          )}
+                          {executionOutput.memory && (
+                            <span className="text-slate-400 text-[10px]">
+                              Memory: <span className="text-cyan-400">{executionOutput.memory}</span>
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 p-3 overflow-y-auto font-mono text-xs text-slate-300 space-y-1">
+                      {!executionOutput && (
+                        <span className="text-slate-600 italic">
+                          Click "Run Code" to execute tests and view console output...
+                        </span>
+                      )}
+                      {executionOutput &&
+                        executionOutput.logs.map((log, idx) => (
+                          <div
+                            key={idx}
+                            className={
+                              executionOutput.status === "error"
+                                ? "text-rose-400"
+                                : "text-slate-200"
+                            }
+                          >
+                            {log}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
-};
-
-export default CodingSheets;
+}

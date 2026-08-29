@@ -1,0 +1,65 @@
+export const risingBrainData = [
+  {
+    category: "Pattern 1: Sliding Window",
+    problems: [
+      {
+        id: "rb-1",
+        title: "Maximum Sum Subarray of Size K",
+        difficulty: "easy",
+        platform: "gfg",
+        link: "https://www.geeksforgeeks.org/find-maximum-minimum-sum-subarray-size-k/",
+        description: "Given an array of positive numbers and a positive number k, find the maximum sum of any contiguous subarray of size k.",
+        examples: [{ input: "arr = [2, 1, 5, 1, 3, 2], k = 3", output: "9 (subarray [5, 1, 3])" }],
+        constraints: ["1 <= k <= arr.length <= 10^5"],
+        solutionHint: "Slide a window of size k: add outgoing element, subtract incoming element in O(1) per step.",
+        starterCode: `function maxSubArrayOfSizeK(k, arr) {\n  let maxSum = 0, windowSum = 0;\n  for (let i = 0; i < k; i++) windowSum += arr[i];\n  maxSum = windowSum;\n  for (let i = k; i < arr.length; i++) {\n    windowSum += arr[i] - arr[i - k];\n    maxSum = Math.max(maxSum, windowSum);\n  }\n  return maxSum;\n};`,
+      },
+      {
+        id: "rb-2",
+        title: "Smallest Subarray with a Given Sum",
+        difficulty: "medium",
+        platform: "leetcode",
+        link: "https://leetcode.com/problems/minimum-size-subarray-sum/",
+        description: "Find the minimal length of a contiguous subarray of which the sum >= target.",
+        examples: [{ input: "target = 7, nums = [2,3,1,2,4,3]", output: "2 ([4,3])" }],
+        constraints: ["1 <= target <= 10^9", "1 <= nums.length <= 10^5"],
+        solutionHint: "Expand right until sum >= target, then shrink left to find minimum length.",
+        starterCode: `function minSubArrayLen(target, nums) {\n  let minLen = Infinity, sum = 0, l = 0;\n  for (let r = 0; r < nums.length; r++) {\n    sum += nums[r];\n    while (sum >= target) {\n      minLen = Math.min(minLen, r - l + 1);\n      sum -= nums[l++];\n    }\n  }\n  return minLen === Infinity ? 0 : minLen;\n};`,
+      },
+    ],
+  },
+  {
+    category: "Pattern 2: Fast & Slow Pointers",
+    problems: [
+      {
+        id: "rb-3",
+        title: "Happy Number",
+        difficulty: "easy",
+        platform: "leetcode",
+        link: "https://leetcode.com/problems/happy-number/",
+        description: "Starting with any positive integer, replace the number by the sum of the squares of its digits until it equals 1.",
+        examples: [{ input: "n = 19", output: "true" }],
+        constraints: ["1 <= n <= 2^31 - 1"],
+        solutionHint: "Use slow and fast pointers to detect cycle in digit square sums.",
+        starterCode: `function isHappy(n) {\n  const getNext = (num) => {\n    let sum = 0;\n    while (num > 0) {\n      const d = num % 10;\n      sum += d * d;\n      num = Math.floor(num / 10);\n    }\n    return sum;\n  };\n  let slow = n, fast = getNext(n);\n  while (fast !== 1 && slow !== fast) {\n    slow = getNext(slow);\n    fast = getNext(getNext(fast));\n  }\n  return fast === 1;\n};`,
+      },
+    ],
+  },
+  {
+    category: "Pattern 3: Merge Intervals",
+    problems: [
+      {
+        id: "rb-4",
+        title: "Insert Interval",
+        difficulty: "medium",
+        platform: "leetcode",
+        link: "https://leetcode.com/problems/insert-interval/",
+        description: "Insert newInterval into intervals such that intervals is still sorted and has no overlapping intervals.",
+        examples: [{ input: "intervals = [[1,3],[6,9]], newInterval = [2,5]", output: "[[1,5],[6,9]]" }],
+        constraints: ["0 <= intervals.length <= 10^4"],
+        solutionHint: "1. Add all intervals before newInterval. 2. Merge all overlapping intervals. 3. Add remaining intervals.",
+        starterCode: `function insert(intervals, newInterval) {\n  const res = [];\n  let i = 0, n = intervals.length;\n  while (i < n && intervals[i][1] < newInterval[0]) res.push(intervals[i++]);\n  while (i < n && intervals[i][0] <= newInterval[1]) {\n    newInterval[0] = Math.min(newInterval[0], intervals[i][0]);\n    newInterval[1] = Math.max(newInterval[1], intervals[i][1]);\n    i++;\n  }\n  res.push(newInterval);\n  while (i < n) res.push(intervals[i++]);\n  return res;\n};`,
+      },
+    ],
+  },
+];

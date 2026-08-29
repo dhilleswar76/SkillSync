@@ -1,18 +1,19 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
+const express = require("express");
+const router = express.Router();
 const {
+  getAllSheets,
+  getSheetById,
   getSheetProgress,
-  toggleProblemComplete,
-  getAllSheetsProgress
+  updateSheetProgress,
 } = require("../controllers/codingSheetController");
+const { protect } = require("../middlewares/authMiddleware");
 
-// Get progress for a specific sheet
-router.get("/progress/:sheetId", auth, getSheetProgress);
+// Public routes to view sheets
+router.get("/", getAllSheets);
+router.get("/:sheetId", getSheetById);
 
-// Toggle problem completion
-router.post("/progress/toggle", auth, toggleProblemComplete);
-
-// Get all sheets progress for current user
-router.get("/progress/all", auth, getAllSheetsProgress);
+// Protected routes to read/write user progress on sheets
+router.get("/:sheetId/progress", protect, getSheetProgress);
+router.post("/:sheetId/progress", protect, updateSheetProgress);
 
 module.exports = router;

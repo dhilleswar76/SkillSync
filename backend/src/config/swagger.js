@@ -1,16 +1,23 @@
-const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerJSDoc = require("swagger-jsdoc");
 
-module.exports = swaggerJsdoc({
+const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Student Learning Portal API",
-      version: "1.0.0"
+      title: "SkillSync Learning Portal API",
+      version: "1.0.0",
+      description: "API Documentation for SkillSync Student Portal",
     },
     servers: [
-      { url: "https://skillsync-wi9y.onrender.com", description: "Production" },
-      { url: "http://localhost:5000", description: "Local development" }
-    ]
+      {
+        url: "http://localhost:5000/api",
+        description: "Development Server",
+      },
+    ],
   },
-  apis: ["./src/routes/*.js"]
-});
+  apis: ["./src/routes/*.js"],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
+module.exports = swaggerSpec;

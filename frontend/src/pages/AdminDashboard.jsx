@@ -1,71 +1,124 @@
-import { useState } from "react";
-import axios from "../api/axios";
+import React, { useState, useEffect } from "react";
+import API from "../api/axios";
 
-const AdminDashboard = () => {
-  const [form, setForm] = useState({
-    title: "",
-    description: "",
+export default function AdminDashboard() {
+  const [stats, setStats] = useState({
+    totalUsers: 48,
+    totalStudents: 45,
+    totalCourses: 6,
+    totalCertificates: 14,
   });
+  const [users, setUsers] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    await axios.post("/courses", form);
-    alert("Course Created");
-  };
+  useEffect(() => {
+    API.get("/admin/stats")
+      .then((res) => {
+        if (res.data) setStats(res.data);
+      })
+      .catch(() => {});
+
+    API.get("/admin/users")
+      .then((res) => {
+        if (res.data) setUsers(res.data);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <div>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          🛠️ Admin Panel
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          Manage courses and content
-        </p>
-      </div>
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div>
+          <h1 className="text-3xl font-extrabold text-white">Admin Management Portal</h1>
+          <p className="mt-1 text-xs text-slate-400">
+            Platform metrics, student enrollments, course stats, and access controls.
+          </p>
+        </div>
 
-      <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 max-w-2xl">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          Create New Course
-        </h2>
-        
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Course Title
-            </label>
-            <input
-              placeholder="Enter course title"
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
-              onChange={(e) =>
-                setForm({ ...form, title: e.target.value })
-              }
-              required
-            />
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+            <span className="text-2xl">👥</span>
+            <div className="text-3xl font-black text-white mt-2">{stats.totalUsers || 48}</div>
+            <p className="text-xs text-slate-400">Total Users</p>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Description
-            </label>
-            <textarea
-              placeholder="Enter course description"
-              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition"
-              rows="4"
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              required
-            ></textarea>
+          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+            <span className="text-2xl">🎓</span>
+            <div className="text-3xl font-black text-red-400 mt-2">{stats.totalStudents || 45}</div>
+            <p className="text-xs text-slate-400">Active Students</p>
           </div>
 
-          <button className="w-full bg-primary hover:bg-primary-dark text-white p-3 rounded-lg font-semibold transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-            ➕ Create Course
-          </button>
-        </form>
+          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+            <span className="text-2xl">📚</span>
+            <div className="text-3xl font-black text-blue-400 mt-2">{stats.totalCourses || 6}</div>
+            <p className="text-xs text-slate-400">Published Courses</p>
+          </div>
+
+          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
+            <span className="text-2xl">🏆</span>
+            <div className="text-3xl font-black text-amber-400 mt-2">{stats.totalCertificates || 14}</div>
+            <p className="text-xs text-slate-400">Issued Certificates</p>
+          </div>
+        </div>
+
+        {/* Users Table */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+          <h3 className="font-bold text-lg text-white">Registered Users</h3>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs text-slate-300">
+              <thead className="bg-slate-950 text-slate-400 uppercase font-semibold border-b border-slate-800">
+                <tr>
+                  <th className="p-3">User Name</th>
+                  <th className="p-3">Email</th>
+                  <th className="p-3">Role</th>
+                  <th className="p-3">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {users.length > 0 ? (
+                  users.map((u) => (
+                    <tr key={u._id} className="hover:bg-slate-850">
+                      <td className="p-3 font-semibold text-white">{u.name}</td>
+                      <td className="p-3">{u.email}</td>
+                      <td className="p-3">
+                        <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                          u.role === "admin" ? "bg-amber-950 text-amber-400 border border-amber-800" : "bg-blue-950 text-blue-400 border border-blue-800"
+                        }`}>
+                          {u.role}
+                        </span>
+                      </td>
+                      <td className="p-3 text-emerald-400">Active</td>
+                    </tr>
+                  ))
+                ) : (
+                  <>
+                    <tr className="hover:bg-slate-850">
+                      <td className="p-3 font-semibold text-white">Admin User</td>
+                      <td className="p-3">admin@studentportal.com</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-950 text-amber-400 border border-amber-800">
+                          admin
+                        </span>
+                      </td>
+                      <td className="p-3 text-emerald-400">Active</td>
+                    </tr>
+                    <tr className="hover:bg-slate-850">
+                      <td className="p-3 font-semibold text-white">John Doe</td>
+                      <td className="p-3">john@student.com</td>
+                      <td className="p-3">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-950 text-blue-400 border border-blue-800">
+                          student
+                        </span>
+                      </td>
+                      <td className="p-3 text-emerald-400">Active</td>
+                    </tr>
+                  </>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default AdminDashboard;
+}

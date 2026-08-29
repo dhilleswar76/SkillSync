@@ -1,8 +1,17 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
-const role = require("../middlewares/roleMiddleware");
-const { dashboard } = require("../controllers/adminController");
+const express = require("express");
+const router = express.Router();
+const {
+  getAdminStats,
+  getAllUsers,
+  updateUserRole,
+} = require("../controllers/adminController");
+const { protect } = require("../middlewares/authMiddleware");
+const { adminOnly } = require("../middlewares/adminMiddleware");
 
-router.get("/dashboard", auth, role("admin"), dashboard);
+router.use(protect, adminOnly);
+
+router.get("/stats", getAdminStats);
+router.get("/users", getAllUsers);
+router.put("/users/:id/role", updateUserRole);
 
 module.exports = router;

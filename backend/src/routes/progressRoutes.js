@@ -1,7 +1,14 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
-const { markComplete } = require("../controllers/progressController");
+const express = require("express");
+const router = express.Router();
+const {
+  getAllUserProgress,
+  getCourseProgress,
+  updateProgress,
+} = require("../controllers/progressController");
+const { protect } = require("../middlewares/authMiddleware");
 
-router.post("/complete", auth, markComplete);
+router.get("/", protect, getAllUserProgress);
+router.get("/:courseId", protect, getCourseProgress);
+router.post("/:courseId", protect, updateProgress);
 
 module.exports = router;

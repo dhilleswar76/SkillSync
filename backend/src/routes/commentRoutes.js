@@ -1,7 +1,9 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
-const { addComment } = require("../controllers/commentController");
+const express = require("express");
+const router = express.Router();
+const { getLessonComments, addComment } = require("../controllers/commentController");
+const { protect } = require("../middlewares/authMiddleware");
 
-router.post("/:lessonId", auth, addComment);
+router.get("/lesson/:lessonId", getLessonComments);
+router.post("/", protect, addComment);
 
 module.exports = router;

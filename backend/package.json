@@ -21,8 +21,8 @@
     "multer": "^2.0.2",
     "nodemailer": "^8.0.2",
     "pdfkit": "^0.15.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "jest": "^29.7.0",

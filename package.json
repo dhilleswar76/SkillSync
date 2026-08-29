@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "description": "Full-stack MERN learning management system",
   "scripts": {
-    "install-backend": "cd student-portal-backend && npm install",
+    "install-backend": "cd backend && npm install",
     "install-frontend": "cd frontend && npm install",
     "install-all": "npm run install-backend && npm run install-frontend",
-    "backend": "cd student-portal-backend && npm run dev",
+    "backend": "cd backend && npm run dev",
     "frontend": "cd frontend && npm run dev",
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "seed": "cd student-portal-backend && npm run seed",
-    "test-backend": "cd student-portal-backend && npm test",
+    "seed": "cd backend && npm run seed",
+    "test-backend": "cd backend && npm test",
     "build-frontend": "cd frontend && npm run build"
   },
   "keywords": [

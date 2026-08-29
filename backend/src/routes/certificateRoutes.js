@@ -1,11 +1,9 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
-const {
-  issueCertificate,
-  downloadCertificate
-} = require("../controllers/certificateController");
+const express = require("express");
+const router = express.Router();
+const { getCertificates, generateCertificate } = require("../controllers/certificateController");
+const { protect } = require("../middlewares/authMiddleware");
 
-router.post("/", auth, issueCertificate);
-router.get("/download/:courseId", auth, downloadCertificate);
+router.get("/", protect, getCertificates);
+router.post("/", protect, generateCertificate);
 
 module.exports = router;

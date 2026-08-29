@@ -1,7 +1,10 @@
-const router = require("express").Router();
-const auth = require("../middlewares/authMiddleware");
-const { submitQuiz } = require("../controllers/quizController");
+const express = require("express");
+const router = express.Router();
+const { getQuiz, createQuiz } = require("../controllers/quizController");
+const { protect } = require("../middlewares/authMiddleware");
+const { adminOnly } = require("../middlewares/adminMiddleware");
 
-router.post("/:quizId", auth, submitQuiz);
+router.get("/:lessonOrCourseId", getQuiz);
+router.post("/", protect, adminOnly, createQuiz);
 
 module.exports = router;

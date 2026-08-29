@@ -15,6 +15,7 @@ import MyProgress from "./pages/MyProgress";
 import Certificates from "./pages/Certificates";
 import CodePractice from "./pages/CodePractice";
 import CodingSheets from "./pages/CodingSheets";
+import SuggestedSheets from "./pages/SuggestedSheets";
 import Roadmaps from "./pages/Roadmaps";
 import AllCourses from "./pages/AllCourses";
 import CourseView from "./pages/CourseView";
@@ -30,19 +31,21 @@ function App() {
           <Route path="/admin-login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/all-courses" element={<AllCourses />} />
+          <Route path="/course/:courseId" element={<CourseView />} />
           <Route path="/sheets" element={<CodingSheets />} />
+          <Route path="/suggested-sheets" element={<SuggestedSheets />} />
+          <Route path="/all-sheets" element={<SuggestedSheets />} />
+          <Route path="/roadmaps" element={<Roadmaps />} />
+          <Route path="/practice" element={<CodePractice />} />
         </Route>
 
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<StudentDashboard />} />
-            <Route path="/course/:courseId" element={<CourseView />} />
             <Route path="/lesson/:id" element={<LessonView />} />
             <Route path="/progress" element={<MyProgress />} />
             <Route path="/certificates" element={<Certificates />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/practice" element={<CodePractice />} />
-            <Route path="/roadmaps" element={<Roadmaps />} />
             <Route 
               path="/admin" 
               element={

@@ -1,501 +1,185 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
-const Roadmaps = () => {
-  const [selectedRoadmap, setSelectedRoadmap] = useState(null);
+const ROADMAPS = [
+  {
+    id: "dsa",
+    title: "DSA & Competitive Programming",
+    duration: "6-8 Months",
+    icon: "🎯",
+    color: "from-red-600 to-amber-500",
+    description: "Systematic mastery of algorithms, data structures, complexity analysis, and coding sheet problem sets.",
+    phases: [
+      {
+        name: "Phase 1: Language Basics & Complexity",
+        topics: ["C++ STL / Java Collections / JS ES6", "Time & Space Complexity", "Recursion & Math basics"],
+      },
+      {
+        name: "Phase 2: Core Linear & Non-Linear Structures",
+        topics: ["Arrays & 2-Pointers", "Linked Lists", "Stacks & Queues", "Binary Trees & BST"],
+      },
+      {
+        name: "Phase 3: Advanced Algorithms",
+        topics: ["Dynamic Programming (1D, 2D, Grid, Partition)", "Graphs (BFS/DFS, Dijkstra, MST)", "Tries & Bit Manipulation"],
+      },
+      {
+        name: "Phase 4: Interview Sheets & Contests",
+        topics: ["Striver SDE Sheet (191 Qs)", "NeetCode 150", "Weekly LeetCode & Codeforces Contests"],
+      },
+    ],
+  },
+  {
+    id: "fullstack",
+    title: "Full Stack Web Development (MERN)",
+    duration: "6-9 Months",
+    icon: "🌐",
+    color: "from-blue-600 to-cyan-500",
+    description: "End-to-end modern web engineering with React, Node.js, Express, MongoDB, Tailwind, and Cloud Deployments.",
+    phases: [
+      {
+        name: "Phase 1: Frontend Foundations",
+        topics: ["HTML5 Semantic Tags & CSS3 Flexbox/Grid", "Modern JavaScript (ES6+, Async/Await, DOM)", "Tailwind CSS"],
+      },
+      {
+        name: "Phase 2: React Ecosystem",
+        topics: ["React 18 Hooks & Lifecycle", "State Management (Context API / Redux)", "Client-Side Routing & Vite"],
+      },
+      {
+        name: "Phase 3: Backend & Database",
+        topics: ["Node.js Runtime & Express REST APIs", "MongoDB & Mongoose Schemas", "JWT Authentication & Role Security"],
+      },
+      {
+        name: "Phase 4: Production & DevOps",
+        topics: ["Cloud Deployments (Vercel, Render)", "Docker Basics & CI/CD", "Performance Optimization"],
+      },
+    ],
+  },
+  {
+    id: "ml-ai",
+    title: "Machine Learning & Generative AI",
+    duration: "8-12 Months",
+    icon: "🤖",
+    color: "from-purple-600 to-indigo-500",
+    description: "From Python data science to Deep Learning, LLMs, Transformer architectures, and vector embeddings.",
+    phases: [
+      {
+        name: "Phase 1: Python & Data Engineering",
+        topics: ["NumPy, Pandas, Matplotlib", "Linear Algebra & Probability", "Feature Engineering"],
+      },
+      {
+        name: "Phase 2: Classical Machine Learning",
+        topics: ["Linear/Logistic Regression", "Decision Trees & Random Forests", "SVMs & K-Means Clustering"],
+      },
+      {
+        name: "Phase 3: Deep Learning & Neural Networks",
+        topics: ["PyTorch Foundations", "CNNs for Computer Vision", "RNNs & LSTMs for NLP"],
+      },
+      {
+        name: "Phase 4: GenAI & LLMs",
+        topics: ["Transformers & Attention Mechanisms", "LangChain & RAG Systems", "Vector Databases & Model Fine-Tuning"],
+      },
+    ],
+  },
+  {
+    id: "devops",
+    title: "DevOps & Cloud Engineering",
+    duration: "6-8 Months",
+    icon: "⚙️",
+    color: "from-emerald-600 to-teal-500",
+    description: "Infrastructure as code, containerization, orchestration, and AWS cloud architecture.",
+    phases: [
+      {
+        name: "Phase 1: Linux & Scripting",
+        topics: ["Linux Shell Scripting & Bash", "Git & GitHub Workflows", "Networking Essentials"],
+      },
+      {
+        name: "Phase 2: Containers & Orchestration",
+        topics: ["Docker & Container Registries", "Kubernetes Pods, Services & Ingress", "Helm Charts"],
+      },
+      {
+        name: "Phase 3: CI/CD & Cloud",
+        topics: ["GitHub Actions & Jenkins", "AWS Core (EC2, S3, RDS, IAM, Lambda)", "Terraform IaC"],
+      },
+    ],
+  },
+];
 
-  const roadmaps = {
-    dsa: {
-      title: '🎯 DSA & Competitive Programming',
-      description: 'Master Data Structures and Algorithms for coding interviews',
-      duration: '6-8 months',
-      difficulty: 'Intermediate',
-      phases: [
-        {
-          phase: 'Phase 1: Programming Fundamentals',
-          duration: '2-3 weeks',
-          topics: [
-            { name: 'Basic Syntax & I/O', techniques: ['Input/Output Operations', 'String Formatting', 'File Handling'] },
-            { name: 'Control Flow', techniques: ['If-Else Statements', 'Switch Cases', 'Loops (For, While)', 'Break & Continue'] },
-            { name: 'Functions & Recursion', techniques: ['Function Parameters', 'Return Values', 'Recursive Functions', 'Base Cases'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: Arrays & String Techniques',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'Arrays', techniques: ['Two Pointers', 'Sliding Window', 'Prefix Sum', 'Kadane\'s Algorithm', 'Dutch National Flag', 'Binary Search'] },
-            { name: 'Strings', techniques: ['Pattern Matching', 'KMP Algorithm', 'Rabin-Karp', 'Anagram Checking', 'Palindrome Patterns', 'String Hashing'] },
-            { name: 'Hashing', techniques: ['HashMap/HashSet', 'Frequency Counting', 'Two Sum Pattern', 'Subarray Sum Problems'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Linked Lists & Pointers',
-          duration: '3-4 weeks',
-          topics: [
-            { name: 'Linked Lists', techniques: ['Fast & Slow Pointers', 'Reversal', 'Cycle Detection (Floyd\'s)', 'Merge Two Lists', 'Remove Nth Node', 'Dummy Node Technique'] },
-            { name: 'Stacks', techniques: ['Monotonic Stack', 'Next Greater Element', 'Valid Parentheses', 'Infix/Postfix Conversion'] },
-            { name: 'Queues', techniques: ['Circular Queue', 'Deque', 'Priority Queue', 'Sliding Window Maximum'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Trees & Graph Basics',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'Binary Trees', techniques: ['DFS (Inorder, Preorder, Postorder)', 'BFS (Level Order)', 'Height Calculation', 'Diameter', 'Lowest Common Ancestor'] },
-            { name: 'Binary Search Trees', techniques: ['BST Validation', 'Insertion & Deletion', 'Kth Smallest/Largest', 'Range Sum Queries'] },
-            { name: 'Advanced Trees', techniques: ['AVL Trees', 'Segment Trees', 'Fenwick Tree (BIT)', 'Trie', 'Suffix Trees'] },
-            { name: 'Graphs', techniques: ['BFS & DFS', 'Topological Sort', 'Cycle Detection', 'Shortest Path (Dijkstra, Bellman-Ford)', 'MST (Kruskal, Prim)', 'Union-Find'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: Advanced Algorithms',
-          duration: '8-10 weeks',
-          topics: [
-            { name: 'Dynamic Programming', techniques: ['Memoization', 'Tabulation', 'Knapsack Problems', 'LCS/LIS', 'Matrix Chain Multiplication', 'Coin Change', 'Edit Distance'] },
-            { name: 'Greedy', techniques: ['Activity Selection', 'Huffman Coding', 'Fractional Knapsack', 'Job Sequencing', 'Minimum Platforms'] },
-            { name: 'Backtracking', techniques: ['N-Queens', 'Sudoku Solver', 'Rat in Maze', 'Subset Sum', 'Permutations & Combinations'] },
-            { name: 'Bit Manipulation', techniques: ['XOR Properties', 'Set/Clear/Toggle Bits', 'Count Set Bits', 'Power of Two', 'Single Number Problems'] },
-          ],
-        },
-        {
-          phase: 'Phase 6: Problem Solving Mastery',
-          duration: 'Ongoing',
-          topics: [
-            { name: 'Practice Platforms', techniques: ['LeetCode (150+ Problems)', 'Codeforces (Div 2 & 3)', 'CodeChef', 'AtCoder', 'HackerRank'] },
-            { name: 'Contest Strategy', techniques: ['Time Management', 'Problem Selection', 'Debugging Tricks', 'Edge Case Handling'] },
-            { name: 'Interview Prep', techniques: ['Mock Interviews', 'System Design Basics', 'Behavioral Questions', 'Company-Specific Patterns'] },
-          ],
-        },
-      ],
-      careers: ['Software Engineer', 'SDE at FAANG', 'Competitive Programmer', 'Backend Developer'],
-    },
-    webdev: {
-      title: '🌐 Full Stack Web Development',
-      description: 'Build modern web applications from frontend to backend',
-      duration: '6-9 months',
-      difficulty: 'Beginner to Advanced',
-      phases: [
-        {
-          phase: 'Phase 1: Frontend Basics',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'HTML5', techniques: ['Semantic HTML', 'Forms & Validation', 'Accessibility (ARIA)', 'Meta Tags & SEO'] },
-            { name: 'CSS3', techniques: ['Flexbox', 'Grid Layout', 'Animations & Transitions', 'Media Queries', 'CSS Variables', 'Pseudo-classes'] },
-            { name: 'JavaScript', techniques: ['ES6+ Features', 'DOM Manipulation', 'Event Handling', 'Async/Await', 'Promises', 'Closures'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: React Ecosystem',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'React Fundamentals', techniques: ['JSX', 'Components', 'Props & State', 'Conditional Rendering', 'Lists & Keys'] },
-            { name: 'React Hooks', techniques: ['useState', 'useEffect', 'useContext', 'useReducer', 'useMemo', 'useCallback', 'Custom Hooks'] },
-            { name: 'State Management', techniques: ['Context API', 'Redux Toolkit', 'Zustand', 'React Query', 'Local vs Global State'] },
-            { name: 'Routing', techniques: ['React Router', 'Dynamic Routes', 'Protected Routes', 'Nested Routes', 'URL Parameters'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Backend with Node.js',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'Node.js & Express', techniques: ['Middleware', 'Routing', 'Error Handling', 'File Uploads', 'CORS'] },
-            { name: 'Databases', techniques: ['MongoDB (Mongoose)', 'PostgreSQL (Sequelize)', 'Database Design', 'Indexing', 'Transactions'] },
-            { name: 'Authentication', techniques: ['JWT', 'OAuth 2.0', 'Sessions', 'Password Hashing (bcrypt)', 'Refresh Tokens'] },
-            { name: 'REST APIs', techniques: ['RESTful Design', 'Status Codes', 'API Versioning', 'Rate Limiting', 'Pagination'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Advanced Full Stack',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'TypeScript', techniques: ['Types & Interfaces', 'Generics', 'Type Guards', 'Decorators', 'TSConfig'] },
-            { name: 'Next.js', techniques: ['SSR vs SSG', 'API Routes', 'Image Optimization', 'File-based Routing', 'Incremental Static Regeneration'] },
-            { name: 'Testing', techniques: ['Jest', 'React Testing Library', 'Integration Tests', 'E2E Testing (Playwright)', 'Test Coverage'] },
-            { name: 'Real-time', techniques: ['WebSockets', 'Socket.io', 'Server-Sent Events', 'Real-time Chat', 'Notifications'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: DevOps & Deployment',
-          duration: '3-4 weeks',
-          topics: [
-            { name: 'Version Control', techniques: ['Git Workflow', 'Branching Strategies', 'Pull Requests', 'Code Reviews'] },
-            { name: 'Cloud Deployment', techniques: ['Vercel', 'Netlify', 'AWS (EC2, S3)', 'Environment Variables', 'SSL/TLS'] },
-            { name: 'CI/CD', techniques: ['GitHub Actions', 'Docker', 'Containerization', 'Automated Testing', 'Build Pipelines'] },
-            { name: 'Performance', techniques: ['Code Splitting', 'Lazy Loading', 'Caching Strategies', 'CDN', 'Lighthouse Optimization'] },
-          ],
-        },
-      ],
-      careers: ['Full Stack Developer', 'Frontend Developer', 'Backend Developer', 'MERN Stack Developer'],
-    },
-    ml: {
-      title: '🤖 Machine Learning & AI',
-      description: 'Dive into ML algorithms, deep learning, and AI applications',
-      duration: '8-12 months',
-      difficulty: 'Advanced',
-      phases: [
-        {
-          phase: 'Phase 1: Mathematics & Python',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'Linear Algebra', techniques: ['Vectors & Matrices', 'Eigenvalues & Eigenvectors', 'Matrix Decomposition', 'Dot Product'] },
-            { name: 'Calculus', techniques: ['Derivatives', 'Gradients', 'Chain Rule', 'Partial Derivatives', 'Optimization'] },
-            { name: 'Statistics', techniques: ['Probability Distributions', 'Bayes Theorem', 'Hypothesis Testing', 'Correlation', 'Variance'] },
-            { name: 'Python for ML', techniques: ['NumPy', 'Pandas', 'Matplotlib', 'Scikit-learn', 'Data Preprocessing'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: Supervised Learning',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'Regression', techniques: ['Linear Regression', 'Polynomial Regression', 'Ridge & Lasso', 'Gradient Descent', 'Cost Functions'] },
-            { name: 'Classification', techniques: ['Logistic Regression', 'Decision Trees', 'Random Forests', 'SVM', 'Naive Bayes', 'KNN'] },
-            { name: 'Model Evaluation', techniques: ['Cross-Validation', 'Confusion Matrix', 'ROC-AUC', 'Precision-Recall', 'F1 Score', 'Overfitting/Underfitting'] },
-            { name: 'Feature Engineering', techniques: ['Feature Scaling', 'Encoding Categorical Variables', 'Feature Selection', 'PCA', 'Handling Missing Data'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Unsupervised & Ensemble',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'Clustering', techniques: ['K-Means', 'Hierarchical Clustering', 'DBSCAN', 'Gaussian Mixture Models'] },
-            { name: 'Dimensionality Reduction', techniques: ['PCA', 't-SNE', 'UMAP', 'Autoencoders'] },
-            { name: 'Ensemble Methods', techniques: ['Bagging', 'Boosting (XGBoost, LightGBM)', 'Stacking', 'Voting Classifiers'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Deep Learning',
-          duration: '8-10 weeks',
-          topics: [
-            { name: 'Neural Networks', techniques: ['Perceptron', 'Backpropagation', 'Activation Functions', 'Loss Functions', 'Optimizers (Adam, SGD)'] },
-            { name: 'CNNs', techniques: ['Convolutional Layers', 'Pooling', 'Transfer Learning', 'ResNet', 'VGG', 'Image Classification', 'Object Detection'] },
-            { name: 'RNNs & LSTMs', techniques: ['Sequential Data', 'Time Series', 'LSTM', 'GRU', 'Attention Mechanism', 'Seq2Seq Models'] },
-            { name: 'Transformers', techniques: ['Self-Attention', 'BERT', 'GPT', 'Vision Transformers', 'Tokenization', 'Fine-tuning'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: Advanced Topics & MLOps',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'NLP', techniques: ['Word Embeddings', 'TF-IDF', 'Named Entity Recognition', 'Sentiment Analysis', 'Text Generation'] },
-            { name: 'Computer Vision', techniques: ['Image Segmentation', 'Face Recognition', 'GANs', 'Style Transfer', 'OCR'] },
-            { name: 'Reinforcement Learning', techniques: ['Q-Learning', 'Policy Gradients', 'DQN', 'PPO', 'Game AI'] },
-            { name: 'MLOps', techniques: ['Model Deployment', 'Flask/FastAPI', 'Docker', 'MLflow', 'Monitoring', 'A/B Testing'] },
-          ],
-        },
-        {
-          phase: 'Phase 6: Projects & Research',
-          duration: 'Ongoing',
-          topics: [
-            { name: 'Kaggle', techniques: ['Competition Strategy', 'Feature Engineering', 'Model Ensembling', 'Leaderboard Climbing'] },
-            { name: 'Portfolio Projects', techniques: ['End-to-End ML Pipeline', 'Web App Deployment', 'API Development', 'Documentation'] },
-            { name: 'Research', techniques: ['Reading Papers', 'Implementing Papers', 'arXiv Exploration', 'Writing Blogs'] },
-          ],
-        },
-      ],
-      careers: ['ML Engineer', 'Data Scientist', 'AI Researcher', 'Computer Vision Engineer', 'NLP Engineer'],
-    },
-    mobile: {
-      title: '📱 Mobile App Development',
-      description: 'Create native and cross-platform mobile applications',
-      duration: '5-7 months',
-      difficulty: 'Intermediate',
-      phases: [
-        {
-          phase: 'Phase 1: Mobile Fundamentals',
-          duration: '2-3 weeks',
-          topics: [
-            { name: 'Mobile UI/UX', techniques: ['Material Design', 'iOS Human Interface Guidelines', 'Responsive Layouts', 'Touch Gestures', 'Animation'] },
-            { name: 'JavaScript/TypeScript', techniques: ['ES6+ Features', 'Type Safety', 'Async Programming', 'Modules', 'Error Handling'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: React Native',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'React Native Basics', techniques: ['Components', 'StyleSheet', 'Flexbox Layout', 'Platform-Specific Code', 'Hot Reloading'] },
-            { name: 'Navigation', techniques: ['React Navigation', 'Stack Navigator', 'Tab Navigator', 'Drawer Navigator', 'Deep Linking'] },
-            { name: 'State Management', techniques: ['Context API', 'Redux', 'Zustand', 'React Query', 'Async Storage'] },
-            { name: 'Native Modules', techniques: ['Bridging Native Code', 'Third-party Libraries', 'Permissions', 'Linking'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Native Development (Optional)',
-          duration: '8-10 weeks',
-          topics: [
-            { name: 'Android (Kotlin)', techniques: ['Activities & Fragments', 'RecyclerView', 'Room Database', 'Coroutines', 'Material Components'] },
-            { name: 'iOS (Swift)', techniques: ['UIKit', 'SwiftUI', 'Core Data', 'Combine', 'Auto Layout', 'Storyboards'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Advanced Features',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'Push Notifications', techniques: ['Firebase Cloud Messaging', 'OneSignal', 'Local Notifications', 'Badge Management'] },
-            { name: 'Storage & Data', techniques: ['AsyncStorage', 'SQLite', 'Realm', 'File System', 'Secure Storage'] },
-            { name: 'Media & Sensors', techniques: ['Camera & Gallery', 'Video Recording', 'Image Picker', 'Geolocation', 'Accelerometer'] },
-            { name: 'Payments', techniques: ['Stripe', 'Razorpay', 'In-App Purchases', 'Payment Gateways', 'Subscription Management'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: Testing & Publishing',
-          duration: '2-3 weeks',
-          topics: [
-            { name: 'Testing', techniques: ['Jest', 'Detox', 'Unit Testing', 'E2E Testing', 'Test Coverage'] },
-            { name: 'Publishing', techniques: ['App Store Submission', 'Google Play Console', 'App Signing', 'Release Management'] },
-            { name: 'Analytics & Monitoring', techniques: ['Firebase Analytics', 'Crashlytics', 'App Performance', 'User Behavior Tracking'] },
-          ],
-        },
-      ],
-      careers: ['Mobile App Developer', 'React Native Developer', 'Android Developer', 'iOS Developer'],
-    },
-    devops: {
-      title: '⚙️ DevOps & Cloud Engineering',
-      description: 'Automate, deploy, and manage scalable infrastructure',
-      duration: '6-8 months',
-      difficulty: 'Advanced',
-      phases: [
-        {
-          phase: 'Phase 1: Linux & Scripting',
-          duration: '3-4 weeks',
-          topics: [
-            { name: 'Linux Administration', techniques: ['Command Line', 'File Permissions', 'Process Management', 'System Logs', 'Package Managers'] },
-            { name: 'Shell Scripting', techniques: ['Bash Scripts', 'Variables & Loops', 'Functions', 'Cron Jobs', 'Automation'] },
-            { name: 'Networking', techniques: ['TCP/IP', 'DNS', 'HTTP/HTTPS', 'SSH', 'Firewalls', 'Load Balancers'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: Version Control & CI/CD',
-          duration: '4-5 weeks',
-          topics: [
-            { name: 'Git Advanced', techniques: ['Branching Strategies', 'Merge vs Rebase', 'Hooks', 'Submodules', 'Cherry-pick'] },
-            { name: 'CI/CD Pipelines', techniques: ['Jenkins', 'GitHub Actions', 'GitLab CI', 'CircleCI', 'Build Automation', 'Artifact Management'] },
-            { name: 'Testing', techniques: ['Unit Tests', 'Integration Tests', 'Security Scans', 'Code Quality', 'Test Coverage'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Containerization',
-          duration: '5-6 weeks',
-          topics: [
-            { name: 'Docker', techniques: ['Dockerfile', 'Images & Containers', 'Volumes', 'Networks', 'Multi-stage Builds', 'Docker Compose'] },
-            { name: 'Kubernetes', techniques: ['Pods & Deployments', 'Services', 'ConfigMaps & Secrets', 'Ingress', 'Helm Charts', 'StatefulSets'] },
-            { name: 'Container Security', techniques: ['Image Scanning', 'Runtime Security', 'RBAC', 'Network Policies'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Cloud Platforms',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'AWS', techniques: ['EC2', 'S3', 'RDS', 'Lambda', 'VPC', 'CloudFormation', 'ECS/EKS', 'Route53'] },
-            { name: 'Azure/GCP', techniques: ['Virtual Machines', 'Storage', 'Databases', 'Networking', 'Serverless', 'IAM'] },
-            { name: 'Cloud Security', techniques: ['IAM Policies', 'Encryption', 'Security Groups', 'Compliance', 'Cost Optimization'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: IaC & Monitoring',
-          duration: '4-6 weeks',
-          topics: [
-            { name: 'Infrastructure as Code', techniques: ['Terraform', 'Ansible', 'CloudFormation', 'Pulumi', 'State Management'] },
-            { name: 'Monitoring & Logging', techniques: ['Prometheus', 'Grafana', 'ELK Stack', 'CloudWatch', 'Alerting', 'Dashboards'] },
-            { name: 'SRE Practices', techniques: ['SLIs/SLOs/SLAs', 'Incident Management', 'Postmortems', 'On-call Rotation', 'Chaos Engineering'] },
-          ],
-        },
-      ],
-      careers: ['DevOps Engineer', 'Cloud Engineer', 'SRE', 'Platform Engineer'],
-    },
-    cybersecurity: {
-      title: '🔒 Cybersecurity',
-      description: 'Protect systems and networks from digital attacks',
-      duration: '7-10 months',
-      difficulty: 'Advanced',
-      phases: [
-        {
-          phase: 'Phase 1: Security Fundamentals',
-          duration: '4-5 weeks',
-          topics: [
-            { name: 'Networking', techniques: ['TCP/IP', 'OSI Model', 'Routing & Switching', 'Wireshark', 'Network Protocols'] },
-            { name: 'Operating Systems', techniques: ['Linux Security', 'Windows Security', 'File Systems', 'User Permissions', 'Process Management'] },
-            { name: 'Cryptography', techniques: ['Encryption/Decryption', 'Hashing', 'Digital Signatures', 'SSL/TLS', 'Public Key Infrastructure'] },
-          ],
-        },
-        {
-          phase: 'Phase 2: Offensive Security',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'Web App Security', techniques: ['OWASP Top 10', 'SQL Injection', 'XSS', 'CSRF', 'Authentication Bypass', 'Burp Suite'] },
-            { name: 'Network Pentesting', techniques: ['Nmap', 'Metasploit', 'Vulnerability Scanning', 'Port Scanning', 'Enumeration'] },
-            { name: 'Exploitation', techniques: ['Buffer Overflow', 'Privilege Escalation', 'Reverse Shells', 'Payload Generation', 'Post-Exploitation'] },
-          ],
-        },
-        {
-          phase: 'Phase 3: Defensive Security',
-          duration: '6-8 weeks',
-          topics: [
-            { name: 'Network Defense', techniques: ['Firewall Rules', 'IDS/IPS (Snort)', 'VPN Configuration', 'Network Segmentation'] },
-            { name: 'Security Monitoring', techniques: ['SIEM (Splunk)', 'Log Analysis', 'Threat Detection', 'Alert Triage', 'IOC Analysis'] },
-            { name: 'Incident Response', techniques: ['Incident Handling', 'Forensics Tools', 'Evidence Collection', 'Malware Containment', 'Reporting'] },
-          ],
-        },
-        {
-          phase: 'Phase 4: Advanced Topics',
-          duration: '5-7 weeks',
-          topics: [
-            { name: 'Malware Analysis', techniques: ['Static Analysis', 'Dynamic Analysis', 'Reverse Engineering', 'Sandboxing', 'Threat Intelligence'] },
-            { name: 'Cloud Security', techniques: ['AWS Security', 'Azure Security', 'IAM', 'Container Security', 'Serverless Security'] },
-            { name: 'Application Security', techniques: ['Secure Coding', 'Code Review', 'SAST/DAST', 'API Security', 'DevSecOps'] },
-          ],
-        },
-        {
-          phase: 'Phase 5: Certifications & Practice',
-          duration: 'Ongoing',
-          topics: [
-            { name: 'CTF & Bug Bounty', techniques: ['HackTheBox', 'TryHackMe', 'PicoCTF', 'Bug Bounty Platforms', 'Write-ups'] },
-            { name: 'Certifications', techniques: ['CompTIA Security+', 'CEH', 'OSCP', 'CISSP', 'GIAC Certifications'] },
-            { name: 'Real-world Skills', techniques: ['Threat Hunting', 'Red Team Operations', 'Blue Team Defense', 'Security Architecture'] },
-          ],
-        },
-      ],
-      careers: ['Security Analyst', 'Penetration Tester', 'Security Engineer', 'SOC Analyst'],
-    },
-  };
+export default function Roadmaps() {
+  const [selectedRoadmap, setSelectedRoadmap] = useState("dsa");
+  const current = ROADMAPS.find((r) => r.id === selectedRoadmap) || ROADMAPS[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary via-coral to-secondary py-8 sm:py-10 md:py-12">
-        <div className="container mx-auto px-4 sm:px-6">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 sm:mb-3">🗺️ Career Roadmaps</h1>
-          <p className="text-white/90 text-sm sm:text-base md:text-lg">Choose your path and master your domain</p>
+    <div className="min-h-screen bg-slate-950 text-slate-100 py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white">Career Roadmaps</h1>
+          <p className="mt-2 text-sm text-slate-400">
+            Step-by-step career blueprints designed to take you from beginner to interview-ready.
+          </p>
         </div>
-      </div>
 
-      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
-        {/* Roadmap Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
-          {Object.entries(roadmaps).map(([key, roadmap]) => (
-            <div
-              key={key}
-              className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition cursor-pointer"
-              onClick={() => setSelectedRoadmap(selectedRoadmap === key ? null : key)}
+        {/* Roadmap Selector Tabs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {ROADMAPS.map((r) => (
+            <button
+              key={r.id}
+              onClick={() => setSelectedRoadmap(r.id)}
+              className={`p-4 rounded-xl text-left border transition-all ${
+                selectedRoadmap === r.id
+                  ? "bg-slate-900 border-red-500 ring-2 ring-red-500/20 shadow-lg"
+                  : "bg-slate-900/60 border-slate-800 hover:bg-slate-900 hover:border-slate-700"
+              }`}
             >
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-                {roadmap.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {roadmap.description}
-              </p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs font-medium">
-                  ⏱️ {roadmap.duration}
-                </span>
-                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  roadmap.difficulty === 'Beginner to Advanced' || roadmap.difficulty === 'Intermediate'
-                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400'
-                    : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'
-                }`}>
-                  📊 {roadmap.difficulty}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-2xl">{r.icon}</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+                  {r.duration}
                 </span>
               </div>
-              <button className="w-full px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition">
-                {selectedRoadmap === key ? 'Hide Details' : 'View Roadmap'}
-              </button>
-            </div>
+              <h3 className="font-bold text-sm text-white">{r.title}</h3>
+            </button>
           ))}
         </div>
 
-        {/* Detailed Roadmap View */}
-        {selectedRoadmap && (
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-4 sm:p-6 md:p-8 shadow-xl border border-gray-200 dark:border-gray-700 mb-8">
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex-1 min-w-0 pr-4">
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">
-                  {roadmaps[selectedRoadmap].title}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  {roadmaps[selectedRoadmap].description}
-                </p>
-              </div>
-              <button
-                onClick={() => setSelectedRoadmap(null)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Career Paths */}
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-3">💼 Career Opportunities</h3>
-              <div className="flex flex-wrap gap-2">
-                {roadmaps[selectedRoadmap].careers.map((career) => (
-                  <span
-                    key={career}
-                    className="px-4 py-2 bg-gradient-to-r from-primary to-coral text-white rounded-lg text-sm font-medium"
-                  >
-                    {career}
-                  </span>
-                ))}
+        {/* Selected Roadmap Timeline */}
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">{current.icon}</span>
+              <div>
+                <h2 className="text-2xl font-extrabold text-white">{current.title}</h2>
+                <p className="text-xs text-slate-400">{current.description}</p>
               </div>
             </div>
-
-            {/* Learning Phases */}
-            <div>
-              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">📚 Learning Path</h3>
-              <div className="space-y-4">
-                {roadmaps[selectedRoadmap].phases.map((phase, index) => (
-                  <div
-                    key={index}
-                    className="border-l-4 border-primary pl-6 py-2"
-                  >
-                    <div className="flex items-center gap-3 mb-2">
-                      <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
-                        {index + 1}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-gray-900 dark:text-white">{phase.phase}</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Duration: {phase.duration}</p>
-                      </div>
-                    </div>
-                    <div className="space-y-3 mt-4">
-                      {phase.topics.map((topic, topicIndex) => (
-                        <div key={topicIndex} className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg">
-                          <h5 className="font-semibold text-gray-900 dark:text-white mb-2">{topic.name}</h5>
-                          <div className="flex flex-wrap gap-2">
-                            {topic.techniques.map((technique, techIndex) => (
-                              <span
-                                key={techIndex}
-                                className="px-3 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full text-xs border border-gray-200 dark:border-gray-600"
-                              >
-                                {technique}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="mt-8 p-6 bg-gradient-to-r from-primary/10 to-coral/10 dark:from-primary/20 dark:to-coral/20 rounded-xl border border-primary/20">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Ready to Start?</h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Enroll in our comprehensive courses and start your journey today!
-              </p>
-              <Link
-                to="/all-courses"
-                className="inline-block px-6 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-medium transition shadow-md"
-              >
-                Browse Courses →
-              </Link>
-            </div>
+            <Link
+              to="/sheets"
+              className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white text-xs font-bold rounded-xl shadow-md"
+            >
+              Practice Relevant Sheets →
+            </Link>
           </div>
-        )}
+
+          <div className="space-y-6 pt-2">
+            {current.phases.map((phase, idx) => (
+              <div key={idx} className="relative pl-6 border-l-2 border-red-500/40 space-y-2">
+                <div className="absolute -left-2 top-0 w-4 h-4 rounded-full bg-red-500 border-2 border-slate-900" />
+                <h4 className="font-bold text-base text-red-400">{phase.name}</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
+                  {phase.topics.map((t, i) => (
+                    <div
+                      key={i}
+                      className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 flex items-center gap-2"
+                    >
+                      <span className="text-emerald-400">✓</span>
+                      <span>{t}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
-};
-
-export default Roadmaps;
+}

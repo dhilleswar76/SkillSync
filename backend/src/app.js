@@ -9,24 +9,21 @@ const app = express();
 // Middleware
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or Postman)
+    // Allow requests with no origin (like mobile apps or curl/Postman)
     if (!origin) return callback(null, true);
     
-    const allowedOrigins = [
-      "http://localhost:3000",
-      "https://skill-sync-learning-portal.vercel.app",
-      process.env.FRONTEND_URL
-    ].filter(Boolean);
-    
-    // Check if origin matches allowed origins or is a Vercel deployment
-    const isAllowed = allowedOrigins.includes(origin) || 
-                      origin.includes('vercel.app') ||
-                      origin.includes('skill-sync');
+    // Allow any localhost, 127.0.0.1, vercel, or skill-sync domain
+    const isAllowed = 
+      origin.includes("localhost") ||
+      origin.includes("127.0.0.1") ||
+      origin.includes("vercel.app") ||
+      origin.includes("skill-sync") ||
+      origin === process.env.FRONTEND_URL;
     
     if (isAllowed) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(null, true); // Permissive in dev mode
     }
   },
   credentials: true

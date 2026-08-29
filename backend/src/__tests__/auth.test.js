@@ -1,15 +1,15 @@
-jest.mock("../src/models/User", () => ({
+jest.mock("../models/User", () => ({
   findOne: jest.fn(),
   create: jest.fn(),
   findById: jest.fn(),
   findByIdAndUpdate: jest.fn(),
 }));
 
-jest.mock("../src/utils/generateToken", () => jest.fn(() => "test-token"));
+jest.mock("../utils/generateToken", () => jest.fn(() => "test-token"));
 
 const request = require("supertest");
-const app = require("../src/app");
-const User = require("../src/models/User");
+const app = require("../app");
+const User = require("../models/User");
 
 describe("Auth API", () => {
   it("registers user", async () => {

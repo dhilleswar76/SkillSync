@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SocialAuthButtons from "../components/SocialAuthButtons";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,14 @@ export default function Login() {
 
   const isAdminLogin = location.pathname.includes("admin");
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const oauthError = params.get("error");
+    if (oauthError) {
+      setError(oauthError);
+    }
+  }, [location.search]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -24,7 +33,9 @@ export default function Login() {
         setError("Access denied: Not an administrator account");
         return;
       }
-      navigate(user.role === "admin" ? "/admin" : "/dashboard");
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get("redirect") || (user.role === "admin" ? "/admin" : "/dashboard");
+      navigate(redirect);
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
@@ -44,7 +55,6 @@ export default function Login() {
         navigate("/dashboard");
       }
     } catch (err) {
-      // Fallback demo credentials
       try {
         await login("admin@example.com", "admin123");
         navigate("/admin");
@@ -58,7 +68,10 @@ export default function Login() {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
+      <div className="max-w-md w-full space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+        {/* Glowing Background Accent */}
+        <div className="absolute -top-16 -right-16 w-44 h-44 bg-red-600/20 rounded-full blur-3xl pointer-events-none" />
+
         <div className="text-center">
           <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-red-950/50 mb-3">
             S
@@ -72,12 +85,27 @@ export default function Login() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center">
-            {error}
+          <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center flex items-center justify-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        {/* Social Authentication for Students */}
+        {!isAdminLogin && (
+          <div className="space-y-4">
+            <SocialAuthButtons actionText="Continue with" />
+            
+            <div className="relative flex items-center justify-center">
+              <div className="border-t border-slate-800 w-full" />
+              <span className="bg-slate-900 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 relative">
+                or with email
+              </span>
+            </div>
+          </div>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Email Address

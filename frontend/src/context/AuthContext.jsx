@@ -64,6 +64,19 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
+  const loginWithOAuthData = (userData, authToken) => {
+    setUser(userData);
+    setToken(authToken);
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", authToken);
+
+    // Execute pending action if any
+    if (pendingAction && typeof pendingAction === "function") {
+      pendingAction();
+      setPendingAction(null);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
@@ -114,6 +127,7 @@ export const AuthProvider = ({ children }) => {
         closeAuthModal,
         requireAuth,
         login,
+        loginWithOAuthData,
         register,
         logout,
         updateUserData,

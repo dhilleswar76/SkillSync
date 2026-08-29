@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SocialAuthButtons from "./SocialAuthButtons";
 
 export default function AuthModal() {
   const { isAuthModalOpen, closeAuthModal, authModalMessage, login, register } = useAuth();
@@ -60,14 +61,14 @@ export default function AuthModal() {
         </button>
 
         {/* Modal Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white text-2xl mx-auto mb-3 shadow-lg shadow-red-950/50">
             🔐
           </div>
           <h3 className="text-xl font-extrabold text-white">
             {isRegisterMode ? "Create a Free Account" : "Sign In to Access"}
           </h3>
-          <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
             {authModalMessage ||
               "Sign in or create an account to save your progress, solve problems, submit code, and earn certificates."}
           </p>
@@ -80,8 +81,23 @@ export default function AuthModal() {
           </div>
         )}
 
+        {/* 1-Click Social Sign In */}
+        <div className="mb-4 space-y-3">
+          <SocialAuthButtons 
+            actionText="Continue with" 
+            onInitiate={() => closeAuthModal()}
+          />
+          
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-slate-800 w-full" />
+            <span className="bg-slate-900 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 relative">
+              or with email
+            </span>
+          </div>
+        </div>
+
         {/* Quick Auth Form */}
-        <form onSubmit={handleSubmit} className="space-y-3.5">
+        <form onSubmit={handleSubmit} className="space-y-3">
           {isRegisterMode && (
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
@@ -143,7 +159,7 @@ export default function AuthModal() {
         </form>
 
         {/* Switch Between Login & Register */}
-        <div className="mt-4 pt-4 border-t border-slate-800/80 text-center space-y-2">
+        <div className="mt-4 pt-3 border-t border-slate-800/80 text-center space-y-2">
           <p className="text-xs text-slate-400">
             {isRegisterMode ? "Already have an account?" : "Don't have an account yet?"}{" "}
             <button

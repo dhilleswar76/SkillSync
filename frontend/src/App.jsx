@@ -7,6 +7,7 @@ import AdminRoute from "./components/AdminRoute";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import OAuthCallback from "./pages/OAuthCallback";
 import StudentDashboard from "./pages/StudentDashboard";
 import LessonView from "./pages/LessonView";
 import AdminDashboard from "./pages/AdminDashboard";
@@ -30,6 +31,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin-login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/oauth-callback" element={<OAuthCallback />} />
+          <Route path="/oauth/callback" element={<OAuthCallback />} />
           <Route path="/all-courses" element={<AllCourses />} />
           <Route path="/course/:courseId" element={<CourseView />} />
           <Route path="/sheets" element={<CodingSheets />} />

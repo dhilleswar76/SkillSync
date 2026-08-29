@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SocialAuthButtons from "../components/SocialAuthButtons";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -12,6 +13,7 @@ export default function Register() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,7 +21,9 @@ export default function Register() {
     setLoading(true);
     try {
       await register(name, email, password, "student", phone);
-      navigate("/dashboard");
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get("redirect") || "/dashboard";
+      navigate(redirect);
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed");
     } finally {
@@ -29,7 +33,10 @@ export default function Register() {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
+      <div className="max-w-md w-full space-y-6 bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl relative overflow-hidden">
+        {/* Glowing Background Accent */}
+        <div className="absolute -top-16 -right-16 w-44 h-44 bg-red-600/20 rounded-full blur-3xl pointer-events-none" />
+
         <div className="text-center">
           <div className="w-12 h-12 mx-auto rounded-xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-red-950/50 mb-3">
             S
@@ -41,12 +48,25 @@ export default function Register() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center">
-            {error}
+          <div className="p-3 bg-red-950/60 border border-red-800/80 rounded-xl text-red-300 text-xs text-center flex items-center justify-center gap-2">
+            <span>⚠️</span>
+            <span>{error}</span>
           </div>
         )}
 
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+        {/* 1-Click Social Sign Up */}
+        <div className="space-y-4">
+          <SocialAuthButtons actionText="Sign up with" />
+          
+          <div className="relative flex items-center justify-center">
+            <div className="border-t border-slate-800 w-full" />
+            <span className="bg-slate-900 px-3 text-[11px] font-semibold uppercase tracking-wider text-slate-500 relative">
+              or register with email
+            </span>
+          </div>
+        </div>
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">
               Full Name

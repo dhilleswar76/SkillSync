@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -6,66 +6,68 @@ export default function OAuthCallback() {
   const [status, setStatus] = useState("processing"); // 'processing' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState("");
   const [userName, setUserName] = useState("");
+  const hasProcessed = useRef(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const { loginWithOAuthData } = useAuth();
 
   useEffect(() => {
-    const handleCallback = async () => {
-      const params = new URLSearchParams(location.search);
-      const error = params.get("error") || params.get("error_description");
-      const token = params.get("token");
-      const rawUser = params.get("user");
-      const redirect = params.get("redirect") || "/dashboard";
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
 
-      if (error) {
-        setStatus("error");
-        setErrorMessage(error);
-        return;
-      }
+    const params = new URLSearchParams(location.search);
+    const error = params.get("error") || params.get("error_description");
+    const token = params.get("token");
+    const rawUser = params.get("user");
+    const redirect = params.get("redirect") || "/dashboard";
 
-      if (!token) {
-        setStatus("error");
-        setErrorMessage("No authentication token received from the identity provider.");
-        return;
-      }
+    if (error) {
+      setStatus("error");
+      setErrorMessage(error);
+      return;
+    }
 
-      try {
-        let userData = {};
-        if (rawUser) {
+    if (!token) {
+      setStatus("error");
+      setErrorMessage("No authentication token received from the identity provider.");
+      return;
+    }
+
+    try {
+      let userData = {};
+      if (rawUser) {
+        try {
+          userData = JSON.parse(decodeURIComponent(rawUser));
+        } catch {
           try {
-            userData = JSON.parse(decodeURIComponent(rawUser));
-          } catch {
-            try {
-              userData = JSON.parse(rawUser);
-            } catch (err) {
-              console.warn("Could not parse user payload:", err);
-            }
+            userData = JSON.parse(rawUser);
+          } catch (err) {
+            console.warn("Could not parse user payload:", err);
           }
         }
-
-        if (userData.name) {
-          setUserName(userData.name);
-        }
-
-        // Update context & storage
-        loginWithOAuthData(userData, token);
-        setStatus("success");
-
-        // Smooth redirect after brief animation
-        setTimeout(() => {
-          navigate(redirect, { replace: true });
-        }, 800);
-      } catch (err) {
-        console.error("OAuth processing failed:", err);
-        setStatus("error");
-        setErrorMessage("An unexpected error occurred while finalizing your login.");
       }
-    };
 
-    handleCallback();
-  }, [location.search, navigate, loginWithOAuthData]);
+      if (userData.name) {
+        setUserName(userData.name);
+      }
+
+      // Update context & storage
+      loginWithOAuthData(userData, token);
+      setStatus("success");
+
+      // Single clean navigation after brief confirmation animation
+      const timer = setTimeout(() => {
+        navigate(redirect, { replace: true });
+      }, 700);
+
+      return () => clearTimeout(timer);
+    } catch (err) {
+      console.error("OAuth processing failed:", err);
+      setStatus("error");
+      setErrorMessage("An unexpected error occurred while finalizing your login.");
+    }
+  }, []); // Run strictly once on mount
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import API from "../api/axios";
 
 const AuthContext = createContext();
@@ -16,6 +16,13 @@ export const AuthProvider = ({ children }) => {
   const [authModalMessage, setAuthModalMessage] = useState("");
   const [pendingAction, setPendingAction] = useState(null);
 
+  const logout = useCallback(() => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+  }, []);
+
   useEffect(() => {
     const fetchUser = async () => {
       if (token) {
@@ -32,9 +39,9 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUser();
-  }, [token]);
+  }, [token, logout]);
 
-  const login = async (email, password) => {
+  const login = useCallback(async (email, password) => {
     const res = await API.post("/auth/login", { email, password });
     setUser(res.data);
     setToken(res.data.token);
@@ -47,9 +54,9 @@ export const AuthProvider = ({ children }) => {
       setPendingAction(null);
     }
     return res.data;
-  };
+  }, [pendingAction]);
 
-  const register = async (name, email, password, role = "student", phone) => {
+  const register = useCallback(async (name, email, password, role = "student", phone) => {
     const res = await API.post("/auth/register", { name, email, password, role, phone });
     setUser(res.data);
     setToken(res.data.token);
@@ -62,9 +69,9 @@ export const AuthProvider = ({ children }) => {
       setPendingAction(null);
     }
     return res.data;
-  };
+  }, [pendingAction]);
 
-  const loginWithOAuthData = (userData, authToken) => {
+  const loginWithOAuthData = useCallback((userData, authToken) => {
     setUser(userData);
     setToken(authToken);
     localStorage.setItem("user", JSON.stringify(userData));
@@ -75,33 +82,26 @@ export const AuthProvider = ({ children }) => {
       pendingAction();
       setPendingAction(null);
     }
-  };
+  }, [pendingAction]);
 
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-  };
-
-  const updateUserData = (updatedUser) => {
+  const updateUserData = useCallback((updatedUser) => {
     setUser(updatedUser);
     localStorage.setItem("user", JSON.stringify(updatedUser));
-  };
+  }, []);
 
-  const openAuthModal = (message = "") => {
+  const openAuthModal = useCallback((message = "") => {
     setAuthModalMessage(message);
     setIsAuthModalOpen(true);
-  };
+  }, []);
 
-  const closeAuthModal = () => {
+  const closeAuthModal = useCallback(() => {
     setIsAuthModalOpen(false);
     setPendingAction(null);
-  };
+  }, []);
 
   // requireAuth: If user is logged in, executes action immediately.
   // If not logged in, opens the auth modal with custom message and saves the action to run after login.
-  const requireAuth = (action, message = "Please sign in to complete this action and save your progress.") => {
+  const requireAuth = useCallback((action, message = "Please sign in to complete this action and save your progress.") => {
     if (user) {
       if (typeof action === "function") action();
       return true;
@@ -111,7 +111,7 @@ export const AuthProvider = ({ children }) => {
       setIsAuthModalOpen(true);
       return false;
     }
-  };
+  }, [user]);
 
   return (
     <AuthContext.Provider

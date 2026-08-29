@@ -3,10 +3,10 @@ const generateToken = require("../utils/generateToken");
 
 // Helper to determine frontend URL for OAuth callback redirects
 const getFrontendUrl = (req, stateOrigin) => {
-  if (stateOrigin && typeof stateOrigin === "string" && stateOrigin.startsWith("http")) {
-    return stateOrigin.replace(/\/+$/, "");
+  if (stateOrigin && typeof stateOrigin === "string" && stateOrigin.trim().startsWith("http")) {
+    return stateOrigin.trim().replace(/\/+$/, "");
   }
-  const envFrontend = process.env.FRONTEND_URL;
+  const envFrontend = process.env.FRONTEND_URL?.trim();
   if (envFrontend && envFrontend.startsWith("http")) {
     return envFrontend.replace(/\/+$/, "");
   }
@@ -16,11 +16,11 @@ const getFrontendUrl = (req, stateOrigin) => {
 // Helper to get backend redirect URI dynamically or from env
 const getRedirectUri = (req, provider) => {
   const envUri = provider === "google" 
-    ? process.env.GOOGLE_REDIRECT_URI 
-    : process.env.GITHUB_REDIRECT_URI;
+    ? process.env.GOOGLE_REDIRECT_URI?.trim()
+    : process.env.GITHUB_REDIRECT_URI?.trim();
 
   if (envUri && !envUri.startsWith("your_")) {
-    return envUri;
+    return envUri.replace(/[\r\n\s]+$/, "");
   }
 
   // Fallback to current request host
@@ -158,16 +158,25 @@ const oauthLogin = async (req, res) => {
 // @desc Start Google OAuth
 // @route GET /api/auth/google/start
 const googleStart = (req, res) => {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  if (!clientId || clientId.startsWith("your_")) {
-    return res.status(503).json({ message: "Google OAuth is not configured" });
-  }
-
-  const redirectUri = getRedirectUri(req, "google");
+  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
   const stateObj = {
     redirect: req.query.redirect || "/dashboard",
     origin: req.query.origin || (req.headers.referer ? new URL(req.headers.referer).origin : ""),
   };
+  const frontendUrl = getFrontendUrl(req, stateObj.origin);
+
+  if (!clientId || clientId.startsWith("your_")) {
+    if (req.query.format === "json") {
+      return res.status(503).json({ message: "Google OAuth is not configured on the server" });
+    }
+    return res.redirect(
+      `${frontendUrl}/login?error=${encodeURIComponent(
+        "Google OAuth credentials (GOOGLE_CLIENT_ID) are not configured in your backend environment yet."
+      )}`
+    );
+  }
+
+  const redirectUri = getRedirectUri(req, "google");
   const state = Buffer.from(JSON.stringify(stateObj)).toString("base64");
 
   const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${encodeURIComponent(
@@ -211,8 +220,8 @@ const googleCallback = async (req, res) => {
   }
 
   try {
-    const clientId = process.env.GOOGLE_CLIENT_ID;
-    const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+    const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
+    const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
     const redirectUri = getRedirectUri(req, "google");
 
     if (!clientId || !clientSecret) {
@@ -304,16 +313,25 @@ const googleCallback = async (req, res) => {
 // @desc Start GitHub OAuth
 // @route GET /api/auth/github/start
 const githubStart = (req, res) => {
-  const clientId = process.env.GITHUB_CLIENT_ID;
-  if (!clientId || clientId.startsWith("your_")) {
-    return res.status(503).json({ message: "GitHub OAuth is not configured" });
-  }
-
-  const redirectUri = getRedirectUri(req, "github");
+  const clientId = process.env.GITHUB_CLIENT_ID?.trim();
   const stateObj = {
     redirect: req.query.redirect || "/dashboard",
     origin: req.query.origin || (req.headers.referer ? new URL(req.headers.referer).origin : ""),
   };
+  const frontendUrl = getFrontendUrl(req, stateObj.origin);
+
+  if (!clientId || clientId.startsWith("your_")) {
+    if (req.query.format === "json") {
+      return res.status(503).json({ message: "GitHub OAuth is not configured on the server" });
+    }
+    return res.redirect(
+      `${frontendUrl}/login?error=${encodeURIComponent(
+        "GitHub OAuth credentials (GITHUB_CLIENT_ID) are not configured in your backend environment yet."
+      )}`
+    );
+  }
+
+  const redirectUri = getRedirectUri(req, "github");
   const state = Buffer.from(JSON.stringify(stateObj)).toString("base64");
 
   const url = `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(
@@ -355,8 +373,8 @@ const githubCallback = async (req, res) => {
   }
 
   try {
-    const clientId = process.env.GITHUB_CLIENT_ID;
-    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+    const clientId = process.env.GITHUB_CLIENT_ID?.trim();
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET?.trim();
     const redirectUri = getRedirectUri(req, "github");
 
     if (!clientId || !clientSecret) {
@@ -483,8 +501,8 @@ const githubCallback = async (req, res) => {
 // @desc Get OAuth Configuration Status
 // @route GET /api/auth/oauth-config
 const getOAuthConfig = (req, res) => {
-  const googleClientId = process.env.GOOGLE_CLIENT_ID;
-  const githubClientId = process.env.GITHUB_CLIENT_ID;
+  const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim();
+  const githubClientId = process.env.GITHUB_CLIENT_ID?.trim();
 
   res.json({
     googleEnabled: !!(googleClientId && !googleClientId.startsWith("your_")),
